@@ -14,7 +14,7 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 
 ## 当前完成状态与开工准备
 
-截至 2026-10-06，**已完成的是 Guardian 工程骨架和单次运行的 Mock 闭环，尚未完成真实链上异常调查、持续监控或真实自动换币**。上述产品目标不代表这些能力已在当前仓库实现。
+截至 2026-10-07，**已完成的是 Guardian 工程骨架和单次运行的 Mock 闭环，尚未完成真实链上异常调查、持续监控或真实自动换币**。上述产品目标不代表这些能力已在当前仓库实现。
 
 | 内容 | 当前状态 |
 | --- | --- |
@@ -22,18 +22,18 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 | Agent 无执行权、Policy 硬门控、白名单、单向转换、额度和独立重读验证 | 已实现并有测试 |
 | 首页和 `POST /api/rescue` | 已实现，点击一次运行一次固定 Mock 场景 |
 | Ethereum 钱包 ETH 余额、实时价格及链上资金异常读取 | 主 Guardian 尚未接入；已有真实 Aave 读取仅为独立扩展 |
-| 链上信号与结构化调查证据 | 尚未实现、尚未冻结；当前 evidence 为 `string[]`，confidence 固定为 0.88 |
+| 链上信号与结构化证据 | `OnchainSignalState` / `OnchainEvidence` 已冻结并实现 Zod/infer 与测试；尚未接入运行流程，现有调查 evidence 仍为 `string[]`、confidence 固定为 0.88 |
 | 持续监控与异常触发调查 | 尚未实现；当前每次请求都运行调查，并创建新的 Mock 场景 |
 | 同钱包跨轮重复/并发执行保护 | 尚未实现；Mock 状态内拒绝重复转换不等于持续监控下的保护 |
 | 四人下一阶段开发 | 职责已划分，本仓库尚未开始本轮真实能力接入；具体任务单待细化 |
-| 团队共同代码基线 | 以本仓库 `main` 为共享 Mock 基线；新增链上调查与监控仍需先冻结契约再开发 |
+| 团队共同代码基线 | 团队以 `main` 中的 Guardian Mock 骨架和冻结链上合同为共同基线，从同一提交创建各自工作分支 |
 
-现有冻结范围见 [Guardian Mock 设计](docs/loopx/design/2026-10-06-risk-guardian/需求设计文档.md)。该记录中的“无未决问题”指已完成的 Mock 架构纠偏，不包括后续新增的链上异常和持续监控需求。
+现有冻结范围见 [Guardian Mock 设计](docs/loopx/design/2026-10-06-risk-guardian/需求设计文档.md) 与 [A→B 链上合同设计](docs/loopx/design/2026-10-06-onchain-contracts/需求设计文档.md)。两份记录中的“无未决问题”分别指 Mock 架构纠偏和这两个数据合同，不代表真实采集与持续监控已实现。
 
-正式分工前仍需完成：
+A/B 已可按冻结合同分别开发采集与分析。后续实现任务仍需明确：
 
-- 确定第一版观察哪一种链上资金异常，以及地址范围、时间窗口和异常阈值。
-- 冻结独立链上信号、可核验调查证据及监控/重复执行规则；不把这些数据偷偷塞进 Portfolio。
+- 第一版信号已确定为 `DEX_SELL_PRESSURE`；在采集任务中配置 DEX/池范围、窗口长度、交易识别和 USD 估值来源，在分析任务中确定异常阈值。
+- 在监控任务中确定调度和重复执行规则；链上信号保持独立，不放进 Portfolio。
 - 确认 36 小时交付范围，明确哪些能力接真实数据、哪些保留 Mock。
 - 为 ABCD 写明输入、输出、文件范围、交付节点和验收标准；开工时从 `main` 的同一提交创建各自的工作分支。
 
@@ -147,18 +147,37 @@ tests/
 
 | 开发者 | 主要目录 | 下一步职责 |
 | --- | --- | --- |
-| A | `src/modules/portfolio/`、`src/modules/market/` | 钱包 ETH 余额、ETH 行情及链上资金数据；链上信号的独立合同和目录待共同冻结，不能与 Portfolio 混用 |
-| B | `src/modules/risk/`、`src/modules/investigation/` | 异常识别、风险计算、压力测试、Agent 调查和证据整理；只输出分析，不获得交易权限 |
+| A | `src/modules/portfolio/`、`src/modules/market/` | 钱包 ETH 余额、ETH 行情及链上资金数据；按冻结的 `OnchainSignalState` 输出，采集实现目录在 A/D 集成任务中确定，不与 Portfolio 混用 |
+| B | `src/modules/risk/`、`src/modules/investigation/` | 消费冻结的链上信号与证据，开发异常识别、风险计算、压力测试和调查；只输出分析，不获得交易权限 |
 | C | `src/modules/policy/`、`src/modules/execution/` | 用户预设规则、白名单、额度与受限执行；配合监控规则防止重复动作，当前执行仍为 Mock |
 | D | `src/app/`、`src/integration/`、`src/modules/rescue/` | Dashboard、API、监控入口、异常触发与流程集成，负责执行后的独立重读和效果展示 |
 
-此表描述下一阶段的职责边界，不表示四名开发者已经开工，也不替代具体任务单。真实 Adapter 的接入范围需按上一节完成确认；本次 README 更新没有启用真实钱包、LLM 或交易。
+此表描述下一阶段的职责边界，不表示四名开发者已经开工，也不替代具体任务单。A/B 的数据交接边界已冻结，可各自从样例开发；真实 Adapter 的接入与监控任务需按上一节明确范围。
 
 `src/domain/` 是共同稳定边界，`src/mocks/` 与公共配置由集成负责人协调，顺序整合变更。Adapter 实现由各负责人维护，D 在 composition root 注入；业务层不知道具体 Mock 类型。可选 Aave 扩展单独维护，不能作为新 Portfolio 或短周期 Market 的替代源。
 
 ## 数据合同与 API
 
 全部核心 schema 的字段、范围和跨字段约束见 [contracts.md](docs/contracts.md)。三项核心边界为 `PortfolioState`、`RiskAnalysis`、`PolicyDecision`；`MarketState` 独立存在。Zod 是唯一真源，TypeScript 类型由 `z.infer` 推导。对象严格拒绝未知字段。
+
+### A→B 链上数据交接
+
+两个新增合同从公共入口导入：
+
+```typescript
+import { OnchainSignalStateSchema, OnchainEvidenceSchema } from "@/domain/schemas";
+import type { OnchainSignalState, OnchainEvidence } from "@/domain/types";
+```
+
+A 输出 `OnchainSignalState`，包含 ETH 卖压类型、UTC 观察窗口、当前与基线卖出美元额、异常倍数、交易数、钱包数及 `OnchainEvidence[]`。B 消费同一个结构，结合证据做调查；证据与 Agent 建议均不构成执行授权。C 继续以 PolicyDecision 为执行入口，D 负责后续装配。
+
+- 当前窗口为 `[windowStart, windowEnd)`；基线是紧邻之前的一个等长窗口。
+- 卖出额统计 ETH **总卖出额，不减买入**；`anomalyRatio = currentSellVolumeUsd / baselineSellVolumeUsd`，表示倍数，不是百分比。
+- 基线必须大于 0；为 0 时拒绝生成有效信号。当前卖出额可以为 0。
+- `txCount` 按 ETH 卖出交易的 txHash 去重，`uniqueWallets` 按这些交易的原始 `tx.from` 去重，不使用 router/池地址。
+- `TRANSACTION` 必填 txHash；`BLOCK` 必填 blockHash；`CONTRACT_EVENT` 必填 txHash 与 contractAddress。三类均要求 blockNumber、description、source。
+
+完整字段、校验规则、证据抽样口径和可解析 JSON 示例见 [链上合同](docs/contracts.md)。格式校验不证明链上事实，A 负责真实来源，B 负责证据对结论的支持程度。本次没有修改现有 Investigation 签名、`string[]` 证据、RescueSession 或 API；接入运行流程属于后续集成任务。
 
 ```http
 POST /api/rescue
@@ -198,6 +217,7 @@ OpenAPI 文档验证范围为 JSON 解析、内部引用及示例对 Zod 合同�
 ## 验收标准
 
 - [ ] `pnpm typecheck`、`pnpm test`、`pnpm build` 全部通过。
+- [ ] 两个链上合同可从公共入口导入；测试验证三类证据必填引用、零基线拒绝、ratio 一致性、UTC 窗口、计数关系及未知字段拒绝。
 - [ ] 无真实 Key/RPC 时启动核心页面，明确显示 MOCK MODE。
 - [ ] Run Demo 展示 10 ETH / $30,000 / 100% → 模拟 $3,000 → $2,700 → Risk 91 / Confidence 88% → Policy Triggered → Mock 3 ETH → 8,100 USDC → 独立重读 7 ETH / 8,100 USDC / 70% → PASSED。
 - [ ] 页面解释 $3,000 价值变化来自市场冲击，压力测试基于 before 快照。

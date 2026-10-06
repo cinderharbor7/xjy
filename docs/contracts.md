@@ -5,7 +5,7 @@
 ## 公共规则
 
 - wallet 与 symbol trim 后非空；核心 Mock wallet 允许测试标签，不要求真实地址。
-- USD / balance 为有限非负数，比例和风险/波动分数为 `[0,100]`，confidence 为 `[0,1]`。
+- USD / balance 为有限非负数，敞口/动作百分比和风险/波动分数为 `[0,100]`，confidence 为 `[0,1]`；anomalyRatio 是有限非负倍数，没有 100 的上限。
 - timestamp 是 UTC ISO 8601；可选 blockNumber 为非负安全整数；tokenAddress 是 `0x` 加 40 位十六进制。
 - action 仅 `NONE | SWAP_TO_SAFE`；白名单由服务端提前配置，请求或 Agent 不能提供授权。
 - **reduceExposurePct / maxDeRiskPct 单位为风险敞口百分点**。80% 降低 30 个百分点 → 50%。
@@ -41,6 +41,48 @@ type MarketState = {
   priceChange1hPct: number;
   volatilityScore: number;
   timestamp: string;
+};
+
+type OnchainEvidence =
+  | {
+      type: "TRANSACTION";
+      txHash: string;
+      blockHash?: string;
+      blockNumber: number;
+      contractAddress?: string;
+      description: string;
+      source: string;
+    }
+  | {
+      type: "BLOCK";
+      txHash?: string;
+      blockHash: string;
+      blockNumber: number;
+      contractAddress?: string;
+      description: string;
+      source: string;
+    }
+  | {
+      type: "CONTRACT_EVENT";
+      txHash: string;
+      blockHash?: string;
+      blockNumber: number;
+      contractAddress: string;
+      description: string;
+      source: string;
+    };
+
+type OnchainSignalState = {
+  signalType: "DEX_SELL_PRESSURE";
+  asset: "ETH";
+  windowStart: string;
+  windowEnd: string;
+  currentSellVolumeUsd: number;
+  baselineSellVolumeUsd: number;
+  anomalyRatio: number;
+  txCount: number;
+  uniqueWallets: number;
+  evidence: OnchainEvidence[];
 };
 
 type StressTestResult = {
@@ -119,6 +161,66 @@ Asset symbol 在一个组合内唯一；RISK / DEFENSIVE 的 usdValue 汇总分�
 Market priceUsd > 0，5m / 1h 变化不得低于 -100%，可为正数；volatilityScore 为 0..100。行情不偷偷塞进 Portfolio。压力测试变化同样 ≥ -100%；投影组合价值与损失非负。
 
 Demo 首读 10 ETH × $3,000 = $30,000，随后 Market Mock 把模拟外部 ETH 价格更新为 $2,700，执行和再次读取得到冲击后估值。风险分析中的 riskExposurePct 必须描述 before。压力测试只冲击 before 中 RISK 的 USD 估值，DEFENSIVE 暂固定：`projectedPortfolioUsd = defensiveAssetUsd + riskAssetUsd × (1 + priceChangePct/100)`，`projectedLossUsd = max(0, totalUsd - projectedPortfolioUsd)`。它是场景计算，不是市场收益预测。
+
+## OnchainSignalState / OnchainEvidence：A → B 冻结合同
+
+这两个合同定义在 [onchain.ts](../src/domain/schemas/onchain.ts)，用于交接 Ethereum 链上 ETH 卖出压力信号。MVP 只接受 `signalType=DEX_SELL_PRESSURE`、`asset=ETH`，不能通过自由字符串加入其他信号或资产。OnchainSignalState 与 PortfolioState / MarketState 分开，既不是用户余额，也不是执行授权。
+
+### 信号统计口径
+
+- `windowStart` / `windowEnd` 使用 UTC ISO 8601。当前窗口为 `[windowStart, windowEnd)`，必须有正的持续时间；恰好位于结束时间的交易属于下一个窗口。
+- 设窗口长度为 Δ，基线窗口为紧邻之前的 `[windowStart − Δ, windowStart)`，使用与当前窗口相同的统计范围和口径。字段 `baselineSellVolumeUsd` 表示这个完整等长窗口的卖出总额，不能改成历史均值、买卖净额或其他时间长度。
+- `currentSellVolumeUsd` / `baselineSellVolumeUsd` 统计 **ETH 总卖出额，不减买入额**，单位为 USD。当前卖出额必须有限且 ≥0；基线必须有限且 >0。基线为 0 时 A 不能生成有效信号，也不能使用 Infinity、替代基线或补造比例。
+- `anomalyRatio = currentSellVolumeUsd / baselineSellVolumeUsd`，必须是有限非负数，按浮点容差 `1e-9 × max(1, abs(a), abs(b))` 验证一致；除法得到非有限值时拒绝该信号。比例表示相对卖出量，是否触发调查由另行配置的规则判断。
+- `txCount` 按当前窗口中发生 ETH 卖出的交易哈希去重，同一交易出现多个卖出事件仍只计一笔交易。`uniqueWallets` 按这些交易的原始发起地址 `tx.from` 去重，不按 router、池或事件中的中间地址计数。两者均为非负安全整数，`uniqueWallets <= txCount`；`txCount=0` 时当前卖出额必须为 0。
+- `evidence` 可以为空或只提供样本引用。`evidence.length` 不等于 `txCount`，也不能据此推导 uniqueWallets；统计值描述整个当前窗口。
+
+### 证据引用口径
+
+OnchainEvidence 按 `type` 区分三个严格对象：
+
+| type | 必填引用 | 允许的可选引用 |
+| --- | --- | --- |
+| TRANSACTION | txHash、blockNumber | blockHash、contractAddress |
+| BLOCK | blockHash、blockNumber | txHash、contractAddress |
+| CONTRACT_EVENT | txHash、contractAddress、blockNumber | blockHash |
+
+所有证据还必须有 trim 后非空的 description / source。txHash / blockHash 格式为 `0x` 加 64 位十六进制；contractAddress 为 `0x` 加 40 位十六进制；blockNumber 为非负安全整数。BLOCK 不要求制造一个交易哈希。
+
+`description` 说明这条引用支持什么观察，`source` 使用可公开展示的来源标签或公开 URL，不放带凭据的 RPC URL、API key 或私密信息。Schema 只验证字段、格式和数值一致性；它不能证明交易存在、事件真实或统计正确。A 必须从真实数据读取和加工引用，B 通过这些引用调查和核验，不能补造哈希来“生成证据”。
+
+有效信号示例（以下数值及哈希仅为合同示例）：
+
+```json
+{
+  "signalType": "DEX_SELL_PRESSURE",
+  "asset": "ETH",
+  "windowStart": "2026-10-06T12:00:00Z",
+  "windowEnd": "2026-10-06T12:05:00Z",
+  "currentSellVolumeUsd": 300000,
+  "baselineSellVolumeUsd": 100000,
+  "anomalyRatio": 3,
+  "txCount": 12,
+  "uniqueWallets": 9,
+  "evidence": [
+    {
+      "type": "TRANSACTION",
+      "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+      "blockNumber": 24000000,
+      "description": "当前窗口 ETH 卖出交易样本（Mock 合同示例）",
+      "source": "Mock contract example"
+    }
+  ]
+}
+```
+
+该例的基线窗口是 `2026-10-06T11:55:00Z` 至 `12:00:00Z`，不是信号对象中的新增字段。
+
+### 并行交接边界与当前接入状态
+
+A 负责读取、聚合、去重和 schema 验证，按以上结构向 B 交付；B 消费信号并调查，保留收到的输入与引用，不改写原始统计或补造引用。C 仍只能依据 PolicyDecision 执行，不能把 OnchainSignalState、证据文字或 Agent 推荐视为授权。D 展示统计窗口、异常比例与可核验引用。既有单向减风险、白名单、额度及执行后独立重读规则保持。
+
+这次冻结新增 Domain 合同，**尚未把信号接入运行链路**。InvestigationResult.evidence 仍为 `string[]`；Risk / Investigation 的现有调用签名、RescueSession 及 `/api/rescue` 返回结构保持不变。DEX / 池范围、数据源、异常触发阈值、持续监控和重复执行保护属于后续实现任务；定义合同不代表真实链上监控或调查已经实现。
 
 ## Risk 与 Agent
 

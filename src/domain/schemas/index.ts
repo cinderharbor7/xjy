@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { verifyRescueOutcome } from "../verification";
 
+export { OnchainEvidenceSchema, OnchainSignalStateSchema } from "./onchain";
+
 export const WalletSchema = z.string().trim().min(1);
 export const AssetSymbolSchema = z.string().trim().min(1);
 export const ActionSchema = z.enum(["NONE", "SWAP_TO_SAFE"]);
