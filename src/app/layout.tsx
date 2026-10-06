@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "DeFi Risk Rescue · Mock Demo",
-  description: "A developer demo of policy-approved DeFi risk rescue with mock adapters.",
+  title: "Autonomous On-chain Risk Guardian · Mock Demo",
+  description: "A mock demo of a policy-approved guardian that reduces risk exposure into user-approved defensive assets.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

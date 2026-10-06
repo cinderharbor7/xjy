@@ -1,56 +1,54 @@
 import {
-  ExecutionResultSchema, InvestigationResultSchema, PolicyDecisionSchema,
-  PositionStateSchema, RescueSessionSchema, RiskAnalysisSchema, WalletSchema,
+  ExecutionResultSchema, InvestigationResultSchema, MarketStateSchema, PolicyDecisionSchema,
+  PortfolioStateSchema, RescueSessionSchema, RiskAnalysisSchema, WalletSchema,
 } from "@/domain/schemas";
 import type { RescueSession } from "@/domain/types";
-import type { PositionService } from "../position/position.service";
+import { verifyRescueOutcome } from "@/domain/verification";
+import type { PortfolioService } from "../portfolio/portfolio.service";
+import type { MarketService } from "../market/market.service";
 import type { RiskService } from "../risk/risk.service";
 import type { InvestigationService } from "../investigation/investigation.service";
 import type { PolicyService } from "../policy/policy.service";
 import type { ExecutionService } from "../execution/execution.service";
 
 export interface RescueServices {
-  positionService: Pick<PositionService, "getPosition">;
+  portfolioService: Pick<PortfolioService, "getPortfolio">;
+  marketService: Pick<MarketService, "getMarketState">;
   riskService: Pick<RiskService, "analyze">;
   investigationService: Pick<InvestigationService, "investigate">;
   policyService: Pick<PolicyService, "evaluate">;
   executionService: Pick<ExecutionService, "execute">;
 }
 
-/** Owns sequencing only. External adapters are supplied by the integration layer. */
+/** Owns sequencing and independent verification; adapters are chosen by integration. */
 export class RescueOrchestrator {
   constructor(private readonly services: RescueServices) {}
 
   async runRescueSession(wallet: string): Promise<RescueSession> {
     const requestedWallet = WalletSchema.parse(wallet);
-    const before = PositionStateSchema.parse(await this.services.positionService.getPosition(requestedWallet));
-    const preliminaryRisk = RiskAnalysisSchema.parse(this.services.riskService.analyze(before));
+    const before = PortfolioStateSchema.parse(await this.services.portfolioService.getPortfolio(requestedWallet));
+    if (before.wallet !== requestedWallet) throw new Error("Portfolio does not belong to the requested wallet.");
+    const market = MarketStateSchema.parse(await this.services.marketService.getMarketState());
+    const preliminaryRisk = RiskAnalysisSchema.parse(this.services.riskService.analyze(before, market));
     const investigation = InvestigationResultSchema.parse(
-      await this.services.investigationService.investigate(before, preliminaryRisk),
+      await this.services.investigationService.investigate(before, market, preliminaryRisk),
     );
     const riskAnalysis = RiskAnalysisSchema.parse({
-      ...preliminaryRisk,
-      investigation,
-      confidence: investigation.confidence,
+      ...preliminaryRisk, investigation, confidence: investigation.confidence,
     });
     const policyDecision = PolicyDecisionSchema.parse(this.services.policyService.evaluate(before, riskAnalysis));
 
-    if (!policyDecision.triggered) {
-      return RescueSessionSchema.parse({
-        before, riskAnalysis, policyDecision,
-        execution: {
-          success: false, action: "NONE", amountUsd: 0,
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
+    const execution = policyDecision.triggered
+      ? ExecutionResultSchema.parse(await this.services.executionService.execute(PolicyDecisionSchema.parse(policyDecision)))
+      : ExecutionResultSchema.parse({ success: false, action: "NONE", timestamp: new Date().toISOString() });
 
-    const execution = ExecutionResultSchema.parse(await this.services.executionService.execute(policyDecision));
-    // Executor never supplies after/HF. Always read the position adapter again after success.
+    // The Executor supplies a receipt only. Balances must come from a fresh Portfolio read.
     const after = execution.success
-      ? PositionStateSchema.parse(await this.services.positionService.getPosition(requestedWallet))
+      ? PortfolioStateSchema.parse(await this.services.portfolioService.getPortfolio(requestedWallet))
       : undefined;
-
-    return RescueSessionSchema.parse({ before, riskAnalysis, policyDecision, execution, ...(after ? { after } : {}) });
+    const verification = verifyRescueOutcome(before, after, policyDecision, execution, market);
+    return RescueSessionSchema.parse({
+      before, market, riskAnalysis, policyDecision, execution, ...(after ? { after } : {}), verification,
+    });
   }
 }

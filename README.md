@@ -1,23 +1,54 @@
-# DeFi 杠杆仓位自动风险救援 Agent
+# Autonomous On-chain Risk Guardian
 
-> We don’t drive your portfolio. We protect it when things go wrong.
+An autonomous on-chain risk guardian that reduces exposure when abnormal risk appears.
 
-这是一个供 4 名开发者并行工作的 Hackathon 工程骨架。用户自己管理资产；系统读取仓位、分析风险、调查原因、运行压力测试，再由独立的 Policy Engine 决定是否批准还款。MVP 唯一的自动救援动作是 `REPAY`。
+> We don't drive your portfolio. We protect it when things go wrong.
 
-当前全部外部能力使用明确命名的 Mock Adapter。页面始终显示 **MOCK MODE**，不会读取真实 Aave、调用 LLM、请求钱包签名或发送链上交易。
+产品目标是监控**一个 Ethereum 钱包及其 ETH 风险敞口**。观察 ETH 价格和链上资金行为，发现异常后，由 Agent 调查可能原因，读取并整理可核验的链上证据及置信度；当 Risk Score、Confidence、风险敞口和用户预设规则同时满足时，由 Policy 批准，将限定数量的 ETH 换成用户白名单中的防御资产。执行后重新读取钱包，验证 ETH 风险敞口确实下降。
 
-## 安装与启动
+链上证据应来自真实交易、区块、地址和数据来源，不能由 Agent 编造；Confidence 表示证据对调查结论的支持程度，不是 ETH 必然继续下跌的概率。系统验证的是敞口降低，不保证每次转换都减少最终损失。
 
-需要 Node.js **22.12.0 或更新版本**和 pnpm **11**；项目通过 `packageManager` 固定 pnpm 11.7.0。
+用户决定什么时候承担投资风险。系统只在异常风险出现时，按用户提前设定的硬规则，把部分风险资产转换成用户白名单中的防御资产。**NOT an AI trading bot.** 不做自动抄底、加仓、重新入场、收益优化或杠杆。
+
+比赛 MVP 只有 `NONE` 和 `SWAP_TO_SAFE` 两种动作：允许 `RISK → DEFENSIVE`；禁止 `DEFENSIVE → RISK`。Demo 使用 ETH → USDC，USDC 在这里是 **user-approved defensive asset**，不表示绝对安全或无风险。
+
+## 当前完成状态与开工准备
+
+截至 2026-10-06，**已完成的是 Guardian 工程骨架和单次运行的 Mock 闭环，尚未完成真实链上异常调查、持续监控或真实自动换币**。上述产品目标不代表这些能力已在当前仓库实现。
+
+| 内容 | 当前状态 |
+| --- | --- |
+| Portfolio / Market / Risk / Investigation / Policy / Execution / RescueSession 核心契约 | Mock 阶段已冻结，Zod 与 TypeScript 类型已实现 |
+| Agent 无执行权、Policy 硬门控、白名单、单向转换、额度和独立重读验证 | 已实现并有测试 |
+| 首页和 `POST /api/rescue` | 已实现，点击一次运行一次固定 Mock 场景 |
+| Ethereum 钱包 ETH 余额、实时价格及链上资金异常读取 | 主 Guardian 尚未接入；已有真实 Aave 读取仅为独立扩展 |
+| 链上信号与结构化调查证据 | 尚未实现、尚未冻结；当前 evidence 为 `string[]`，confidence 固定为 0.88 |
+| 持续监控与异常触发调查 | 尚未实现；当前每次请求都运行调查，并创建新的 Mock 场景 |
+| 同钱包跨轮重复/并发执行保护 | 尚未实现；Mock 状态内拒绝重复转换不等于持续监控下的保护 |
+| 四人下一阶段开发 | 职责已划分，本仓库尚未开始本轮真实能力接入；具体任务单待细化 |
+| 团队共同代码基线 | 以本仓库 `main` 为共享 Mock 基线；新增链上调查与监控仍需先冻结契约再开发 |
+
+现有冻结范围见 [Guardian Mock 设计](docs/loopx/design/2026-10-06-risk-guardian/需求设计文档.md)。该记录中的“无未决问题”指已完成的 Mock 架构纠偏，不包括后续新增的链上异常和持续监控需求。
+
+正式分工前仍需完成：
+
+- 确定第一版观察哪一种链上资金异常，以及地址范围、时间窗口和异常阈值。
+- 冻结独立链上信号、可核验调查证据及监控/重复执行规则；不把这些数据偷偷塞进 Portfolio。
+- 确认 36 小时交付范围，明确哪些能力接真实数据、哪些保留 Mock。
+- 为 ABCD 写明输入、输出、文件范围、交付节点和验收标准；开工时从 `main` 的同一提交创建各自的工作分支。
+
+**36 小时候选范围，尚未最终确认：** 一个 Ethereum 钱包、ETH 余额与价格读取、一种明确的链上资金异常、Agent 调查与可核验证据、Policy 门控、Mock 换币和效果展示。真实主网自动交易属于另一个需要明确授权与验收的里程碑。该范围是下一阶段建议，不是当前实现或完成时间保证。
+
+## 安装与运行
+
+需要 Node.js **22.12.0 或更新版本**、pnpm **11**；仓库固定 pnpm 11.7.0。
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)，输入测试 wallet，点击 **Run Demo**。Mock 模式接受任意去除首尾空格后非空的字符串，包括页面默认的测试地址；当前不做真实 Ethereum 地址校验。
-
-无需创建环境文件或提供任何 API Key。`MOCK_MODE` 缺省为 `true`；可选配置参考 [.env.example](.env.example)。`MOCK_MODE=false` 会明确报错，因为当前没有真实 Adapter。预留的 `ETHEREUM_RPC_URL`、`AAVE_NETWORK`、`LLM_API_KEY`、`PRIVATE_KEY` 均不参与 Mock 运行。`.env*` 已被 Git 忽略，只有 `.env.example` 可提交；不要在源码、文档或 Git 中写入真实密钥。
+打开 [http://localhost:3000](http://localhost:3000)，输入任意 trim 后非空的测试 wallet，点击 **Run Demo**。核心 Demo 明确显示 **MOCK MODE**，不需要 RPC、真实 API Key、私钥或钱包连接。`MOCK_MODE` 默认 `true`；设置为 `false` 会明确拒绝运行，没有隐藏的真实交易实现。
 
 检查命令：
 
@@ -27,86 +58,107 @@ pnpm test
 pnpm build
 ```
 
-`pnpm test` 使用 Vitest。`pnpm build` 验证生产构建；构建后可通过 `pnpm start` 启动。
+构建后可用 `pnpm start` 运行生产服务。`.env*` 已被 Git 忽略，仅 `.env.example` 可提交；不提交真实私钥或 API Key。
 
-## 系统数据流与权限
+## 架构纠偏前后
+
+原核心流程：
 
 ```text
-Ethereum / Aave（当前由 Mock 模拟）
-  → Position Service → PositionState
-  → Risk Engine → 本地风险与压力测试
-  → Investigation Agent → InvestigationResult
-  → Orchestrator 合成 RiskAnalysis
+Ethereum / Aave → PositionService → PositionState
+  → HF 风险和压力测试 → Investigation
+  → HF / debt / confidence Policy → REPAY
+  → 再次读取 PositionState → 比较 Health Factor
+```
+
+现在核心流程：
+
+```text
+Wallet / Blockchain → PortfolioService → PortfolioState ─┐
+Market Data → MarketService → MarketState ────────────────┤
+                                                        ↓
+Risk Engine → Investigation Agent → RiskAnalysis
   → Policy Engine → PolicyDecision
-  → Executor → ExecutionResult
-  → Ethereum / Aave（当前由 Mock 模拟）
-  → Position Service 再次读取 PositionState
-  → Dashboard：Before → Risk → Trigger → Rescue → After
+  → Mitigation Executor → ExecutionResult
+  → Blockchain → PortfolioService 再次读取 PortfolioState
+  → verification → Dashboard
 ```
 
-Orchestrator 负责模块调用顺序。Agent 只提供调查结果与建议，没有 Executor 引用或执行权限。Policy 不调用 LLM；它读取结构化数值并运行用户预设的硬规则。`recommendedAction` 和调查文本不能替代 Policy 批准。Executor 只接受结构化 `PolicyDecision`，拒绝未触发的决定、自由文本和不一致的执行结果。
+外部世界目前由 Mock Adapter 模拟。Orchestrator 管流程，服务通过 Zod 数据合同通信。Risk Engine 做确定性计算；Agent 解释事件、原因、证据与不确定性，没有 Executor 引用。Policy 使用服务端用户预设阈值和资产名单，Agent 建议或文字不构成批准。Executor 只接结构化 `PolicyDecision`，并独立检查可信名单、方向和限额。
 
-Policy 不触发时，Orchestrator 跳过 Executor，并返回 `action: "NONE"`、`success: false`、`amountUsd: 0` 的执行记录；这里的 `success: false` 表示 **skipped**。已批准的执行失败则保留 `REPAY` 和批准金额，并且没有 `after`。执行成功后必须再次通过 Position Service 读取仓位，不能采用 Executor 声称的 Health Factor。Dashboard 比较 `after.healthFactor > before.healthFactor` 验证是否改善；如果没有改善，会明确显示。
+核心不再要求 collateral、debt、healthFactor 或 Aave：`PositionState` 换为 `PortfolioState`，HF 压力测试换为组合价值压力测试，HF/债务触发条件换为风险分数、可信度、风险敞口与白名单，`repay()` 换为 `execute(decision)`。保留服务/Adapter 分层、Risk、Investigation、Policy、Execution、RescueOrchestrator、API 和现有页面/CSS体系。
 
-## 模块与四人分工
-
-```text
-src/
-  domain/schemas/                 # 冻结的 Zod 数据契约
-  domain/types/                   # 从 Zod 推导 TypeScript 类型
-  modules/
-    position/                     # PositionAdapter、仓位服务、Mock 读取
-    risk/                         # 风险评分与压力测试
-    investigation/                # 调查接口、服务、Mock Agent
-    policy/                       # 独立硬规则审批
-    execution/                    # 执行接口、服务、Mock REPAY
-    rescue/                       # RescueOrchestrator
-  mocks/scenarios.ts              # 固定场景与请求级模拟状态
-  integration/                    # Adapter 装配与统一集成入口
-  app/
-    api/rescue/                   # POST /api/rescue
-    page.tsx                      # 只调用 API 的 Demo Dashboard
-tests/                            # 契约、模块与集成测试
-docs/contracts.md                 # 八项冻结契约与语义
-```
-
-| 开发者 | 主要拥有的目录 | 下一步任务 |
-| --- | --- | --- |
-| A | `src/modules/position/` | 实现真实 Ethereum / Aave 仓位读取，保持 `PositionAdapter` 接口与输出契约 |
-| B | `src/modules/risk/`、`src/modules/investigation/` | 实现风险模型与调查 Agent，输出已有契约，不获取执行权限 |
-| C | `src/modules/policy/`、`src/modules/execution/` | 完善硬规则与 Aave Repay Adapter，保持结构化审批边界 |
-| D | `src/app/`、`src/integration/` | Dashboard、API、Adapter 装配与联调 |
-
-`src/domain/` 是共同冻结边界；`src/modules/rescue/`、`src/mocks/` 和公共配置的变更由集成负责人协调，顺序合并。模块不得依赖其他模块的内部字段。新增 Adapter 尽量只新增各自目录文件；由 D 在 `integration/` 切换装配，减少共享文件冲突。
-
-## 三个核心数据契约
-
-契约唯一真源在 [src/domain/schemas/index.ts](src/domain/schemas/index.ts)，所有类型由 [src/domain/types/index.ts](src/domain/types/index.ts) 的 `z.infer` 推导。
-
-| 核心契约 | 作用与主要字段 |
-| --- | --- |
-| `PositionState` | 仓位快照：wallet、collateralUsd、debtUsd、healthFactor、ethPrice、timestamp、可选 blockNumber |
-| `RiskAnalysis` | 风险结论：riskScore、confidence、healthFactor、stressTests、investigation、recommendedAction |
-| `PolicyDecision` | 唯一的结构化审批结果：triggered、action、repayAmountUsd、reasons |
-
-其余五项 `StressTestResult`、`InvestigationResult`、`PolicyConfig`、`ExecutionResult`、`RescueSession`，以及每个字段的范围和一致性约束，见 [完整契约说明](docs/contracts.md)。对象拒绝未知字段。更改公开字段或语义前需要四人明确确认，再一起更新 schema、消费者、测试和文档。
+交易成功和保护效果分开记录。成功执行后必须独立重读 Portfolio；验证钱包、重读时间不早于执行、区块不倒退、资产身份/方向、数量变化与回执一致、按市场报价核对批准百分点，以及风险敞口下降，才得到 `verification.status: "PASSED"`。执行成功但效果不符返回真实 `after` 和 `FAILED`，系统停止；未批准或执行失败为 `SKIPPED`。重读失败明确报错，不能采用 Executor 提供的“执行后组合”。
 
 ## 固定 Mock 闭环
 
-| 阶段 | 固定 Demo 数据 |
+| 阶段 | Demo 数据 |
 | --- | --- |
-| Before | Collateral $200,000；Debt $100,000；HF 1.08；ETH $2,800 |
-| Risk + Investigation | Risk Score 91；Confidence 0.88；调查文本和证据明确标记 Mock |
-| Stress Tests | ETH -5% → HF 1.03；-10% → 0.97；-15% → 0.92 |
-| Policy | HF < 1.15 **且** Risk Score > 80 **且** Confidence > 0.85；有债务且还款上限为正 |
-| Execution | 批准后 Mock REPAY $20,000；返回 `0x` 加 64 位十六进制的假交易哈希 |
-| After | Position Service 再次读取：Debt $80,000；HF 1.34 |
+| Portfolio Before | 10 ETH，ETH $3,000；0 USDC；总值 $30,000；风险敞口 100% |
+| Market Shock | ETH $3,000 → $2,700；5m -3%，1h -10%，volatilityScore 82 |
+| Risk / Agent | Risk Score 91；Confidence 0.88；调查和证据明确标记 Mock |
+| Policy | score > 80、confidence > 0.85、exposure > 70，ETH/USDC 在用户预设名单内 |
+| Action | `SWAP_TO_SAFE`；降低 **30 个百分点**；Mock 3 ETH → 8,100 USDC |
+| 独立重读 | 7 ETH = $18,900；8,100 USDC；总值 $27,000；风险敞口 70% |
+| Verification | `PASSED`，风险敞口 100% → 70%，到此停止 |
 
-压力测试使用本地 Demo 公式 `healthFactor × (1 + ethChangePct / 100)`，四舍五入到两位小数，所以 -15% 对应 **0.92**。执行后的 HF **1.34** 来自独立的固定 Mock fixture，不是用该压力公式或还款公式推算的真实链上结果。
+`reduceExposurePct` 和 `maxDeRiskPct` 的单位是**风险敞口百分点**：80% 降低 30 个百分点是 50%，不是 56%。Mock 按执行时组合总值 × 批准百分点 / 100 计算转换金额。Demo 中执行时总值 $27,000，30 个百分点对应 $8,100，即 3 ETH。USDC 按 $1 模拟，不模拟手续费、滑点或真实流动性。
 
-Position 与 Execution Mock Adapter 共享同一个**请求级** `MockScenarioState`，模拟执行对外部仓位的影响。该固定 fixture 只支持一笔精确的 $20,000 还款；其他金额或同一状态的重复执行会报错。每次 API 请求都会创建新状态，因此重复点击 Demo 仍从 HF 1.08 开始，不会累计还款，也不会串用其他请求的 wallet。
+Before 的 $30,000 与 After 的 $27,000 相差 $3,000，来自 ETH 的模拟市场跌价；转换本身没有在 Demo 中造成这笔损失。Market Mock 更新请求内外部世界的 ETH 估值，Portfolio 的首读保留冲击前快照，执行后的重读使用冲击后价格。
 
-## API 与集成入口
+风险公式是 Demo 的确定性规则：
+
+```text
+riskScore = round(0.5 × volatilityScore
+                + 0.3 × clamp(-priceChange1hPct × 10, 0, 100)
+                + 0.2 × riskExposurePct)
+```
+
+没有风险资产时 score 为 0。压力测试对 **before 快照**的风险资产部分施加 -5% / -10% / -15%，防御资产估值暂固定；Demo 输出 $28,500 / $27,000 / $25,500，损失 $1,500 / $3,000 / $4,500。它不是在 $2,700 的当前价上再跌一次的预测。调查前 confidence 为 0，调查后采用 Mock Investigation 的 0.88。
+
+每个请求有独立 `MockScenarioState`，因此连续点击和并发请求均从初始状态开始。相同状态重复执行会报错，不重试、不回退，不自动反向交易。
+
+## 模块与四人交接
+
+```text
+src/
+  domain/
+    schemas/              # Guardian 核心 Zod 合同
+    types/                # 从 Zod infer 的类型
+    verification.ts       # 重读后的实际效果检查
+  modules/
+    portfolio/            # 钱包组合服务与 Adapter
+    market/               # 独立行情服务与 Adapter
+    risk/                 # 确定性风险和压力测试
+    investigation/        # 调查接口、服务、Mock Agent
+    policy/               # 用户预设硬规则、资产白名单
+    execution/            # 结构化单向减风险执行
+    rescue/               # 编排与重读
+  mocks/scenarios.ts      # 请求级模拟外部世界
+  integration/rescue.ts   # 核心 Adapter 装配入口
+  extensions/aave/        # 可选的独立真实只读扩展
+  app/
+    api/rescue/           # 核心 Mock API
+    api/position/         # Aave 扩展 API
+    position/             # Aave 扩展只读页面
+    page.tsx              # Guardian Mock Dashboard
+tests/
+```
+
+| 开发者 | 主要目录 | 下一步职责 |
+| --- | --- | --- |
+| A | `src/modules/portfolio/`、`src/modules/market/` | 钱包 ETH 余额、ETH 行情及链上资金数据；链上信号的独立合同和目录待共同冻结，不能与 Portfolio 混用 |
+| B | `src/modules/risk/`、`src/modules/investigation/` | 异常识别、风险计算、压力测试、Agent 调查和证据整理；只输出分析，不获得交易权限 |
+| C | `src/modules/policy/`、`src/modules/execution/` | 用户预设规则、白名单、额度与受限执行；配合监控规则防止重复动作，当前执行仍为 Mock |
+| D | `src/app/`、`src/integration/`、`src/modules/rescue/` | Dashboard、API、监控入口、异常触发与流程集成，负责执行后的独立重读和效果展示 |
+
+此表描述下一阶段的职责边界，不表示四名开发者已经开工，也不替代具体任务单。真实 Adapter 的接入范围需按上一节完成确认；本次 README 更新没有启用真实钱包、LLM 或交易。
+
+`src/domain/` 是共同稳定边界，`src/mocks/` 与公共配置由集成负责人协调，顺序整合变更。Adapter 实现由各负责人维护，D 在 composition root 注入；业务层不知道具体 Mock 类型。可选 Aave 扩展单独维护，不能作为新 Portfolio 或短周期 Market 的替代源。
+
+## 数据合同与 API
+
+全部核心 schema 的字段、范围和跨字段约束见 [contracts.md](docs/contracts.md)。三项核心边界为 `PortfolioState`、`RiskAnalysis`、`PolicyDecision`；`MarketState` 独立存在。Zod 是唯一真源，TypeScript 类型由 `z.infer` 推导。对象严格拒绝未知字段。
 
 ```http
 POST /api/rescue
@@ -115,41 +167,44 @@ Content-Type: application/json
 {"wallet":"test-wallet"}
 ```
 
-成功直接返回满足 `RescueSessionSchema` 的 `RescueSession`，并附带 `X-Rescue-Mode: MOCK` 和 `Cache-Control: no-store`。非法 JSON、空 wallet 或不符合请求契约的字段返回 HTTP 400；配置或流程异常返回 HTTP 500。
+HTTP 200 直接返回新 `RescueSession`：before、market、riskAnalysis、policyDecision、execution、可选 after、必填 verification，带 `X-Rescue-Mode: MOCK` 和 `Cache-Control: no-store`。400 / 500 使用 `application/problem+json`，不暴露原始异常。请求不能指定动作、白名单、阈值、RPC 或执行权限。
 
-核心类是 `RescueOrchestrator.runRescueSession(wallet)`。`src/integration/` 提供 `runRescueSession(wallet)` 作为 API 集成入口，以及 `createMockRescueOrchestrator(wallet, policyConfig = DEMO_POLICY_CONFIG)` 供测试和装配使用。页面不直接实例化业务模块。
+URL 保留，但响应**整体替换**旧借贷合同，不维护旧 `PositionState` / `REPAY` 响应格式。完整机器合同见 [rescue-api.openapi.json](docs/rescue-api.openapi.json)。
 
-Risk Service 先输出包含本地风险评分、压力测试和 `Pending investigation` 的 `RiskAnalysis`，其初始 confidence 为 0。Orchestrator 调用 Investigation Service 后，用其调查结果与 confidence 合成最终 `RiskAnalysis`，再提交 Policy。
+## 可选 Aave 只读扩展
 
-## 后续替换 Mock Adapter
+已有真实 Aave 查询保留在 `src/extensions/aave/`；`/position` 和 `POST /api/position` 路径及 ACTIVE / NO_DEBT 响应保持。它读取 Ethereum 主网 Aave V3 Core 聚合抵押、债务、HF、WETH/USD oracle 及前 7200 区块变化，保留地址/区块证据，没有钱包、签名或写链能力。
 
-在各自目录实现同一个接口，通过 `src/integration/` 注入实例即可；业务服务与 Orchestrator 不判断当前是 Mock 还是真实 Adapter。
+该聚合数据不是整个钱包组合；7200 区块窗口不是精确 24 小时，也不是新核心的 5m / 1h 行情。扩展使用本地 `AavePositionState` 合同，不向主 Risk / Policy / Executor 传递数据。新核心不导入扩展，扩展也不导入新核心 Domain。
 
-| 外部边界 | 当前实现 | 未来替换接口 |
-| --- | --- | --- |
-| 仓位读取 | `MockPositionAdapter` | `PositionAdapter.getPosition(wallet): Promise<PositionState>`，可实现 `AavePositionAdapter` |
-| Agent 调查 | `MockInvestigationAdapter` | `InvestigationAdapter.investigate(position, risk): Promise<InvestigationResult>` |
-| 还款执行 | `MockExecutionAdapter` | `ExecutionAdapter.repay(decision): Promise<ExecutionResult>`，可实现 `AaveExecutionAdapter` |
+仅使用扩展时才需要 `.env.local` 服务端配置：
 
-Execution Adapter 所需的 wallet 或外部客户端应由集成入口构造时绑定，执行方法仍只接收 PolicyDecision。真实执行完成后也必须由 Position Service 独立重新读取；不能在 ExecutionResult 中增加新的 HF 字段。真实实现还需要单独确定网络、身份、执行权限及地址校验规则；本骨架不提前实现钱包或私钥管理，也没有可切换的真实 Adapter。
+```dotenv
+MOCK_MODE=true
+ETHEREUM_RPC_URL=https://eth.drpc.org
+AAVE_NETWORK=ethereum-mainnet
+```
 
-## 当前 Mock 与真实代码
+RPC 必须支持最近 7200 区块历史 `eth_call` 与 EIP-1898 `blockHash` / `requireCanonical`；没有备用端点、重试或 Mock fallback。公开 RPC 示例可用性可能变化。配置修改后重启服务。详情与测试钱包见 [aave-position.md](docs/aave-position.md)，机器合同见 [position-api.openapi.json](docs/position-api.openapi.json)。
 
-**Mock：** 外部仓位与执行后状态、调查内容、confidence 0.88、还款成功和假 txHash。没有链上查询、真实 LLM、签名或广播。
+## 当前 Mock 与实际能力
 
-**实际运行的工程代码：** Zod 校验、TypeScript 类型、模块依赖注入、Orchestrator 顺序控制、独立 Policy 硬规则、执行结果检查、再次读取仓位、API、Dashboard 和测试。风险评分与压力公式是实际执行的本地 Demo 规则，但不代表真实金融模型；Policy 参数也只是 Demo 参数。
+**核心外部能力均为 Mock：** 钱包资产余额、行情冲击和历史变化、Agent 解释与 confidence、ETH → USDC 执行、执行后余额及假 txHash。没有真实 DEX、钱包签名、LLM、交易广播、数据库或多链。
 
-范围限定为风险救援工程骨架和 `REPAY`。不加入自动投资、加仓、收益优化、数据库、消息队列、微服务、保险、MEV、跨链或预测交易。
+**实际运行的工程能力：** Zod/TypeScript 合同、确定性评分和压力测试、Policy 硬门控、Executor 名单/方向/限额检查、流程编排、独立重读、效果验证、API/UI 与测试。**独立扩展中的实际链上能力：** Aave 只读查询；它不代表主 Guardian 已能执行真实防御交易。
+
+OpenAPI 文档验证范围为 JSON 解析、内部引用及示例对 Zod 合同的检查；仓库没有专门 OpenAPI 规范校验器，未声称完成完整 OpenAPI 规范验证。
 
 ## 验收标准
 
-- [ ] 未配置真实 API Key 时，`pnpm install` 和 `pnpm dev` 可以启动；页面明确显示 MOCK MODE。
-- [ ] 任意非空测试 wallet 点击 Run Demo，页面按 Before → Risk → Policy → Execution → After 展示。
-- [ ] 数值为 HF **1.08** → Risk **91** / Confidence **88%** → Policy **Triggered** → Mock REPAY **$20,000** → Debt **$80,000** / HF **1.34**。
-- [ ] 压力测试为 1.03 / 0.97 / 0.92；调查包含摘要、原因、证据和不确定性。
-- [ ] Tx Hash 明确标记 Mock，仅显示为文本，没有真实链上浏览器链接；没有钱包签名提示或连接 Ethereum / Aave / LLM 的外部请求。
-- [ ] 再次运行 Demo 仍从初始仓位开始；成功流程两次读取 Position，Dashboard 根据读回的值验证 HF 改善。
-- [ ] `pnpm test` 通过，包含 schema、风险、硬规则、Orchestrator 成功路径，以及 Policy 不触发时 Executor 调用次数为 **0**。
-- [ ] 测试验证 Agent 的建议和文本不能绕过 Policy，阈值等号不触发，未批准执行被拒绝，成功才出现 `after`。
-- [ ] `pnpm typecheck` 和 `pnpm build` 通过。
-- [ ] 不提交真实密钥；禁用 Mock 模式时明确失败，没有隐含的真实执行实现。
+- [ ] `pnpm typecheck`、`pnpm test`、`pnpm build` 全部通过。
+- [ ] 无真实 Key/RPC 时启动核心页面，明确显示 MOCK MODE。
+- [ ] Run Demo 展示 10 ETH / $30,000 / 100% → 模拟 $3,000 → $2,700 → Risk 91 / Confidence 88% → Policy Triggered → Mock 3 ETH → 8,100 USDC → 独立重读 7 ETH / 8,100 USDC / 70% → PASSED。
+- [ ] 页面解释 $3,000 价值变化来自市场冲击，压力测试基于 before 快照。
+- [ ] Policy 条件不满足或等于阈值时，Executor 调用次数为 0。
+- [ ] Executor 拒绝未批准、自由文本、反向、陌生资产、非白名单及超限决定；Agent 无法绕过 Policy。
+- [ ] 测试覆盖 80% 降低 30 个百分点 → 50%，不是出售风险资产的 30%。
+- [ ] 成功执行后确实再读 Portfolio；执行失败无 after，未改善或余额证据不符为 FAILED 并停止，重读失败明确报错。
+- [ ] 多次/并发请求隔离，没有自动重新入场、追加交易或真 txHash。
+- [ ] `/api/rescue` 严格输入与新 DTO/verification/error 合同一致；旧借贷格式不继续输出。
+- [ ] Aave 的 3 个专项测试保持通过；现有读取路径/字段/错误/NO_DEBT/canonical 要求不变，主核心不依赖它。

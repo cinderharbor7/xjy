@@ -21,6 +21,8 @@ slices:
 
 # DeFi 风险救援 Mock 工程骨架
 
+> 历史里程碑：本文件保留当时的决策和验收记录。当前 Guardian 核心已改为 Portfolio / Market / SWAP_TO_SAFE；有效 Aave 读取仅作为独立可选扩展。当前设计见 [Guardian 设计](../design/2026-10-06-risk-guardian/需求设计文档.md)。
+
 ## Goal And Boundaries
 
 交付 Next.js App Router、TypeScript、pnpm、Zod 的模块化单仓库，支持一次 Mock 救援从 HF 1.08、Risk 91、调查、硬规则审批、REPAY $20,000 到重新读取 HF 1.34。四名开发者分别拥有 Position、Risk/Investigation、Policy/Execution、App/Integration 区域。现有目录仅包含空 Git 仓库，没有可运行的基线测试。

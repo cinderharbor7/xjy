@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.7.0",
-  "engines": { "node": ">=22.12.0" },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,9 +16,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@aave-dao/aave-address-book": "4.71.3",
     "next": "16.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "viem": "2.57.3",
     "zod": "4.6.5"
   },
   "devDependencies": {

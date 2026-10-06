@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { FormEvent, ReactNode } from "react";
-import { RescueSessionSchema } from "@/domain/schemas";
-import type { RescueSession } from "@/domain/types";
+import { RescueProblemSchema, RescueSessionSchema } from "@/domain/schemas";
+import type { PortfolioState, RescueSession } from "@/domain/types";
 
 const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
   maximumFractionDigits: 0,
 });
+const amount = new Intl.NumberFormat("en-US", { maximumFractionDigits: 6 });
+const percent = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
 function Metric({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -24,6 +27,38 @@ function Findings({ items }: { items: string[] }) {
   return items.length > 0 ? (
     <ul>{items.map((item, index) => <li key={index}>{item}</li>)}</ul>
   ) : <p>None reported.</p>;
+}
+
+function Portfolio({ portfolio }: { portfolio: PortfolioState }) {
+  return (
+    <>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr><th scope="col">Asset</th><th scope="col">Balance</th><th scope="col">Value</th><th scope="col">Category</th></tr>
+          </thead>
+          <tbody>
+            {portfolio.assets.map((asset) => (
+              <tr key={asset.symbol}>
+                <td>{asset.symbol}</td>
+                <td>{amount.format(asset.amount)} {asset.symbol}</td>
+                <td>{usd.format(asset.usdValue)}</td>
+                <td>{asset.category === "RISK" ? "Risk asset" : "User-approved defensive asset"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <dl className="metrics">
+        <Metric label="Total Value">{usd.format(portfolio.totalUsd)}</Metric>
+        <Metric label="Risk Asset Value">{usd.format(portfolio.riskAssetUsd)}</Metric>
+        <Metric label="Defensive Asset Value">{usd.format(portfolio.defensiveAssetUsd)}</Metric>
+        <Metric label="Risk Exposure">{percent.format(portfolio.riskExposurePct)}%</Metric>
+      </dl>
+      <p className="muted">Portfolio read: <time dateTime={portfolio.timestamp}>{portfolio.timestamp}</time></p>
+      {portfolio.blockNumber !== undefined && <p className="muted">Block: {portfolio.blockNumber}</p>}
+    </>
+  );
 }
 
 export default function DemoPage() {
@@ -44,10 +79,19 @@ export default function DemoPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wallet }),
       });
-      if (!response.ok) {
-        throw new Error(`Demo request failed (HTTP ${response.status}).`);
+      let payload: unknown;
+      try {
+        payload = await response.json();
+      } catch {
+        throw new Error("The API returned an unreadable response.");
       }
-      const parsed = RescueSessionSchema.safeParse(await response.json());
+      if (!response.ok) {
+        const problem = RescueProblemSchema.safeParse(payload);
+        throw new Error(problem.success && problem.data.status === response.status
+          ? problem.data.detail
+          : `Demo request failed (HTTP ${response.status}).`);
+      }
+      const parsed = RescueSessionSchema.safeParse(payload);
       if (!parsed.success) {
         throw new Error("The API response does not match the RescueSession contract.");
       }
@@ -59,13 +103,20 @@ export default function DemoPage() {
     }
   }
 
+  const initialMarketAsset = session?.before.assets.find((asset) => asset.symbol === session.market.asset);
+  const initialPrice = initialMarketAsset && initialMarketAsset.amount > 0
+    ? initialMarketAsset.usdValue / initialMarketAsset.amount
+    : undefined;
+
   return (
     <main>
       <header>
-        <p className="mock-banner">MOCK MODE · Simulated positions, investigation and transactions</p>
-        <h1>DeFi Risk Rescue Agent</h1>
+        <p className="mock-banner">MOCK MODE · Simulated portfolio, market, investigation and swaps</p>
+        <h1>Autonomous On-chain Risk Guardian</h1>
         <p>We don’t drive your portfolio. We protect it when things go wrong.</p>
+        <p>Humans decide when to take risk. The system only helps reduce it.</p>
         <p className="muted">Developer demo. No real wallet signatures or on-chain transactions.</p>
+        <p className="muted">Automatic permission: RISK → user-approved DEFENSIVE only. No automatic re-entry.</p>
       </header>
 
       <form onSubmit={runDemo} aria-busy={loading}>
@@ -90,7 +141,7 @@ export default function DemoPage() {
         </div>
       </form>
 
-      {loading && <p role="status">Running the rescue flow and reading the position again…</p>}
+      {loading && <p role="status">Running the guardian flow and independently reading the portfolio again…</p>}
       {error && <p className="error" role="alert">{error}</p>}
 
       {session && (
@@ -98,13 +149,23 @@ export default function DemoPage() {
           <p className="wallet-result">Test wallet: <code>{session.before.wallet}</code></p>
 
           <section aria-labelledby="before-heading">
-            <h2 id="before-heading">BEFORE</h2>
+            <h2 id="before-heading">PORTFOLIO BEFORE · INITIAL</h2>
+            <Portfolio portfolio={session.before} />
+          </section>
+
+          <p className="flow-arrow" aria-hidden="true">↓</p>
+          <section aria-labelledby="market-heading">
+            <h2 id="market-heading">SIMULATED MARKET SHOCK</h2>
             <dl className="metrics">
-              <Metric label="Collateral">{usd.format(session.before.collateralUsd)}</Metric>
-              <Metric label="Debt">{usd.format(session.before.debtUsd)}</Metric>
-              <Metric label="Health Factor">{session.before.healthFactor.toFixed(2)}</Metric>
-              <Metric label="ETH Price">{usd.format(session.before.ethPrice)}</Metric>
+              <Metric label={`${session.market.asset} Price`}>
+                {initialPrice !== undefined && <>{usd.format(initialPrice)} → </>}{usd.format(session.market.priceUsd)}
+              </Metric>
+              <Metric label="5-minute Price Change">{percent.format(session.market.priceChange5mPct)}%</Metric>
+              <Metric label="1-hour Price Change">{percent.format(session.market.priceChange1hPct)}%</Metric>
+              <Metric label="Volatility Score">{session.market.volatilityScore} / 100</Metric>
             </dl>
+            <p>The initial valuation precedes this market shock. The Demo swap uses the shocked market price.</p>
+            <p className="muted">Market observation: <time dateTime={session.market.timestamp}>{session.market.timestamp}</time></p>
           </section>
 
           <p className="flow-arrow" aria-hidden="true">↓</p>
@@ -113,18 +174,20 @@ export default function DemoPage() {
             <dl className="metrics">
               <Metric label="Risk Score">{session.riskAnalysis.riskScore} / 100</Metric>
               <Metric label="Confidence">{(session.riskAnalysis.confidence * 100).toFixed(0)}%</Metric>
+              <Metric label="Risk Exposure">{percent.format(session.riskAnalysis.riskExposurePct)}%</Metric>
               <Metric label="Recommended Action">{session.riskAnalysis.recommendedAction}</Metric>
             </dl>
-            <h3>Stress Tests</h3>
+            <h3>Stress Tests · Initial portfolio valuation</h3>
+            <p className="muted">These hypothetical shocks use the independently read initial portfolio as their baseline.</p>
             <div className="table-container">
               <table>
-                <thead><tr><th scope="col">ETH Change</th><th scope="col">Projected HF</th><th scope="col">Liquidation Risk</th></tr></thead>
+                <thead><tr><th scope="col">Price Change</th><th scope="col">Projected Portfolio Value</th><th scope="col">Projected Loss</th></tr></thead>
                 <tbody>
                   {session.riskAnalysis.stressTests.map((test, index) => (
                     <tr key={index}>
-                      <td>{test.ethChangePct}%</td>
-                      <td>{test.projectedHealthFactor.toFixed(2)}</td>
-                      <td>{test.liquidationRisk ? "Yes" : "No"}</td>
+                      <td>{percent.format(test.priceChangePct)}%</td>
+                      <td>{usd.format(test.projectedPortfolioUsd)}</td>
+                      <td>{usd.format(test.projectedLossUsd)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -133,6 +196,7 @@ export default function DemoPage() {
             <h3>Agent Investigation · Mock</h3>
             <p>{session.riskAnalysis.investigation.summary}</p>
             <p><strong>Primary Cause:</strong> {session.riskAnalysis.investigation.primaryCause}</p>
+            <p className="muted">The Agent explains risk. Policy approves execution.</p>
             <h3>Evidence</h3>
             <Findings items={session.riskAnalysis.investigation.evidence} />
             <h3>Uncertainty</h3>
@@ -145,48 +209,60 @@ export default function DemoPage() {
             <dl className="metrics">
               <Metric label="Decision">{session.policyDecision.triggered ? "Triggered" : "Not Triggered"}</Metric>
               <Metric label="Approved Action">{session.policyDecision.action}</Metric>
-              <Metric label="Repay Amount">{usd.format(session.policyDecision.repayAmountUsd)}</Metric>
+              {session.policyDecision.triggered && (
+                <>
+                  <Metric label="Approved Direction">{session.policyDecision.sourceAsset} → {session.policyDecision.targetAsset}</Metric>
+                  <Metric label="Exposure Reduction">{percent.format(session.policyDecision.reduceExposurePct!)} percentage points</Metric>
+                </>
+              )}
             </dl>
             <h3>Reasons</h3>
             <Findings items={session.policyDecision.reasons} />
+            <p className="muted">USDC is the Demo user’s approved defensive asset.</p>
           </section>
 
           <p className="flow-arrow" aria-hidden="true">↓</p>
           <section aria-labelledby="execution-heading">
-            <h2 id="execution-heading">EXECUTION · MOCK</h2>
+            <h2 id="execution-heading">ACTION · MOCK</h2>
             {!session.policyDecision.triggered ? (
               <p>Skipped — Policy did not approve execution.</p>
             ) : (
               <>
-                <p><strong>{session.execution.success ? "Success" : "Failed"}</strong> · Mock {session.execution.action} {usd.format(session.execution.amountUsd)}</p>
+                <p><strong>{session.execution.success ? "Success" : "Failed"}</strong> · Mock {session.execution.action}</p>
+                {session.execution.success && (
+                  <p><strong>{amount.format(session.execution.sourceAmount!)} {session.execution.sourceAsset} → {amount.format(session.execution.targetAmount!)} {session.execution.targetAsset}</strong></p>
+                )}
                 {session.execution.error && <p className="error">{session.execution.error}</p>}
               </>
             )}
             {session.execution.txHash && (
               <p className="tx-hash"><strong>Tx Hash · Mock:</strong> <code>{session.execution.txHash}</code></p>
             )}
+            <p className="muted">Demo assumption: USDC = $1; swap fees and slippage are omitted.</p>
           </section>
 
           <p className="flow-arrow" aria-hidden="true">↓</p>
           <section aria-labelledby="after-heading">
-            <h2 id="after-heading">AFTER</h2>
+            <h2 id="after-heading">PORTFOLIO AFTER · INDEPENDENT RE-READ</h2>
             {session.after ? (
               <>
-                <p className="hf-change">HF {session.before.healthFactor.toFixed(2)} → {session.after.healthFactor.toFixed(2)}</p>
-                <dl className="metrics">
-                  <Metric label="Debt">{usd.format(session.after.debtUsd)}</Metric>
-                  <Metric label="Health Factor">{session.after.healthFactor.toFixed(2)}</Metric>
-                </dl>
-                <p className={session.after.healthFactor > session.before.healthFactor ? "verified" : "error"}>
-                  {session.after.healthFactor > session.before.healthFactor
-                    ? "Verified from the position read after execution: Health Factor improved."
-                    : "Position read after execution: Health Factor did not improve."}
-                </p>
+                <p><strong>Risk Exposure: {percent.format(session.before.riskExposurePct)}% → {percent.format(session.after.riskExposurePct)}%</strong></p>
+                <Portfolio portfolio={session.after} />
+                {session.verification.status === "PASSED" && (
+                  <p>{usd.format(session.before.totalUsd)} → {usd.format(session.after.totalUsd)} reflects the simulated market shock. The Demo swap exchanges equal value at that shocked price.</p>
+                )}
               </>
-            ) : <p>No position read after execution: execution was skipped or failed.</p>}
+            ) : <p>No portfolio read after execution: execution was skipped or failed.</p>}
+            <p className={session.verification.status === "PASSED" ? "verified" : session.verification.status === "FAILED" ? "error" : "muted"}>
+              <strong>Risk reduction verification: {session.verification.status}</strong>
+            </p>
+            <Findings items={session.verification.reasons} />
+            <p>The session stops here. No automatic swap from defensive assets back to risk assets.</p>
           </section>
         </div>
       )}
+
+      <p className="muted"><Link href="/position">Optional Aave extension · Read only</Link>. Separate from the Guardian Mock flow.</p>
     </main>
   );
 }

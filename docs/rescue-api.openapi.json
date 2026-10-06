@@ -1,0 +1,1236 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Guardian Mock Rescue API",
+    "version": "0.1.0",
+    "description": "Autonomous On-chain Risk Guardian Mock flow. Existing /api/rescue URL is retained, but its former lending/HF/REPAY response is intentionally replaced by Portfolio/Market/SWAP_TO_SAFE and verification. No legacy response shim, real DEX, wallet, LLM or transaction. Only RISK -> user-approved DEFENSIVE is permitted; defensive -> risk and re-entry are forbidden."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/api/rescue": {
+      "post": {
+        "operationId": "runMockGuardianRescue",
+        "summary": "Run one independently scoped Guardian Mock rescue session",
+        "description": "Strict {wallet} request, no policy/asset/action/RPC overrides. Every call creates fresh Mock balances and market state, with no persistent idempotency, database or shared wallet updates. Core needs no API Key/RPC and accepts any trimmed nonempty wallet label. No pagination/multichain/wallet signing or retries. Orchestrator reads Portfolio, Market, analyzes/investigates, evaluates Policy, executes only if approved, then independently re-reads and verifies. MOCK_MODE=false explicitly fails. Aave live-read extension is separate.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RescueRequest"
+              },
+              "example": {
+                "wallet": "test-wallet"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New Guardian RescueSession. A successful swap still requires independent verification; FAILED is a reported outcome, not a second trade.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Uncached result.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Rescue-Mode": {
+                "description": "All core external capabilities are Mock.",
+                "schema": {
+                  "type": "string",
+                  "const": "MOCK"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RescueSession"
+                },
+                "examples": {
+                  "passed": {
+                    "summary": "Fixed Mock 10 ETH -> 7 ETH + 8100 USDC, 100% -> 70%. Market decline explains $30000 -> $27000.",
+                    "value": {
+                      "before": {
+                        "wallet": "test-wallet",
+                        "totalUsd": 30000,
+                        "riskAssetUsd": 30000,
+                        "defensiveAssetUsd": 0,
+                        "riskExposurePct": 100,
+                        "assets": [
+                          {
+                            "symbol": "ETH",
+                            "amount": 10,
+                            "usdValue": 30000,
+                            "category": "RISK"
+                          },
+                          {
+                            "symbol": "USDC",
+                            "amount": 0,
+                            "usdValue": 0,
+                            "category": "DEFENSIVE"
+                          }
+                        ],
+                        "timestamp": "2026-10-06T14:00:00.000Z"
+                      },
+                      "market": {
+                        "asset": "ETH",
+                        "priceUsd": 2700,
+                        "priceChange5mPct": -3,
+                        "priceChange1hPct": -10,
+                        "volatilityScore": 82,
+                        "timestamp": "2026-10-06T14:00:01.000Z"
+                      },
+                      "riskAnalysis": {
+                        "riskScore": 91,
+                        "confidence": 0.88,
+                        "riskExposurePct": 100,
+                        "stressTests": [
+                          {
+                            "priceChangePct": -5,
+                            "projectedPortfolioUsd": 28500,
+                            "projectedLossUsd": 1500
+                          },
+                          {
+                            "priceChangePct": -10,
+                            "projectedPortfolioUsd": 27000,
+                            "projectedLossUsd": 3000
+                          },
+                          {
+                            "priceChangePct": -15,
+                            "projectedPortfolioUsd": 25500,
+                            "projectedLossUsd": 4500
+                          }
+                        ],
+                        "investigation": {
+                          "summary": "Mock investigation: ETH market shock with full risk exposure.",
+                          "primaryCause": "Simulated ETH decline and high volatility.",
+                          "evidence": [
+                            "Mock 1h price change: -10%.",
+                            "Mock volatilityScore: 82.",
+                            "Before risk exposure: 100%."
+                          ],
+                          "uncertainties": [
+                            "Mock data, no LLM, no prediction of future price."
+                          ],
+                          "confidence": 0.88
+                        },
+                        "recommendedAction": "SWAP_TO_SAFE"
+                      },
+                      "policyDecision": {
+                        "triggered": true,
+                        "action": "SWAP_TO_SAFE",
+                        "sourceAsset": "ETH",
+                        "targetAsset": "USDC",
+                        "reduceExposurePct": 30,
+                        "reasons": [
+                          "Risk score 91 > 80.",
+                          "Confidence 0.88 > 0.85.",
+                          "Risk exposure 100 > 70.",
+                          "ETH -> user-approved USDC allowed; approved 30 percentage points."
+                        ]
+                      },
+                      "execution": {
+                        "success": true,
+                        "action": "SWAP_TO_SAFE",
+                        "sourceAsset": "ETH",
+                        "targetAsset": "USDC",
+                        "sourceAmount": 3,
+                        "targetAmount": 8100,
+                        "txHash": "0xabababababababababababababababababababababababababababababababab",
+                        "timestamp": "2026-10-06T14:00:02.000Z"
+                      },
+                      "after": {
+                        "wallet": "test-wallet",
+                        "totalUsd": 27000,
+                        "riskAssetUsd": 18900,
+                        "defensiveAssetUsd": 8100,
+                        "riskExposurePct": 70,
+                        "assets": [
+                          {
+                            "symbol": "ETH",
+                            "amount": 7,
+                            "usdValue": 18900,
+                            "category": "RISK"
+                          },
+                          {
+                            "symbol": "USDC",
+                            "amount": 8100,
+                            "usdValue": 8100,
+                            "category": "DEFENSIVE"
+                          }
+                        ],
+                        "timestamp": "2026-10-06T14:00:03.000Z"
+                      },
+                      "verification": {
+                        "status": "PASSED",
+                        "reasons": [
+                          "Independent portfolio re-read verifies source/defensive balances, approved 30 percentage points, and risk exposure 100% -> 70%."
+                        ]
+                      }
+                    }
+                  },
+                  "policySkipped": {
+                    "summary": "Unapproved policy never calls Executor.",
+                    "value": {
+                      "before": {
+                        "wallet": "test-wallet",
+                        "totalUsd": 0,
+                        "riskAssetUsd": 0,
+                        "defensiveAssetUsd": 0,
+                        "riskExposurePct": 0,
+                        "assets": [],
+                        "timestamp": "2026-10-06T14:00:00.000Z"
+                      },
+                      "market": {
+                        "asset": "ETH",
+                        "priceUsd": 2700,
+                        "priceChange5mPct": -3,
+                        "priceChange1hPct": -10,
+                        "volatilityScore": 82,
+                        "timestamp": "2026-10-06T14:00:01.000Z"
+                      },
+                      "riskAnalysis": {
+                        "riskScore": 0,
+                        "confidence": 0.88,
+                        "riskExposurePct": 0,
+                        "stressTests": [
+                          {
+                            "priceChangePct": -5,
+                            "projectedPortfolioUsd": 0,
+                            "projectedLossUsd": 0
+                          },
+                          {
+                            "priceChangePct": -10,
+                            "projectedPortfolioUsd": 0,
+                            "projectedLossUsd": 0
+                          },
+                          {
+                            "priceChangePct": -15,
+                            "projectedPortfolioUsd": 0,
+                            "projectedLossUsd": 0
+                          }
+                        ],
+                        "investigation": {
+                          "summary": "Mock investigation: empty portfolio.",
+                          "primaryCause": "No risk exposure.",
+                          "evidence": [
+                            "No asset balance in the before portfolio."
+                          ],
+                          "uncertainties": [
+                            "Mock data, no LLM, no prediction of future price."
+                          ],
+                          "confidence": 0.88
+                        },
+                        "recommendedAction": "NONE"
+                      },
+                      "policyDecision": {
+                        "triggered": false,
+                        "action": "NONE",
+                        "reasons": [
+                          "No risk balance; policy conditions are not satisfied."
+                        ]
+                      },
+                      "execution": {
+                        "success": false,
+                        "action": "NONE",
+                        "timestamp": "2026-10-06T14:00:02.000Z"
+                      },
+                      "verification": {
+                        "status": "SKIPPED",
+                        "reasons": [
+                          "Policy did not approve execution."
+                        ]
+                      }
+                    }
+                  },
+                  "verificationFailed": {
+                    "summary": "Illustrative independent re-read mismatch; receipt success does not claim protection.",
+                    "value": {
+                      "before": {
+                        "wallet": "test-wallet",
+                        "totalUsd": 30000,
+                        "riskAssetUsd": 30000,
+                        "defensiveAssetUsd": 0,
+                        "riskExposurePct": 100,
+                        "assets": [
+                          {
+                            "symbol": "ETH",
+                            "amount": 10,
+                            "usdValue": 30000,
+                            "category": "RISK"
+                          },
+                          {
+                            "symbol": "USDC",
+                            "amount": 0,
+                            "usdValue": 0,
+                            "category": "DEFENSIVE"
+                          }
+                        ],
+                        "timestamp": "2026-10-06T14:00:00.000Z"
+                      },
+                      "market": {
+                        "asset": "ETH",
+                        "priceUsd": 2700,
+                        "priceChange5mPct": -3,
+                        "priceChange1hPct": -10,
+                        "volatilityScore": 82,
+                        "timestamp": "2026-10-06T14:00:01.000Z"
+                      },
+                      "riskAnalysis": {
+                        "riskScore": 91,
+                        "confidence": 0.88,
+                        "riskExposurePct": 100,
+                        "stressTests": [
+                          {
+                            "priceChangePct": -5,
+                            "projectedPortfolioUsd": 28500,
+                            "projectedLossUsd": 1500
+                          },
+                          {
+                            "priceChangePct": -10,
+                            "projectedPortfolioUsd": 27000,
+                            "projectedLossUsd": 3000
+                          },
+                          {
+                            "priceChangePct": -15,
+                            "projectedPortfolioUsd": 25500,
+                            "projectedLossUsd": 4500
+                          }
+                        ],
+                        "investigation": {
+                          "summary": "Mock investigation: ETH market shock with full risk exposure.",
+                          "primaryCause": "Simulated ETH decline and high volatility.",
+                          "evidence": [
+                            "Mock 1h price change: -10%.",
+                            "Mock volatilityScore: 82.",
+                            "Before risk exposure: 100%."
+                          ],
+                          "uncertainties": [
+                            "Mock data, no LLM, no prediction of future price."
+                          ],
+                          "confidence": 0.88
+                        },
+                        "recommendedAction": "SWAP_TO_SAFE"
+                      },
+                      "policyDecision": {
+                        "triggered": true,
+                        "action": "SWAP_TO_SAFE",
+                        "sourceAsset": "ETH",
+                        "targetAsset": "USDC",
+                        "reduceExposurePct": 30,
+                        "reasons": [
+                          "Risk score 91 > 80.",
+                          "Confidence 0.88 > 0.85.",
+                          "Risk exposure 100 > 70.",
+                          "ETH -> user-approved USDC allowed; approved 30 percentage points."
+                        ]
+                      },
+                      "execution": {
+                        "success": true,
+                        "action": "SWAP_TO_SAFE",
+                        "sourceAsset": "ETH",
+                        "targetAsset": "USDC",
+                        "sourceAmount": 3,
+                        "targetAmount": 8100,
+                        "txHash": "0xabababababababababababababababababababababababababababababababab",
+                        "timestamp": "2026-10-06T14:00:02.000Z"
+                      },
+                      "after": {
+                        "wallet": "test-wallet",
+                        "totalUsd": 27000,
+                        "riskAssetUsd": 27000,
+                        "defensiveAssetUsd": 0,
+                        "riskExposurePct": 100,
+                        "assets": [
+                          {
+                            "symbol": "ETH",
+                            "amount": 10,
+                            "usdValue": 27000,
+                            "category": "RISK"
+                          },
+                          {
+                            "symbol": "USDC",
+                            "amount": 0,
+                            "usdValue": 0,
+                            "category": "DEFENSIVE"
+                          }
+                        ],
+                        "timestamp": "2026-10-06T14:00:03.000Z"
+                      },
+                      "verification": {
+                        "status": "FAILED",
+                        "reasons": [
+                          "Independent re-read does not confirm receipt balances or lower exposure; no further trade is performed."
+                        ]
+                      }
+                    }
+                  },
+                  "executionFailed": {
+                    "summary": "Illustrative explicit execution failure; no after is claimed.",
+                    "value": {
+                      "before": {
+                        "wallet": "test-wallet",
+                        "totalUsd": 30000,
+                        "riskAssetUsd": 30000,
+                        "defensiveAssetUsd": 0,
+                        "riskExposurePct": 100,
+                        "assets": [
+                          {
+                            "symbol": "ETH",
+                            "amount": 10,
+                            "usdValue": 30000,
+                            "category": "RISK"
+                          },
+                          {
+                            "symbol": "USDC",
+                            "amount": 0,
+                            "usdValue": 0,
+                            "category": "DEFENSIVE"
+                          }
+                        ],
+                        "timestamp": "2026-10-06T14:00:00.000Z"
+                      },
+                      "market": {
+                        "asset": "ETH",
+                        "priceUsd": 2700,
+                        "priceChange5mPct": -3,
+                        "priceChange1hPct": -10,
+                        "volatilityScore": 82,
+                        "timestamp": "2026-10-06T14:00:01.000Z"
+                      },
+                      "riskAnalysis": {
+                        "riskScore": 91,
+                        "confidence": 0.88,
+                        "riskExposurePct": 100,
+                        "stressTests": [
+                          {
+                            "priceChangePct": -5,
+                            "projectedPortfolioUsd": 28500,
+                            "projectedLossUsd": 1500
+                          },
+                          {
+                            "priceChangePct": -10,
+                            "projectedPortfolioUsd": 27000,
+                            "projectedLossUsd": 3000
+                          },
+                          {
+                            "priceChangePct": -15,
+                            "projectedPortfolioUsd": 25500,
+                            "projectedLossUsd": 4500
+                          }
+                        ],
+                        "investigation": {
+                          "summary": "Mock investigation: ETH market shock with full risk exposure.",
+                          "primaryCause": "Simulated ETH decline and high volatility.",
+                          "evidence": [
+                            "Mock 1h price change: -10%.",
+                            "Mock volatilityScore: 82.",
+                            "Before risk exposure: 100%."
+                          ],
+                          "uncertainties": [
+                            "Mock data, no LLM, no prediction of future price."
+                          ],
+                          "confidence": 0.88
+                        },
+                        "recommendedAction": "SWAP_TO_SAFE"
+                      },
+                      "policyDecision": {
+                        "triggered": true,
+                        "action": "SWAP_TO_SAFE",
+                        "sourceAsset": "ETH",
+                        "targetAsset": "USDC",
+                        "reduceExposurePct": 30,
+                        "reasons": [
+                          "Risk score 91 > 80.",
+                          "Confidence 0.88 > 0.85.",
+                          "Risk exposure 100 > 70.",
+                          "ETH -> user-approved USDC allowed; approved 30 percentage points."
+                        ]
+                      },
+                      "execution": {
+                        "success": false,
+                        "action": "SWAP_TO_SAFE",
+                        "sourceAsset": "ETH",
+                        "targetAsset": "USDC",
+                        "timestamp": "2026-10-06T14:00:02.000Z",
+                        "error": "Mock execution rejected without settled balances."
+                      },
+                      "verification": {
+                        "status": "SKIPPED",
+                        "reasons": [
+                          "Execution failed; no changed portfolio is claimed."
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid JSON/request.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Uncached result.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RescueProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:rescue:INVALID_REQUEST",
+                  "title": "Invalid rescue request",
+                  "status": 400,
+                  "detail": "Expected { wallet: string } with a nonempty test wallet and no extra fields.",
+                  "instance": "/api/rescue",
+                  "code": "INVALID_REQUEST"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Configuration, module output or re-read failure. No raw exception leakage.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Uncached result.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RescueProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:rescue:RESCUE_FAILED",
+                  "title": "Rescue session failed",
+                  "status": 500,
+                  "detail": "The Mock Guardian session could not be completed. Check the server configuration.",
+                  "instance": "/api/rescue",
+                  "code": "RESCUE_FAILED"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RescueRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "wallet"
+        ],
+        "properties": {
+          "wallet": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty test-wallet label; a real Ethereum address is not required for Mock."
+          }
+        }
+      },
+      "AssetBalance": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "symbol",
+          "amount",
+          "usdValue",
+          "category"
+        ],
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "tokenAddress": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "usdValue": {
+            "type": "number",
+            "minimum": 0
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "RISK",
+              "DEFENSIVE"
+            ]
+          }
+        }
+      },
+      "PortfolioState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "wallet",
+          "totalUsd",
+          "riskAssetUsd",
+          "defensiveAssetUsd",
+          "riskExposurePct",
+          "assets",
+          "timestamp"
+        ],
+        "properties": {
+          "wallet": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty test-wallet label; a real Ethereum address is not required for Mock."
+          },
+          "totalUsd": {
+            "type": "number",
+            "minimum": 0
+          },
+          "riskAssetUsd": {
+            "type": "number",
+            "minimum": 0
+          },
+          "defensiveAssetUsd": {
+            "type": "number",
+            "minimum": 0
+          },
+          "riskExposurePct": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "assets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetBalance"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          },
+          "blockNumber": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "description": "Asset symbols are unique; category totals and riskExposurePct agree with balances. totalUsd=0 implies riskExposurePct=0. Zero token amount cannot carry positive usdValue. Runtime Zod checks use relative tolerance 1e-9.",
+        "x-runtime-invariants": [
+          "unique assets.symbol",
+          "category asset totals equal aggregate totals",
+          "riskExposurePct = totalUsd == 0 ? 0 : riskAssetUsd/totalUsd*100"
+        ]
+      },
+      "MarketState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "asset",
+          "priceUsd",
+          "priceChange5mPct",
+          "priceChange1hPct",
+          "volatilityScore",
+          "timestamp"
+        ],
+        "properties": {
+          "asset": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "priceUsd": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": 0
+          },
+          "priceChange5mPct": {
+            "type": "number",
+            "minimum": -100
+          },
+          "priceChange1hPct": {
+            "type": "number",
+            "minimum": -100
+          },
+          "volatilityScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          }
+        },
+        "description": "Independent Mock market quote, never fields hidden inside PortfolioState."
+      },
+      "StressTestResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "priceChangePct",
+          "projectedPortfolioUsd",
+          "projectedLossUsd"
+        ],
+        "properties": {
+          "priceChangePct": {
+            "type": "number",
+            "minimum": -100
+          },
+          "projectedPortfolioUsd": {
+            "type": "number",
+            "minimum": 0
+          },
+          "projectedLossUsd": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "description": "Scenario applied to before snapshot RISK USD values with defensive valuation fixed; not a second shock from current market price."
+      },
+      "InvestigationResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "summary",
+          "primaryCause",
+          "evidence",
+          "uncertainties",
+          "confidence"
+        ],
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "primaryCause": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "uncertainties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      },
+      "RiskAnalysis": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "riskScore",
+          "confidence",
+          "riskExposurePct",
+          "stressTests",
+          "investigation",
+          "recommendedAction"
+        ],
+        "properties": {
+          "riskScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "riskExposurePct": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "stressTests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StressTestResult"
+            }
+          },
+          "investigation": {
+            "$ref": "#/components/schemas/InvestigationResult"
+          },
+          "recommendedAction": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "SWAP_TO_SAFE"
+            ]
+          }
+        },
+        "description": "recommendedAction and prose are advisory; only Policy approves execution. Final session confidence equals investigation.confidence."
+      },
+      "PolicyConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "minRiskScore",
+          "minConfidence",
+          "minRiskExposurePct",
+          "maxDeRiskPct",
+          "allowedRiskAssets",
+          "allowedDefensiveAssets"
+        ],
+        "properties": {
+          "minRiskScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "minConfidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "minRiskExposurePct": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "maxDeRiskPct": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Percentage points of total portfolio risk exposure, not a fraction of the risk balance. Reducing 80% by 30 points means 50%.",
+            "maximum": 100
+          },
+          "allowedRiskAssets": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Trimmed nonempty asset symbol."
+            }
+          },
+          "allowedDefensiveAssets": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Trimmed nonempty asset symbol."
+            }
+          }
+        },
+        "description": "Trusted server-side user preset; not accepted in the API request. Allowlists are unique and disjoint. USDC is user-approved defensive, not risk-free.",
+        "example": {
+          "minRiskScore": 80,
+          "minConfidence": 0.85,
+          "minRiskExposurePct": 70,
+          "maxDeRiskPct": 30,
+          "allowedRiskAssets": [
+            "ETH"
+          ],
+          "allowedDefensiveAssets": [
+            "USDC"
+          ]
+        }
+      },
+      "PolicyDecision": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "triggered",
+          "action",
+          "reasons"
+        ],
+        "properties": {
+          "triggered": {
+            "type": "boolean"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "SWAP_TO_SAFE"
+            ]
+          },
+          "sourceAsset": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "targetAsset": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "reduceExposurePct": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Percentage points of total portfolio risk exposure, not a fraction of the risk balance. Reducing 80% by 30 points means 50%.",
+            "maximum": 100
+          },
+          "reasons": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "triggered": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "sourceAsset",
+                "targetAsset",
+                "reduceExposurePct"
+              ],
+              "properties": {
+                "action": {
+                  "const": "SWAP_TO_SAFE"
+                },
+                "reduceExposurePct": {
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "action": {
+                  "const": "NONE"
+                }
+              },
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "sourceAsset"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "targetAsset"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "reduceExposurePct"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "description": "Triggered decisions require distinct source/target assets; the configured RISK -> user-approved DEFENSIVE direction, limits and allowlists are independently checked by Policy and Executor. Schema acceptance is not transaction permission."
+      },
+      "SkippedExecution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "action",
+          "timestamp"
+        ],
+        "properties": {
+          "success": {
+            "const": false
+          },
+          "action": {
+            "const": "NONE"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          }
+        }
+      },
+      "SuccessfulSwapExecution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "action",
+          "sourceAsset",
+          "targetAsset",
+          "sourceAmount",
+          "targetAmount",
+          "txHash",
+          "timestamp"
+        ],
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "action": {
+            "const": "SWAP_TO_SAFE"
+          },
+          "sourceAsset": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "targetAsset": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "sourceAmount": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": 0
+          },
+          "targetAmount": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": 0
+          },
+          "txHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          }
+        },
+        "description": "Distinct source/target assets; Mock txHash is fabricated and must be clearly labeled. This receipt does not prove mitigation."
+      },
+      "FailedSwapExecution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "action",
+          "sourceAsset",
+          "targetAsset",
+          "timestamp",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "const": false
+          },
+          "action": {
+            "const": "SWAP_TO_SAFE"
+          },
+          "sourceAsset": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "targetAsset": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty asset symbol."
+          },
+          "txHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          },
+          "error": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "description": "No settled amounts are claimed on failure; source/target remain the approved distinct assets. Optional hash is allowed by the runtime contract; Mock failures do not fabricate it."
+      },
+      "ExecutionResult": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SkippedExecution"
+          },
+          {
+            "$ref": "#/components/schemas/SuccessfulSwapExecution"
+          },
+          {
+            "$ref": "#/components/schemas/FailedSwapExecution"
+          }
+        ]
+      },
+      "VerificationResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "reasons"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "SKIPPED",
+              "PASSED",
+              "FAILED"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "SKIPPED: unapproved or unsuccessful execution, no after. PASSED: receipt plus independent re-read and all checks pass. FAILED: successful execution and real re-read, but effect/evidence does not pass; stop without another trade."
+      },
+      "RescueSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "before",
+          "market",
+          "riskAnalysis",
+          "policyDecision",
+          "execution",
+          "verification"
+        ],
+        "properties": {
+          "before": {
+            "$ref": "#/components/schemas/PortfolioState"
+          },
+          "market": {
+            "$ref": "#/components/schemas/MarketState"
+          },
+          "riskAnalysis": {
+            "$ref": "#/components/schemas/RiskAnalysis"
+          },
+          "policyDecision": {
+            "$ref": "#/components/schemas/PolicyDecision"
+          },
+          "execution": {
+            "$ref": "#/components/schemas/ExecutionResult"
+          },
+          "after": {
+            "$ref": "#/components/schemas/PortfolioState"
+          },
+          "verification": {
+            "$ref": "#/components/schemas/VerificationResult"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "execution": {
+                  "properties": {
+                    "success": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "after"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "after"
+                ]
+              }
+            }
+          }
+        ],
+        "description": "Execution action/assets match Policy. Analysis exposure matches before; confidence matches investigation. Success always requires an independent after. Runtime verification checks wallet, timestamps/blocks, asset identity/direction, approved percentage points at the market quote, receipt balance changes, unaffected assets and lower exposure; status is recomputed by Zod.",
+        "x-runtime-invariants": [
+          "execution action/source/target match policyDecision",
+          "execution.success iff after exists",
+          "after.wallet == before.wallet",
+          "riskAnalysis.riskExposurePct matches before",
+          "riskAnalysis.confidence == investigation.confidence",
+          "verification.status equals verifyRescueOutcome(before,after,decision,execution,market).status"
+        ]
+      },
+      "RescueProblem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance",
+          "code"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "pattern": "^urn:xjy:rescue:(INVALID_REQUEST|RESCUE_FAILED)$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              400,
+              500
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instance": {
+            "const": "/api/rescue"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_REQUEST",
+              "RESCUE_FAILED"
+            ]
+          }
+        },
+        "description": "Problem response. INVALID_REQUEST=400, RESCUE_FAILED=500. Raw exception text, endpoint URLs, credentials and stacks are never returned."
+      }
+    }
+  }
+}

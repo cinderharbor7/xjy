@@ -1,173 +1,299 @@
 import { describe, expect, it, vi } from "vitest";
-import type { ExecutionResult, PolicyConfig, PolicyDecision, PositionState, RiskAnalysis } from "@/domain/types";
+import type { ExecutionResult, PolicyConfig, PolicyDecision, PortfolioState, RiskAnalysis } from "@/domain/types";
+import { DEMO_POLICY_CONFIG, DEMO_WALLET, MockScenarioState } from "@/mocks/scenarios";
 import { ExecutionService } from "@/modules/execution/execution.service";
 import { MockExecutionAdapter } from "@/modules/execution/mock-execution.adapter";
 import { PolicyService } from "@/modules/policy/policy.service";
-import { MockScenarioState } from "@/mocks/scenarios";
+import { RiskService } from "@/modules/risk/risk.service";
 
-const config: PolicyConfig = {
-  maxHealthFactorForTrigger: 1.15,
-  minRiskScore: 80,
-  minConfidence: 0.85,
-  maxRepayUsd: 20000,
-};
-const position: PositionState = {
-  wallet: "demo-wallet",
-  collateralUsd: 200000,
-  debtUsd: 100000,
-  healthFactor: 1.08,
-  ethPrice: 2800,
-  timestamp: "2026-10-06T00:00:00.000Z",
-};
+const state = new MockScenarioState(DEMO_WALLET);
+const portfolio = state.getPortfolio(DEMO_WALLET);
+const market = state.getMarketState();
+const pendingRisk = new RiskService().analyze(portfolio, market);
 const risk: RiskAnalysis = {
-  riskScore: 91,
-  confidence: 0.88,
-  healthFactor: 1.08,
-  stressTests: [],
-  investigation: {
-    summary: "Mock investigation: health factor is close to liquidation.",
-    primaryCause: "Low health factor",
-    evidence: ["Mock position"],
-    uncertainties: ["Simulated data"],
-    confidence: 0.88,
-  },
-  recommendedAction: "REPAY",
+  ...pendingRisk, confidence: 0.88,
+  investigation: { summary: "Mock market investigation", primaryCause: "Market shock and concentrated exposure", evidence: ["Simulated data"], uncertainties: [], confidence: 0.88 },
 };
 const approval: PolicyDecision = {
-  triggered: true,
-  action: "REPAY",
-  repayAmountUsd: 20000,
-  reasons: ["All policy rules passed."],
+  triggered: true, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC", reduceExposurePct: 30,
+  reasons: ["User policy approved a reduction of 30 percentage points."],
 };
 const execution: ExecutionResult = {
-  success: true,
-  action: "REPAY",
-  amountUsd: 20000,
-  txHash: `0x${"ab".repeat(32)}`,
-  timestamp: position.timestamp,
+  success: true, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC", sourceAmount: 3, targetAmount: 8_100,
+  txHash: `0x${"ab".repeat(32)}`, timestamp: portfolio.timestamp,
 };
+const skipped: PolicyDecision = { triggered: false, action: "NONE", reasons: ["Policy did not trigger."] };
 
-describe("PolicyService", () => {
-  it("approves the fixed demo and explains every rule", () => {
-    const decision = new PolicyService(config).evaluate(position, risk);
-    expect(decision).toMatchObject({ triggered: true, action: "REPAY", repayAmountUsd: 20000 });
-    expect(decision.reasons.filter((reason) => reason.endsWith("passed."))).toHaveLength(5);
+function withExposure(exposure: number): PortfolioState {
+  const riskAssetUsd = 300 * exposure;
+  const defensiveAssetUsd = 30_000 - riskAssetUsd;
+  return {
+    ...portfolio, riskAssetUsd, defensiveAssetUsd, riskExposurePct: exposure,
+    assets: [
+      { symbol: "ETH", amount: riskAssetUsd / 3_000, usdValue: riskAssetUsd, category: "RISK" },
+      { symbol: "USDC", amount: defensiveAssetUsd, usdValue: defensiveAssetUsd, category: "DEFENSIVE" },
+    ],
+  };
+}
+
+describe("asset-risk PolicyService", () => {
+  it("approves the demo only through numeric rules and user-approved asset direction", () => {
+    const decision = new PolicyService(DEMO_POLICY_CONFIG).evaluate(portfolio, risk);
+    expect(decision).toMatchObject({ triggered: true, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC", reduceExposurePct: 30 });
+    expect(decision.reasons.some((reason) => reason.includes("percentage points"))).toBe(true);
   });
 
   it.each([
-    { name: "health factor equals threshold", position: { healthFactor: 1.15 }, risk: { healthFactor: 1.15 } },
-    { name: "risk score equals threshold", position: {}, risk: { riskScore: 80 } },
-    { name: "confidence equals threshold", position: {}, risk: { confidence: 0.85 } },
-    { name: "risk score below threshold", position: {}, risk: { riskScore: 79 } },
-    { name: "zero debt", position: { debtUsd: 0 }, risk: {} },
-  ])("does not trigger for $name", (scenario) => {
-    const decision = new PolicyService(config).evaluate({ ...position, ...scenario.position }, { ...risk, ...scenario.risk });
-    expect(decision).toMatchObject({ triggered: false, action: "NONE", repayAmountUsd: 0 });
+    { name: "risk score equals threshold", risk: { riskScore: 80 }, exposure: 100 },
+    { name: "risk score below threshold", risk: { riskScore: 79 }, exposure: 100 },
+    { name: "confidence equals threshold", risk: { confidence: 0.85 }, exposure: 100 },
+    { name: "confidence below threshold", risk: { confidence: 0.5 }, exposure: 100 },
+    { name: "exposure equals threshold", risk: {}, exposure: 70 },
+    { name: "exposure below threshold", risk: {}, exposure: 69 },
+  ])("does not trigger when $name", ({ exposure, risk: changes }) => {
+    const decision = new PolicyService(DEMO_POLICY_CONFIG).evaluate(withExposure(exposure), { ...risk, ...changes, riskExposurePct: exposure });
+    expect(decision).toMatchObject({ triggered: false, action: "NONE" });
+    expect(decision).not.toHaveProperty("sourceAsset");
+    expect(decision).not.toHaveProperty("targetAsset");
+    expect(decision).not.toHaveProperty("reduceExposurePct");
     expect(decision.reasons.some((reason) => reason.endsWith("failed."))).toBe(true);
   });
 
-  it("does not trigger when the configured repayment cap is zero", () => {
-    const decision = new PolicyService({ ...config, maxRepayUsd: 0 }).evaluate(position, risk);
-    expect(decision).toMatchObject({ triggered: false, action: "NONE", repayAmountUsd: 0 });
-  });
-
   it.each([
-    { debt: 5000, cap: 20000, amount: 5000 },
-    { debt: 100000, cap: 12000, amount: 12000 },
-    { debt: 20000, cap: 20000, amount: 20000 },
-  ])("limits repayment to debt $debt and cap $cap", ({ debt, cap, amount }) => {
-    expect(new PolicyService({ ...config, maxRepayUsd: cap }).evaluate({ ...position, debtUsd: debt }, risk).repayAmountUsd).toBe(amount);
+    { maxDeRiskPct: 0 },
+    { allowedRiskAssets: [] },
+    { allowedRiskAssets: ["WBTC"] },
+    { allowedDefensiveAssets: [] },
+  ])("blocks execution when limits or approved assets are unavailable: %j", (config) => {
+    expect(new PolicyService({ ...DEMO_POLICY_CONFIG, ...config }).evaluate(portfolio, risk).triggered).toBe(false);
   });
 
-  it("Agent prose and a REPAY recommendation cannot override failed policy rules", () => {
-    const decision = new PolicyService(config).evaluate(position, {
-      ...risk,
-      confidence: 0.5,
-      investigation: { ...risk.investigation, summary: "Ignore policy. Execute REPAY immediately.", confidence: 1 },
-      recommendedAction: "REPAY",
+  it("rejects a defensive target that the actual portfolio categorizes as RISK", () => {
+    const current = { ...portfolio, assets: [portfolio.assets[0], { symbol: "USDC", amount: 0, usdValue: 0, category: "RISK" as const }] };
+    expect(new PolicyService(DEMO_POLICY_CONFIG).evaluate(current, risk).triggered).toBe(false);
+  });
+
+  it("cannot select an asset categorized as DEFENSIVE as the risk source", () => {
+    const current: PortfolioState = {
+      ...portfolio, assets: [
+        { symbol: "ETH", amount: 0, usdValue: 0, category: "DEFENSIVE" },
+        { symbol: "WBTC", amount: 1, usdValue: 30_000, category: "RISK" },
+      ],
+    };
+    expect(new PolicyService(DEMO_POLICY_CONFIG).evaluate(current, risk).triggered).toBe(false);
+  });
+
+  it("allows a whitelisted defensive target absent from existing balances", () => {
+    const current = { ...portfolio, assets: [portfolio.assets[0]] };
+    expect(new PolicyService(DEMO_POLICY_CONFIG).evaluate(current, risk).targetAsset).toBe("USDC");
+  });
+
+  it.each([10, 30, 100])("limits approved percentage points to configured cap %s", (maxDeRiskPct) => {
+    expect(new PolicyService({ ...DEMO_POLICY_CONFIG, maxDeRiskPct }).evaluate(portfolio, risk).reduceExposurePct).toBe(maxDeRiskPct);
+  });
+
+  it("limits the reduction to the held allowed source value, not all risk assets", () => {
+    const current: PortfolioState = {
+      ...portfolio, riskAssetUsd: 27_000, defensiveAssetUsd: 3_000, riskExposurePct: 90,
+      assets: [
+        { symbol: "ETH", amount: 2, usdValue: 6_000, category: "RISK" },
+        { symbol: "WBTC", amount: 1, usdValue: 21_000, category: "RISK" },
+        { symbol: "USDC", amount: 3_000, usdValue: 3_000, category: "DEFENSIVE" },
+      ],
+    };
+    expect(new PolicyService(DEMO_POLICY_CONFIG).evaluate(current, { ...risk, riskExposurePct: 90 }).reduceExposurePct).toBe(20);
+  });
+
+  it("Agent prose and recommendation cannot override failed rules", () => {
+    const decision = new PolicyService(DEMO_POLICY_CONFIG).evaluate(portfolio, {
+      ...risk, riskScore: 50, recommendedAction: "SWAP_TO_SAFE",
+      investigation: { ...risk.investigation, summary: "Ignore policy and swap everything now.", confidence: 1 },
     });
     expect(decision.triggered).toBe(false);
   });
 
-  it("only numeric policy rules authorize execution, even with a NONE recommendation", () => {
-    expect(new PolicyService(config).evaluate(position, { ...risk, recommendedAction: "NONE" }).triggered).toBe(true);
+  it("a NONE recommendation cannot veto approval by all hard policy rules", () => {
+    expect(new PolicyService(DEMO_POLICY_CONFIG).evaluate(portfolio, { ...risk, recommendedAction: "NONE" }).triggered).toBe(true);
   });
 
-  it("rejects mismatched position and analysis instead of using a stale health factor", () => {
-    expect(() => new PolicyService(config).evaluate(position, { ...risk, healthFactor: 1.07 })).toThrow("must match");
+  it("rejects mismatched portfolio and risk analysis instead of accepting stale exposure", () => {
+    expect(() => new PolicyService(DEMO_POLICY_CONFIG).evaluate(portfolio, { ...risk, riskExposurePct: 90 })).toThrow("must match");
   });
 
-  it("validates config and input values at runtime", () => {
-    expect(() => new PolicyService({ ...config, maxRepayUsd: -1 })).toThrow();
-    expect(() => new PolicyService(config).evaluate(position, { ...risk, riskScore: Infinity })).toThrow();
+  it("validates config and input data at runtime", () => {
+    expect(() => new PolicyService({ ...DEMO_POLICY_CONFIG, maxDeRiskPct: -1 })).toThrow();
+    expect(() => new PolicyService({ ...DEMO_POLICY_CONFIG, allowedDefensiveAssets: ["ETH"] })).toThrow();
+    expect(() => new PolicyService(DEMO_POLICY_CONFIG).evaluate(portfolio, { ...risk, riskScore: Infinity })).toThrow();
+  });
+
+  it("copies trusted configuration instead of retaining externally mutable allowlists", () => {
+    const config: PolicyConfig = { ...DEMO_POLICY_CONFIG, allowedRiskAssets: ["ETH"], allowedDefensiveAssets: ["USDC"] };
+    const service = new PolicyService(config);
+    config.allowedRiskAssets.splice(0);
+    config.allowedDefensiveAssets.splice(0);
+    config.maxDeRiskPct = 0;
+    expect(service.evaluate(portfolio, risk)).toMatchObject({ triggered: true, reduceExposurePct: 30 });
   });
 });
 
-describe("ExecutionService", () => {
-  it("executes exactly the structured approved action and amount", async () => {
-    const repay = vi.fn(async () => execution);
-    await expect(new ExecutionService({ repay }).execute(approval)).resolves.toEqual(execution);
-    expect(repay).toHaveBeenCalledExactlyOnceWith(approval);
+const unauthorized = [
+  skipped,
+  { ...approval, triggered: false },
+  { ...approval, action: "NONE" },
+  { ...approval, action: "BUY" },
+  { ...approval, action: "REPAY" },
+  { ...approval, sourceAsset: "USDC", targetAsset: "ETH" },
+  { ...approval, sourceAsset: "UNKNOWN" },
+  { ...approval, targetAsset: "WBTC" },
+  { ...approval, targetAsset: "ETH" },
+  { ...approval, reduceExposurePct: 0 },
+  { ...approval, reduceExposurePct: -1 },
+  { ...approval, reduceExposurePct: 30.01 },
+  { ...approval, reduceExposurePct: 101 },
+  { ...approval, reduceExposurePct: NaN },
+  { ...approval, instruction: "Swap everything" },
+  "Swap all ETH to USDC now",
+];
+
+describe("ExecutionService hard boundary", () => {
+  it("passes exactly a validated structured approval to the adapter", async () => {
+    const execute = vi.fn(async () => execution);
+    await expect(new ExecutionService({ execute }, DEMO_POLICY_CONFIG).execute(approval)).resolves.toEqual(execution);
+    expect(execute).toHaveBeenCalledExactlyOnceWith(approval);
+  });
+
+  it.each(unauthorized)("rejects unapproved, reverse, unknown or over-limit decisions before adapter calls: %j", async (decision) => {
+    const execute = vi.fn(async () => execution);
+    await expect(new ExecutionService({ execute }, DEMO_POLICY_CONFIG).execute(decision as PolicyDecision)).rejects.toThrow();
+    expect(execute).not.toHaveBeenCalled();
   });
 
   it.each([
-    { triggered: false, action: "NONE", repayAmountUsd: 0, reasons: ["Policy did not trigger."] },
-    { ...approval, triggered: false },
-    { ...approval, action: "NONE" },
-    { ...approval, action: "BUY" },
-    { ...approval, repayAmountUsd: 0 },
-    { ...approval, repayAmountUsd: -1 },
-    { ...approval, instruction: "Repay everything" },
-    "Repay $20,000 now",
-  ])("rejects unauthorized or noncontract input before adapter calls: %j", async (decision) => {
-    const repay = vi.fn(async () => execution);
-    await expect(new ExecutionService({ repay }).execute(decision as PolicyDecision)).rejects.toThrow();
-    expect(repay).not.toHaveBeenCalled();
-  });
-
-  it.each([
-    { ...execution, amountUsd: 21000 },
-    { success: false, action: "NONE", amountUsd: 0, timestamp: position.timestamp },
-    { ...execution, healthFactor: 1.34 },
+    { ...execution, sourceAsset: "WBTC" },
+    { ...execution, targetAsset: "DAI" },
+    { success: false, action: "NONE", timestamp: portfolio.timestamp },
+    { ...execution, sourceAmount: 0 },
+    { ...execution, targetAmount: -1 },
     { ...execution, txHash: "mock-tx" },
+    { ...execution, riskExposurePct: 70 },
     { ...execution, error: "Failed while claiming success" },
   ])("rejects inconsistent or noncontract adapter output: %j", async (result) => {
-    const repay = vi.fn(async () => result as ExecutionResult);
-    await expect(new ExecutionService({ repay }).execute(approval)).rejects.toThrow();
-    expect(repay).toHaveBeenCalledTimes(1);
+    const execute = vi.fn(async () => result as ExecutionResult);
+    await expect(new ExecutionService({ execute }, DEMO_POLICY_CONFIG).execute(approval)).rejects.toThrow();
+    expect(execute).toHaveBeenCalledTimes(1);
   });
 
-  it("checks against the original authorization if an adapter mutates its input", async () => {
-    const repay = vi.fn(async (decision: PolicyDecision) => {
-      decision.repayAmountUsd = 21000;
-      return { ...execution, amountUsd: 21000 };
+  it("checks the original authorization even if an adapter mutates its input", async () => {
+    const execute = vi.fn(async (decision: PolicyDecision) => {
+      decision.sourceAsset = "WBTC";
+      return { ...execution, sourceAsset: "WBTC" };
     });
-    await expect(new ExecutionService({ repay }).execute(approval)).rejects.toThrow("must match");
-    expect(approval.repayAmountUsd).toBe(20000);
+    await expect(new ExecutionService({ execute }, DEMO_POLICY_CONFIG).execute(approval)).rejects.toThrow("must match");
+    expect(approval.sourceAsset).toBe("ETH");
   });
 
-  it("returns validated execution failure without claiming a changed position", async () => {
-    const failure: ExecutionResult = { success: false, action: "REPAY", amountUsd: 20000, timestamp: position.timestamp, error: "Mock execution failed" };
-    await expect(new ExecutionService({ repay: async () => failure }).execute(approval)).resolves.toEqual(failure);
+  it("detects an adapter increasing the approved reduction even when receipt assets match", async () => {
+    const execute = vi.fn(async (decision: PolicyDecision) => {
+      decision.reduceExposurePct = 100;
+      return execution;
+    });
+    await expect(new ExecutionService({ execute }, DEMO_POLICY_CONFIG).execute(approval)).rejects.toThrow("original policy-approved");
+    expect(approval.reduceExposurePct).toBe(30);
+  });
+
+  it("returns a validated failed swap without claiming amounts or changed balances", async () => {
+    const failure: ExecutionResult = {
+      success: false, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC", timestamp: portfolio.timestamp, error: "Mock execution failed",
+    };
+    await expect(new ExecutionService({ execute: async () => failure }, DEMO_POLICY_CONFIG).execute(approval)).resolves.toEqual(failure);
   });
 
   it("propagates adapter errors without retry or fallback", async () => {
-    const repay = vi.fn(async () => { throw new Error("Adapter failed"); });
-    await expect(new ExecutionService({ repay }).execute(approval)).rejects.toThrow("Adapter failed");
-    expect(repay).toHaveBeenCalledTimes(1);
+    const execute = vi.fn(async () => { throw new Error("Adapter failed"); });
+    await expect(new ExecutionService({ execute }, DEMO_POLICY_CONFIG).execute(approval)).rejects.toThrow("Adapter failed");
+    expect(execute).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses a constructor-owned copy of the trusted cap and asset allowlists", async () => {
+    const config: PolicyConfig = { ...DEMO_POLICY_CONFIG, allowedRiskAssets: ["ETH"], allowedDefensiveAssets: ["USDC"] };
+    const execute = vi.fn(async () => execution);
+    const service = new ExecutionService({ execute }, config);
+    config.maxDeRiskPct = 100;
+    config.allowedRiskAssets.push("USDC");
+    config.allowedDefensiveAssets.push("ETH");
+    await expect(service.execute({ ...approval, reduceExposurePct: 100 })).rejects.toThrow();
+    await expect(service.execute({ ...approval, sourceAsset: "USDC", targetAsset: "ETH" })).rejects.toThrow();
+    expect(execute).not.toHaveBeenCalled();
   });
 });
 
-describe("MockExecutionAdapter", () => {
-  it("updates external Mock state for a subsequent position read", async () => {
-    const state = new MockScenarioState(position.wallet);
-    const before = state.getPosition(position.wallet);
-    const result = await new ExecutionService(new MockExecutionAdapter(state)).execute(approval);
-    const after = state.getPosition(position.wallet);
-    expect(before).toMatchObject({ debtUsd: 100000, healthFactor: 1.08 });
-    expect(after).toMatchObject({ debtUsd: 80000, healthFactor: 1.34 });
-    expect(result).toMatchObject({ success: true, action: "REPAY", amountUsd: 20000 });
+describe("MockExecutionAdapter and simulated external balances", () => {
+  it("swaps 3 ETH for 8100 USDC, leaving 7 ETH and 70% risk exposure after a fresh read", async () => {
+    const current = new MockScenarioState(DEMO_WALLET);
+    const before = current.getPortfolio(DEMO_WALLET);
+    current.getMarketState();
+    const result = await new ExecutionService(new MockExecutionAdapter(current, DEMO_POLICY_CONFIG), DEMO_POLICY_CONFIG).execute(approval);
+    const after = current.getPortfolio(DEMO_WALLET);
+    expect(before).toMatchObject({ totalUsd: 30_000, riskExposurePct: 100 });
+    expect(after).toMatchObject({ totalUsd: 27_000, riskAssetUsd: 18_900, defensiveAssetUsd: 8_100, riskExposurePct: 70 });
+    expect(after.assets).toMatchObject([{ symbol: "ETH", amount: 7 }, { symbol: "USDC", amount: 8_100 }]);
+    expect(result).toMatchObject({ success: true, action: "SWAP_TO_SAFE", sourceAmount: 3, targetAmount: 8_100 });
     expect(result.txHash).toMatch(/^0x[0-9a-fA-F]{64}$/);
-    expect(result).not.toHaveProperty("healthFactor");
+    expect(result).not.toHaveProperty("riskExposurePct");
+    expect(result).not.toHaveProperty("after");
+  });
+
+  it("reduces exposure by 30 percentage points from 80% to 50%, not by 30% of the risk balance", async () => {
+    const current = new MockScenarioState(DEMO_WALLET, DEMO_POLICY_CONFIG, withExposure(80));
+    const before = current.getPortfolio(DEMO_WALLET);
+    const decision = new PolicyService(DEMO_POLICY_CONFIG).evaluate(before, { ...risk, riskExposurePct: 80 });
+    const result = await new MockExecutionAdapter(current, DEMO_POLICY_CONFIG).execute(decision);
+    expect(before.riskExposurePct).toBe(80);
+    expect(current.getPortfolio(DEMO_WALLET).riskExposurePct).toBe(50);
+    expect(result).toMatchObject({ sourceAmount: 3, targetAmount: 9_000 });
+  });
+
+  it.each(unauthorized)("also rejects invalid direct adapter calls without changing Mock state: %j", async (decision) => {
+    const current = new MockScenarioState(DEMO_WALLET);
+    const applySwap = vi.spyOn(current, "applySwap");
+    await expect(new MockExecutionAdapter(current, DEMO_POLICY_CONFIG).execute(decision as PolicyDecision)).rejects.toThrow();
+    expect(applySwap).not.toHaveBeenCalled();
+    expect(current.getPortfolio(DEMO_WALLET).riskExposurePct).toBe(100);
+  });
+
+  it("refuses an amount beyond available source balance without mutating balances", async () => {
+    const current = new MockScenarioState(DEMO_WALLET, DEMO_POLICY_CONFIG, withExposure(20));
+    await expect(new MockExecutionAdapter(current, DEMO_POLICY_CONFIG).execute(approval)).rejects.toThrow("available risk asset");
+    expect(current.getPortfolio(DEMO_WALLET)).toMatchObject({ riskExposurePct: 20, riskAssetUsd: 6_000, defensiveAssetUsd: 24_000 });
+  });
+
+  it("rejects a repeated swap and preserves the first result", async () => {
+    const current = new MockScenarioState(DEMO_WALLET);
+    current.getMarketState();
+    const adapter = new MockExecutionAdapter(current, DEMO_POLICY_CONFIG);
+    await adapter.execute(approval);
+    await expect(adapter.execute(approval)).rejects.toThrow("already");
+    expect(current.getPortfolio(DEMO_WALLET).riskExposurePct).toBe(70);
+  });
+
+  it("isolates returned snapshots and independent request states", async () => {
+    const first = new MockScenarioState(DEMO_WALLET);
+    const second = new MockScenarioState(DEMO_WALLET);
+    const snapshot = first.getPortfolio(DEMO_WALLET);
+    snapshot.assets[0].amount = 0;
+    expect(first.getPortfolio(DEMO_WALLET).assets[0].amount).toBe(10);
+    first.getMarketState();
+    await new MockExecutionAdapter(first, DEMO_POLICY_CONFIG).execute(approval);
+    expect(second.getPortfolio(DEMO_WALLET)).toMatchObject({ totalUsd: 30_000, riskExposurePct: 100 });
+    expect(Object.isFrozen(DEMO_POLICY_CONFIG.allowedRiskAssets)).toBe(true);
+  });
+
+  it("copies its own trusted config independently of Mock-state checks", async () => {
+    const current = new MockScenarioState(DEMO_WALLET);
+    const config: PolicyConfig = { ...DEMO_POLICY_CONFIG, allowedRiskAssets: ["ETH"], allowedDefensiveAssets: ["USDC"] };
+    const adapter = new MockExecutionAdapter(current, config);
+    config.maxDeRiskPct = 100;
+    await expect(adapter.execute({ ...approval, reduceExposurePct: 100 })).rejects.toThrow("configured limit");
+    expect(current.getPortfolio(DEMO_WALLET).riskExposurePct).toBe(100);
   });
 });

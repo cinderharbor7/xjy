@@ -1,5 +1,5 @@
-import type { InvestigationResult, PositionState, RiskAnalysis } from "@/domain/types";
+import type { InvestigationResult, MarketState, PortfolioState, RiskAnalysis } from "@/domain/types";
 
 export interface InvestigationAdapter {
-  investigate(position: PositionState, risk: RiskAnalysis): Promise<InvestigationResult>;
+  investigate(portfolio: PortfolioState, market: MarketState, risk: RiskAnalysis): Promise<InvestigationResult>;
 }

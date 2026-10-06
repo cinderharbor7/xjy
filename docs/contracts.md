@@ -1,134 +1,189 @@
-# 冻结的数据契约
+# Guardian 核心数据合同
 
-这八项结构是模块间和 API 返回值的数据边界。唯一真源是 [Zod schemas](../src/domain/schemas/index.ts)；[TypeScript types](../src/domain/types/index.ts) 全部使用 `z.infer` 从 schema 推导，不重复维护接口。API 请求另由 `RescueRequestSchema` 校验。
-
-任何公开字段、范围或语义变更，都需要四名开发者确认，并同时修改消费者、测试和文档。各模块只交换这些结构，不读取其他模块内部状态；请求级 Mock 状态仅供 Mock Adapter 模拟外部世界。
+唯一真源是 [Zod schemas](../src/domain/schemas/index.ts)，[TypeScript types](../src/domain/types/index.ts) 使用 `z.infer` 推导。模块仅交换这些结构；Portfolio 不携带行情字段，Market 独立读取。所有对象严格拒绝未知字段。此前核心借贷合同已被替换；Aave 专属合同保留在 [extensions/aave/schemas.ts](../src/extensions/aave/schemas.ts)，不属于下述核心 Domain。
 
 ## 公共规则
 
-- 所有对象使用 Zod strict object，拒绝未知字段，不会静默丢弃额外字段。
-- 数值必须是有限数；USD 金额非负；confidence 在闭区间 `[0, 1]`。
-- wallet 去除首尾空格后必须非空。Mock 阶段允许测试标签，不验证 EVM 地址格式。
-- timestamp 是 `z.iso.datetime()` 验证的 UTC ISO 8601 时间字符串，示例 `2026-10-06T12:00:00.000Z`。
-- action 与 recommendedAction 只能是 `"NONE"` 或 `"REPAY"`。NONE 表示不执行动作。
+- wallet 与 symbol trim 后非空；核心 Mock wallet 允许测试标签，不要求真实地址。
+- USD / balance 为有限非负数，比例和风险/波动分数为 `[0,100]`，confidence 为 `[0,1]`。
+- timestamp 是 UTC ISO 8601；可选 blockNumber 为非负安全整数；tokenAddress 是 `0x` 加 40 位十六进制。
+- action 仅 `NONE | SWAP_TO_SAFE`；白名单由服务端提前配置，请求或 Agent 不能提供授权。
+- **reduceExposurePct / maxDeRiskPct 单位为风险敞口百分点**。80% 降低 30 个百分点 → 50%。
 
-## PositionState
+## 全部核心结构
 
-| 字段 | 类型 | 校验与语义 |
-| --- | --- | --- |
-| wallet | string | 非空、trim；仓位所属 wallet |
-| collateralUsd | number | 有限且 ≥ 0 |
-| debtUsd | number | 有限且 ≥ 0 |
-| healthFactor | number | 有限且 ≥ 0 |
-| ethPrice | number | 有限且 > 0 |
-| timestamp | string | UTC ISO 时间；读取仓位的时间 |
-| blockNumber | number，可选 | 非负整数；Mock fixture 不提供该字段 |
+以下 TypeScript 仅展示结构，运行校验以 Zod 为准。
 
-Position Service 验证 Adapter 输出，并要求返回的 wallet 与请求一致。执行后的 PositionState 只能来自独立的再次读取。
+```ts
+type AssetBalance = {
+  symbol: string;
+  tokenAddress?: string;
+  amount: number;
+  usdValue: number;
+  category: "RISK" | "DEFENSIVE";
+};
 
-## StressTestResult
+type PortfolioState = {
+  wallet: string;
+  totalUsd: number;
+  riskAssetUsd: number;
+  defensiveAssetUsd: number;
+  riskExposurePct: number;
+  assets: AssetBalance[];
+  timestamp: string;
+  blockNumber?: number;
+};
 
-| 字段 | 类型 | 校验与语义 |
-| --- | --- | --- |
-| ethChangePct | number | 有限且 ≥ -100；单位是百分比，如 -5 表示跌 5% |
-| projectedHealthFactor | number | 有限且 ≥ 0 |
-| liquidationRisk | boolean | 当前 Demo 在有债务且 projectedHealthFactor ≤ 1 时为 true |
+type MarketState = {
+  asset: string;
+  priceUsd: number;
+  priceChange5mPct: number;
+  priceChange1hPct: number;
+  volatilityScore: number;
+  timestamp: string;
+};
 
-当前公式为 `HF × (1 + ethChangePct / 100)`，结果保留两位小数；HF 1.08 在 -5% / -10% / -15% 时为 1.03 / 0.97 / 0.92。它不包含真实 Aave 清算参数。
+type StressTestResult = {
+  priceChangePct: number;
+  projectedPortfolioUsd: number;
+  projectedLossUsd: number;
+};
 
-## InvestigationResult
+type InvestigationResult = {
+  summary: string;
+  primaryCause: string;
+  evidence: string[];
+  uncertainties: string[];
+  confidence: number;
+};
 
-| 字段 | 类型 | 校验与语义 |
-| --- | --- | --- |
-| summary | string | 长度至少 1 |
-| primaryCause | string | 长度至少 1 |
-| evidence | string[] | 可为空 |
-| uncertainties | string[] | 可为空 |
-| confidence | number | 有限且在 `[0, 1]` |
+type RiskAnalysis = {
+  riskScore: number;
+  confidence: number;
+  riskExposurePct: number;
+  stressTests: StressTestResult[];
+  investigation: InvestigationResult;
+  recommendedAction: "NONE" | "SWAP_TO_SAFE";
+};
 
-调查结果只描述风险，不包含授权或执行方法。当前 Mock confidence 固定为 0.88，文本明确说明模拟数据、未调用 LLM 和压力模型限制。
+type PolicyConfig = {
+  minRiskScore: number;
+  minConfidence: number;
+  minRiskExposurePct: number;
+  maxDeRiskPct: number;
+  allowedRiskAssets: string[];
+  allowedDefensiveAssets: string[];
+};
 
-## RiskAnalysis
+type PolicyDecision = {
+  triggered: boolean;
+  action: "NONE" | "SWAP_TO_SAFE";
+  sourceAsset?: string;
+  targetAsset?: string;
+  reduceExposurePct?: number;
+  reasons: string[];
+};
 
-| 字段 | 类型 | 校验与语义 |
-| --- | --- | --- |
-| riskScore | number | 有限且在 `[0, 100]` |
-| confidence | number | 有限且在 `[0, 1]` |
-| healthFactor | number | 有限且 ≥ 0；必须描述 before 仓位 |
-| stressTests | StressTestResult[] | 可为空；Demo 有三个场景 |
-| investigation | InvestigationResult | 嵌套结构也严格校验 |
-| recommendedAction | NONE 或 REPAY | 建议，不能授权执行 |
+type ExecutionResult = {
+  success: boolean;
+  action: "NONE" | "SWAP_TO_SAFE";
+  sourceAsset?: string;
+  targetAsset?: string;
+  sourceAmount?: number;
+  targetAmount?: number;
+  txHash?: string;
+  timestamp: string;
+  error?: string;
+};
 
-Risk Service 先生成本地评分与压力测试，调查字段为 `Pending investigation`，confidence 为 0。Orchestrator 调用 Investigation Service 后，合并正式调查结果及其 confidence，再交给 Policy。`RiskAnalysisSchema` 允许初始值 0；流程保证 Policy 使用合成后的结果。
+type VerificationResult = {
+  status: "SKIPPED" | "PASSED" | "FAILED";
+  reasons: string[];
+};
 
-## PolicyConfig
+type RescueSession = {
+  before: PortfolioState;
+  market: MarketState;
+  riskAnalysis: RiskAnalysis;
+  policyDecision: PolicyDecision;
+  execution: ExecutionResult;
+  after?: PortfolioState;
+  verification: VerificationResult;
+};
+```
 
-| 字段 | 类型 | 校验与 Demo 默认值 |
-| --- | --- | --- |
-| maxHealthFactorForTrigger | number | 有限且 > 0；默认 1.15 |
-| minRiskScore | number | 有限且在 `[0, 100]`；默认 80 |
-| minConfidence | number | 有限且在 `[0, 1]`；默认 0.85 |
-| maxRepayUsd | number | 有限且 ≥ 0；默认 20,000 |
+## 组合与行情一致性
 
-Policy 的比较采用**严格** `<` 和 `>`：HF < 上限，Risk Score > 下限，Confidence > 下限。等于阈值时不触发。另外要求 debtUsd > 0 且 maxRepayUsd > 0。全部通过才批准，还款金额为 `min(debtUsd, maxRepayUsd)`。这些参数目前仅用于 Demo。
+Asset symbol 在一个组合内唯一；RISK / DEFENSIVE 的 usdValue 汇总分别等于 riskAssetUsd / defensiveAssetUsd；两者之和等于 totalUsd。`riskExposurePct = riskAssetUsd / totalUsd × 100`，空组合 totalUsd=0 时敞口定义为 0。amount 为 0 的资产 usdValue 必须为 0。汇总和比例比较采用浮点容差 `1e-9 × max(1, abs(a), abs(b))`。空 assets 合法，不能因为存在字符串 ETH 就自动认定有风险余额。
 
-## PolicyDecision
+Market priceUsd > 0，5m / 1h 变化不得低于 -100%，可为正数；volatilityScore 为 0..100。行情不偷偷塞进 Portfolio。压力测试变化同样 ≥ -100%；投影组合价值与损失非负。
 
-| 字段 | 类型 | 校验与语义 |
-| --- | --- | --- |
-| triggered | boolean | 是否由 Policy 批准执行 |
-| action | NONE 或 REPAY | 与 triggered 一致 |
-| repayAmountUsd | number | 有限且 ≥ 0；还款 USD 金额 |
-| reasons | string[] | 至少一个原因 |
+Demo 首读 10 ETH × $3,000 = $30,000，随后 Market Mock 把模拟外部 ETH 价格更新为 $2,700，执行和再次读取得到冲击后估值。风险分析中的 riskExposurePct 必须描述 before。压力测试只冲击 before 中 RISK 的 USD 估值，DEFENSIVE 暂固定：`projectedPortfolioUsd = defensiveAssetUsd + riskAssetUsd × (1 + priceChangePct/100)`，`projectedLossUsd = max(0, totalUsd - projectedPortfolioUsd)`。它是场景计算，不是市场收益预测。
 
-Schema 强制一致性：
+## Risk 与 Agent
 
-- `triggered: false` → action 必须为 NONE，repayAmountUsd 必须为 0。
-- `triggered: true` → action 必须为 REPAY，repayAmountUsd 必须 > 0。
+Demo 确定性 score 为 `round(0.5 × volatilityScore + 0.3 × clamp(-priceChange1hPct × 10, 0, 100) + 0.2 × riskExposurePct)`；riskAssetUsd=0 时为0。调查前 RiskAnalysis 含 Pending investigation、confidence=0；调查后 Orchestrator 合成正式 Investigation，并将两处 confidence 设为相同值。
 
-金额不得超过当前债务或配置上限由 **Policy Service** 保证，因为单个 PolicyDecision 不携带债务与配置。Executor 只接受此结构，不接受自由文本指令。调查文本与 recommendedAction 不参与 Policy 授权判断。
+Investigation summary / primaryCause 非空，evidence / uncertainties 数组可为空。`recommendedAction` 只是建议；Policy 不依赖推荐动作或调查自由文本授权。Agent 没有执行接口。
+
+## PolicyConfig / PolicyDecision
+
+名单内 symbol 唯一，RISK 与 DEFENSIVE 名单不得重叠；空名单合法但不能授权交易。Demo 服务端配置为 score>80、confidence>0.85、exposure>70、maxDeRiskPct=30、allowedRiskAssets=[ETH]、allowedDefensiveAssets=[USDC]。
+
+三项阈值使用严格 `>`，等于阈值不触发；还要求 maxDeRiskPct>0、存在有余额的允许 RISK 源资产及允许 DEFENSIVE 目标。源、目标不能相同，已有目标资产不能被标为 RISK。批准百分点不超过上限及源资产占组合总值的百分点。USDC 只是用户预先批准的 Demo 防御资产，不能称为无风险。
+
+Schema 强制：
+
+- 未触发：`action=NONE`，无 sourceAsset / targetAsset / reduceExposurePct。
+- 已触发：`action=SWAP_TO_SAFE`，源/目标非空且不同，reduceExposurePct>0。
+- reasons 至少一项。
+
+单独的 PolicyDecision 不携带用户配置或资产类别；Schema 验证结构，PolicyService 依据组合和可信配置批准，ExecutionService / MockAdapter 再独立依据可信配置验证方向、名单和限额。通过 schema 不等于获得真实交易权限。
 
 ## ExecutionResult
 
-| 字段 | 类型 | 校验与语义 |
-| --- | --- | --- |
-| success | boolean | REPAY 是否成功；NONE 时固定为 false |
-| action | NONE 或 REPAY | 必须与 PolicyDecision 一致 |
-| amountUsd | number | 有限且 ≥ 0；必须等于批准金额 |
-| txHash | string，可选 | `0x` 加 64 位十六进制；当前是假哈希 |
-| timestamp | string | UTC ISO 时间 |
-| error | string，可选 | 错误说明；成功时不允许出现 |
+- NONE 是跳过：success=false，只有 action/timestamp，没有资产、数量、hash、error。
+- SWAP_TO_SAFE 必须有不同的 sourceAsset / targetAsset。
+- 成功 swap：sourceAmount/targetAmount 有限且 >0，必须有 `0x` 加64位十六进制 txHash，不得有 error。
+- 失败 swap：保留批准的资产和动作，必须有非空 error，没有交割数量；schema 允许可选 txHash，当前 Mock 失败不填造 hash。
 
-一致性规则：
+ExecutionAdapter 只暴露 `execute(decision: PolicyDecision)`。ExecutionService 在调用外部 Adapter 前捕获批准内容，并校验结果动作与资产匹配；不能让 Adapter 更换批准内容。Executor 不返回 Portfolio 或“已经改善”的结论。Mock 的 txHash 明确是假哈希，不给真实区块浏览器链接。
 
-- NONE 表示 **skipped**，必须 `success: false`、amountUsd 0、没有 txHash；不是执行失败。
-- REPAY 的 amountUsd 必须 > 0；成功的 REPAY 必须有 txHash。
-- success 为 true 时不得有 error。
-- Execution Service 校验 action 和 amountUsd 与原始批准决定完全一致；外部 Adapter 不能擅自更换动作或金额。
+## RescueSession / VerificationResult
 
-执行失败保留 REPAY 和批准金额。ExecutionResult 不含 Health Factor，不能作为执行后仓位的来源。
+Session 必须包含 market 和 verification；成功执行当且仅当存在 after。前后 wallet 相同；风险敞口匹配 before；riskAnalysis.confidence 等于 investigation.confidence；execution action / source / target 与 policyDecision 相同。
 
-## RescueSession
+[verification.ts](../src/domain/verification.ts) 从独立重读数据核验：钱包相同，after.timestamp 不早于 before.timestamp 或 execution.timestamp，已提供的区块不倒退，源为 RISK / 目标为 DEFENSIVE，源减少与回执 sourceAmount 相符，目标增加与 targetAmount 相符，资产身份及非批准资产数量不变，after.riskExposurePct < before.riskExposurePct。验证还按 Market 报价重估 before 中对应资产的价值，其余资产使用快照估值，核对实际 sourceAmount 对应的组合百分点与批准 reduceExposurePct 相等，防止超卖仍被认定通过。数值比较拒绝非有限中间结果。SessionSchema 同时重算 status，拒绝伪造 PASSED。
 
-| 字段 | 类型 | 语义 |
-| --- | --- | --- |
-| before | PositionState | 首次读取 |
-| riskAnalysis | RiskAnalysis | 风险与调查的合成结果 |
-| policyDecision | PolicyDecision | 硬规则审批结果 |
-| execution | ExecutionResult | 成功、失败或跳过的执行记录 |
-| after | PositionState，可选 | 执行成功后的再次读取 |
+| status | 含义 |
+| --- | --- |
+| SKIPPED | Policy 未批准，或批准执行失败；没有 after，不声称发生保护 |
+| PASSED | 执行成功、独立重读且全部检查通过 |
+| FAILED | 执行成功并保留 after，但敞口或余额/证据检查失败；到此停止 |
 
-Schema 强制跨结构一致性：
+reasons 至少一项。成功回执不是验证成功；未改善可以是合法 FAILED Session。重读失败时整个 API 明确报错，不让 Executor 补造 after，不自动补偿或反向交易。
 
-- execution.action 与 amountUsd 必须分别等于 policyDecision.action 与 repayAmountUsd。
-- execution.success 为 true **当且仅当**存在 after；跳过或失败均不能带 after。
-- after.wallet 必须等于 before.wallet。
-- riskAnalysis.healthFactor 必须等于 before.healthFactor。
+## HTTP 合同
 
-Orchestrator 保证成功后调用 Position Service 重新读取。Schema 不强制 `after.healthFactor > before.healthFactor`：成功执行与仓位改善是两个需要分别验证的事实。Dashboard 从返回的两个快照比较 HF，并在未改善时明确显示。
+`POST /api/rescue` 严格输入 `{wallet:string}`，trim 后非空；拒绝额外字段、动作、白名单/阈值和非法 JSON。200 直接返回新的 RescueSession，响应头 `X-Rescue-Mode: MOCK`、`Cache-Control: no-store`。
 
-## HTTP 请求边界
+错误为严格 `RescueProblem`：
 
-`POST /api/rescue` 请求必须是严格对象 `{ wallet: string }`，应用同一个 WalletSchema。缺字段、空白 wallet、错误类型、未知字段或非法 JSON 返回 HTTP 400。成功响应直接是 RescueSession，无额外包装字段。
+```ts
+type RescueProblem = {
+  type: string;
+  title: string;
+  status: 400 | 500;
+  detail: string;
+  instance: "/api/rescue";
+  code: "INVALID_REQUEST" | "RESCUE_FAILED";
+};
+```
 
-当前 Mock API 每次请求建立新的 MockScenarioState，并同时注入 Position 和 Execution Mock Adapter。模块公共契约不携带 Mock 内部状态，也不增加额外的 mock 字段；模式由页面标识和 `X-Rescue-Mode: MOCK` 响应头说明。
+400/INVALID_REQUEST 表示请求错误，500/RESCUE_FAILED 表示配置或流程失败。Content-Type 为 application/problem+json；type 为 `urn:xjy:rescue:<code>`；不泄漏原始异常、端点或凭据。URL 不变，但旧借贷 DTO 被整体替换，不提供旧格式 shim。见 [Rescue OpenAPI](rescue-api.openapi.json)。
+
+## Aave 可选扩展合同
+
+主合同没有 Aave、debt、HF 或 REPAY 字段。现有 `/position`、`POST /api/position` 使用 [扩展本地 schemas](../src/extensions/aave/schemas.ts) / [types](../src/extensions/aave/types.ts)：AavePositionState 仍为 wallet/collateralUsd/debtUsd/healthFactor/ethPrice/timestamp/blockNumber?；ACTIVE 包含 position、marketChanges、evidence；NO_DEBT 包含 position=null、message、evidence，不产生假的 HF。
+
+PositionEvidence 的 chainId/network/protocol、Provider/Pool/Oracle/WETH、blockNumber/hash/time 以及预留 txHash 保持；PositionMarketChanges 仍为真实7200区块窗口及实际秒数。查询不产生 txHash。HTTP 200/400/502/503、LIVE头、错误instance及canonical hash要求保持，详见 [Aave 文档](aave-position.md) 和 [Position OpenAPI](position-api.openapi.json)。该数据不作为核心 Portfolio 或5m/1h Market 的来源。

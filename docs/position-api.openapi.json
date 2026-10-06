@@ -1,0 +1,596 @@
+{
+  "openapi": "3.1.0",
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "info": {
+    "title": "Aave Position Read API",
+    "version": "0.1.0",
+    "description": "Optional read-only Ethereum mainnet Aave V3 Core extension. Returns one wallet snapshot using extension-local AavePositionState contracts. Guardian Portfolio/Market/SWAP_TO_SAFE is a separate Mock flow. RPC and network configuration are server-only. This operation does not run risk, investigation, policy, execution, signing or transactions."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Position",
+      "description": "Public Aave account snapshot"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/api/position": {
+      "post": {
+        "operationId": "readAavePosition",
+        "tags": [
+          "Position"
+        ],
+        "summary": "Read a wallet Aave V3 Core position",
+        "description": "POST is the established query boundary and does not mutate chain or application state. Accepts one valid Ethereum address, with no authentication or signing. ACTIVE and NO_DEBT are both successful results. Contract reads pin current and historical values by blockHash with requireCanonical: true (EIP-1898); ACTIVE reads the actual oracle at 7200 blocks earlier and exposes the variable elapsed time. The server RPC must support these canonical hash and historical calls. No pagination, filters, version prefix, persisted idempotency key or rate limiter is implemented in this local Demo. No RPC retry, fallback or Mock substitution is performed. The caller cannot override RPC, chain or contract configuration.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PositionQuery"
+              },
+              "examples": {
+                "borrower": {
+                  "summary": "Public read-only test wallet",
+                  "value": {
+                    "wallet": "0x485c028c475dba482297656229d11b4eaf22357b"
+                  }
+                },
+                "noDebt": {
+                  "summary": "No-debt branch sample address",
+                  "value": {
+                    "wallet": "0x0000000000000000000000000000000000000001"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ACTIVE: actual borrowing position; NO_DEBT: no borrowing, no PositionState or synthetic Health Factor.",
+            "headers": {
+              "Cache-Control": {
+                "description": "All query results and errors are uncached.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Position-Mode": {
+                "description": "Real chain reads; this header never claims an execution.",
+                "schema": {
+                  "type": "string",
+                  "const": "LIVE"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionSnapshot"
+                },
+                "examples": {
+                  "active": {
+                    "summary": "Recorded chain snapshot at block 26133728; live values can change",
+                    "value": {
+                      "mode": "LIVE",
+                      "wallet": "0x485c028c475dba482297656229d11b4eaf22357b",
+                      "status": "ACTIVE",
+                      "position": {
+                        "wallet": "0x485c028c475dba482297656229d11b4eaf22357b",
+                        "collateralUsd": 3582.01428638,
+                        "debtUsd": 1092.89096989,
+                        "healthFactor": 2.609328551118806,
+                        "ethPrice": 2716.45427768,
+                        "timestamp": "2026-10-06T13:47:47.000Z",
+                        "blockNumber": 26133728
+                      },
+                      "evidence": {
+                        "chainId": 1,
+                        "network": "ethereum-mainnet",
+                        "protocol": "aave-v3",
+                        "providerAddress": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+                        "poolAddress": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+                        "oracleAddress": "0x54586bE62E3c3580375aE3723C145253060Ca0C2",
+                        "ethAssetAddress": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                        "blockNumber": 26133728,
+                        "blockHash": "0x38b551e537128b04aaacd04f1986597752e5f10bbd5c0adc98ed9e1c353f4f52",
+                        "blockTimestamp": "2026-10-06T13:47:47.000Z"
+                      },
+                      "marketChanges": {
+                        "ethChangePct": -0.2832320420531831,
+                        "previousEthPrice": 2724.17,
+                        "referenceBlockNumber": 26126528,
+                        "referenceBlockHash": "0xb7edda0ddb74c0a1127585d37bf5f206ff6163ab80237bbd42bc7aa2a01ccf04",
+                        "referenceTimestamp": "2026-10-05T13:41:11.000Z",
+                        "referenceOracleAddress": "0x54586bE62E3c3580375aE3723C145253060Ca0C2",
+                        "lookbackBlocks": 7200,
+                        "lookbackSeconds": 86796
+                      }
+                    }
+                  },
+                  "noDebt": {
+                    "summary": "No-debt branch shape with recorded block evidence",
+                    "value": {
+                      "mode": "LIVE",
+                      "wallet": "0x0000000000000000000000000000000000000001",
+                      "status": "NO_DEBT",
+                      "position": null,
+                      "message": "No Aave debt position; Health Factor is not applicable.",
+                      "evidence": {
+                        "chainId": 1,
+                        "network": "ethereum-mainnet",
+                        "protocol": "aave-v3",
+                        "providerAddress": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+                        "poolAddress": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+                        "oracleAddress": "0x54586bE62E3c3580375aE3723C145253060Ca0C2",
+                        "ethAssetAddress": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                        "blockNumber": 26133728,
+                        "blockHash": "0x38b551e537128b04aaacd04f1986597752e5f10bbd5c0adc98ed9e1c353f4f52",
+                        "blockTimestamp": "2026-10-06T13:47:47.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid JSON, missing or unknown fields, invalid wallet address.",
+            "headers": {
+              "Cache-Control": {
+                "description": "All query results and errors are uncached.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionProblem"
+                },
+                "examples": {
+                  "invalidWallet": {
+                    "value": {
+                      "type": "urn:xjy:position:INVALID_WALLET",
+                      "title": "Invalid wallet",
+                      "status": 400,
+                      "detail": "Enter a valid Ethereum address in a strict JSON wallet object.",
+                      "instance": "/api/position",
+                      "code": "INVALID_WALLET"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "RPC returns the wrong chain, invalid chain data, or a failed/timeout/historical/canonical hash read. No retry or fallback is performed.",
+            "headers": {
+              "Cache-Control": {
+                "description": "All query results and errors are uncached.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionProblem"
+                },
+                "examples": {
+                  "wrongChain": {
+                    "value": {
+                      "type": "urn:xjy:position:UNSUPPORTED_NETWORK",
+                      "title": "Unsupported network",
+                      "status": 502,
+                      "detail": "The configured RPC must return Ethereum mainnet chainId 1.",
+                      "instance": "/api/position",
+                      "code": "UNSUPPORTED_NETWORK"
+                    }
+                  },
+                  "invalidData": {
+                    "value": {
+                      "type": "urn:xjy:position:INVALID_CHAIN_DATA",
+                      "title": "Invalid chain data",
+                      "status": 502,
+                      "detail": "Aave returned inconsistent or invalid chain data.",
+                      "instance": "/api/position",
+                      "code": "INVALID_CHAIN_DATA"
+                    }
+                  },
+                  "rpcFailed": {
+                    "value": {
+                      "type": "urn:xjy:position:RPC_READ_FAILED",
+                      "title": "RPC read failed",
+                      "status": 502,
+                      "detail": "The position or historical oracle could not be read from the configured RPC.",
+                      "instance": "/api/position",
+                      "code": "RPC_READ_FAILED"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Server-side RPC URL or AAVE_NETWORK configuration is missing or unsupported.",
+            "headers": {
+              "Cache-Control": {
+                "description": "All query results and errors are uncached.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionProblem"
+                },
+                "examples": {
+                  "configuration": {
+                    "value": {
+                      "type": "urn:xjy:position:CONFIGURATION_ERROR",
+                      "title": "Configuration error",
+                      "status": 503,
+                      "detail": "Configure an Ethereum mainnet RPC URL with support for the historical read window.",
+                      "instance": "/api/position",
+                      "code": "CONFIGURATION_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EthereumAddress": {
+        "type": "string",
+        "pattern": "^0x[0-9a-fA-F]{40}$",
+        "description": "Ethereum address; request whitespace is trimmed. Original casing is retained."
+      },
+      "TransactionOrBlockHash": {
+        "type": "string",
+        "pattern": "^0x[0-9a-fA-F]{64}$"
+      },
+      "PositionQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "wallet"
+        ],
+        "properties": {
+          "wallet": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          }
+        }
+      },
+      "PositionState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "wallet",
+          "collateralUsd",
+          "debtUsd",
+          "healthFactor",
+          "ethPrice",
+          "timestamp"
+        ],
+        "properties": {
+          "wallet": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Trimmed nonempty wallet. ACTIVE snapshot additionally requires equality with the valid outer Ethereum wallet."
+          },
+          "collateralUsd": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Aave collateral account aggregate converted from the oracle base currency, not total wallet assets."
+          },
+          "debtUsd": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Aave market account total debt; must be > 0 within an ACTIVE snapshot."
+          },
+          "healthFactor": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Pool Health Factor converted from 1e18 precision."
+          },
+          "ethPrice": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "WETH/USD price from the Aave oracle at the position block."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          },
+          "blockNumber": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "description": "Extension-local AavePositionState; public JSON fields are unchanged. In an ACTIVE snapshot wallet, timestamp and blockNumber equal outer wallet and evidence values, and debtUsd > 0. It is an Aave aggregate, not a Guardian PortfolioState. JSON numbers are finite; these display values do not encode transaction amounts."
+      },
+      "PositionEvidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "chainId",
+          "network",
+          "protocol",
+          "providerAddress",
+          "poolAddress",
+          "oracleAddress",
+          "ethAssetAddress",
+          "blockNumber",
+          "blockHash",
+          "blockTimestamp"
+        ],
+        "properties": {
+          "chainId": {
+            "type": "integer",
+            "const": 1
+          },
+          "network": {
+            "type": "string",
+            "const": "ethereum-mainnet"
+          },
+          "protocol": {
+            "type": "string",
+            "const": "aave-v3"
+          },
+          "providerAddress": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "poolAddress": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "oracleAddress": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "ethAssetAddress": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "blockNumber": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "blockHash": {
+            "$ref": "#/components/schemas/TransactionOrBlockHash"
+          },
+          "blockTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          },
+          "txHash": {
+            "$ref": "#/components/schemas/TransactionOrBlockHash",
+            "description": "Optional reserved evidence field. eth_call does not create a transaction; omitted by this milestone."
+          }
+        },
+        "description": "Actual contract and pinned block evidence. Pool/Oracle addresses are resolved from Provider at this block. No RPC URL or credentials are returned."
+      },
+      "PositionMarketChanges": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ethChangePct",
+          "previousEthPrice",
+          "referenceBlockNumber",
+          "referenceBlockHash",
+          "referenceTimestamp",
+          "referenceOracleAddress",
+          "lookbackBlocks",
+          "lookbackSeconds"
+        ],
+        "properties": {
+          "ethChangePct": {
+            "type": "number",
+            "description": "(position.ethPrice / previousEthPrice - 1) * 100; percentage points."
+          },
+          "previousEthPrice": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Historical block WETH/USD price using its own oracle/base unit."
+          },
+          "referenceBlockNumber": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "referenceBlockHash": {
+            "$ref": "#/components/schemas/TransactionOrBlockHash"
+          },
+          "referenceTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC ISO 8601 timestamp."
+          },
+          "referenceOracleAddress": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "lookbackBlocks": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Current milestone uses 7200 blocks."
+          },
+          "lookbackSeconds": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Actual elapsed block time; not a fixed 24-hour interval."
+          }
+        },
+        "description": "Current block minus reference block must equal lookbackBlocks; current block time minus referenceTimestamp must equal lookbackSeconds. Historical reads fail explicitly instead of manufacturing history."
+      },
+      "ActivePositionSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mode",
+          "wallet",
+          "status",
+          "position",
+          "marketChanges",
+          "evidence"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "const": "LIVE"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "status": {
+            "type": "string",
+            "const": "ACTIVE"
+          },
+          "position": {
+            "$ref": "#/components/schemas/PositionState"
+          },
+          "marketChanges": {
+            "$ref": "#/components/schemas/PositionMarketChanges"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/PositionEvidence"
+          }
+        },
+        "description": "Positive debt position. Cross-field wallet/block/time/window consistency is validated by PositionSnapshotSchema at runtime.",
+        "x-runtime-constraints": [
+          "position.debtUsd > 0",
+          "position.wallet === wallet",
+          "position.blockNumber === evidence.blockNumber",
+          "position.timestamp === evidence.blockTimestamp",
+          "marketChanges.referenceBlockNumber < evidence.blockNumber",
+          "evidence.blockNumber - marketChanges.referenceBlockNumber === marketChanges.lookbackBlocks",
+          "Date.parse(evidence.blockTimestamp) - Date.parse(marketChanges.referenceTimestamp) === marketChanges.lookbackSeconds * 1000"
+        ]
+      },
+      "NoDebtPositionSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mode",
+          "wallet",
+          "status",
+          "position",
+          "message",
+          "evidence"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "const": "LIVE"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "status": {
+            "type": "string",
+            "const": "NO_DEBT"
+          },
+          "position": {
+            "type": "null"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/PositionEvidence"
+          }
+        },
+        "description": "Both empty accounts and collateral-only accounts with zero borrowing return NO_DEBT. No PositionState, marketChanges, zero/infinite/sentinel HF is fabricated."
+      },
+      "PositionSnapshot": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ActivePositionSnapshot"
+          },
+          {
+            "$ref": "#/components/schemas/NoDebtPositionSnapshot"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "status",
+          "mapping": {
+            "ACTIVE": "#/components/schemas/ActivePositionSnapshot",
+            "NO_DEBT": "#/components/schemas/NoDebtPositionSnapshot"
+          }
+        }
+      },
+      "PositionProblem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance",
+          "code"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^urn:xjy:position:(INVALID_WALLET|CONFIGURATION_ERROR|UNSUPPORTED_NETWORK|INVALID_CHAIN_DATA|RPC_READ_FAILED)$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              400,
+              502,
+              503
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instance": {
+            "type": "string",
+            "const": "/api/position"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_WALLET",
+              "CONFIGURATION_ERROR",
+              "UNSUPPORTED_NETWORK",
+              "INVALID_CHAIN_DATA",
+              "RPC_READ_FAILED"
+            ]
+          }
+        },
+        "description": "RFC 7807 problem response. type is urn:xjy:position:<code>; INVALID_WALLET uses 400, CONFIGURATION_ERROR uses 503, the other codes use 502. title/detail never expose the RPC URL, credentials or raw exception stack."
+      }
+    }
+  },
+  "x-validation": "JSON parsing, internal references and examples are inspected with repository-pinned Zod. No dedicated OpenAPI 3.1 validator is installed or executed. Runtime refinements remain authoritative."
+}

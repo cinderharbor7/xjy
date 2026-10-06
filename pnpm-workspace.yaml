@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@aave-dao/aave-address-book@4.71.3'

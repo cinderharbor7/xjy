@@ -1,21 +1,21 @@
-import { PositionStateSchema, RiskAnalysisSchema } from "@/domain/schemas";
-import type { PositionState, RiskAnalysis } from "@/domain/types";
+import { MarketStateSchema, PortfolioStateSchema, RiskAnalysisSchema } from "@/domain/schemas";
+import type { MarketState, PortfolioState, RiskAnalysis } from "@/domain/types";
 import { runStressTest } from "./stress-test";
 
 export class RiskService {
-  analyze(position: PositionState): RiskAnalysis {
-    const current = PositionStateSchema.parse(position);
-    // Fixed demo bands expose the module boundary without pretending to be a production risk model.
-    const riskScore = current.debtUsd === 0 ? 0
-      : current.healthFactor <= 1.1 ? 91
-      : current.healthFactor < 1.3 ? 75
-      : current.healthFactor < 1.5 ? 50
-      : 20;
+  analyze(portfolio: PortfolioState, market: MarketState): RiskAnalysis {
+    const current = PortfolioStateSchema.parse(portfolio);
+    const conditions = MarketStateSchema.parse(market);
+    // Deterministic demo calculation, not a production portfolio risk model.
+    const downsideScore = Math.min(100, Math.max(0, -conditions.priceChange1hPct * 10));
+    const riskScore = current.riskAssetUsd === 0 ? 0 : Math.round(
+      0.5 * conditions.volatilityScore + 0.3 * downsideScore + 0.2 * current.riskExposurePct,
+    );
 
     return RiskAnalysisSchema.parse({
       riskScore,
       confidence: 0,
-      healthFactor: current.healthFactor,
+      riskExposurePct: current.riskExposurePct,
       stressTests: [-5, -10, -15].map((shock) => runStressTest(current, shock)),
       investigation: {
         summary: "Pending investigation",
@@ -24,7 +24,7 @@ export class RiskService {
         uncertainties: ["Investigation has not run yet."],
         confidence: 0,
       },
-      recommendedAction: riskScore > 80 ? "REPAY" : "NONE",
+      recommendedAction: riskScore > 80 ? "SWAP_TO_SAFE" : "NONE",
     });
   }
 }

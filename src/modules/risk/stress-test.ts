@@ -1,16 +1,16 @@
-import { PositionStateSchema, StressTestResultSchema } from "@/domain/schemas";
-import type { PositionState, StressTestResult } from "@/domain/types";
+import { PortfolioStateSchema, StressTestResultSchema } from "@/domain/schemas";
+import type { PortfolioState, StressTestResult } from "@/domain/types";
 
-/** Demo-only linear price shock; it does not model Aave liquidation parameters. */
-export function runStressTest(position: PositionState, ethChangePct: number): StressTestResult {
-  const current = PositionStateSchema.parse(position);
-  if (!Number.isFinite(ethChangePct) || ethChangePct < -100) {
-    throw new Error("ETH price change must be finite and at least -100 percent.");
+/** Demo-only common risk-asset shock; defensive-asset risks are not modeled. */
+export function runStressTest(portfolio: PortfolioState, priceChangePct: number): StressTestResult {
+  const current = PortfolioStateSchema.parse(portfolio);
+  if (!Number.isFinite(priceChangePct) || priceChangePct < -100) {
+    throw new Error("Price change must be finite and at least -100 percent.");
   }
-  const projectedHealthFactor = Number((current.healthFactor * (1 + ethChangePct / 100)).toFixed(2));
+  const projectedPortfolioUsd = current.riskAssetUsd * (1 + priceChangePct / 100) + current.defensiveAssetUsd;
   return StressTestResultSchema.parse({
-    ethChangePct,
-    projectedHealthFactor,
-    liquidationRisk: current.debtUsd > 0 && projectedHealthFactor <= 1,
+    priceChangePct,
+    projectedPortfolioUsd,
+    projectedLossUsd: Math.max(0, current.totalUsd - projectedPortfolioUsd),
   });
 }
