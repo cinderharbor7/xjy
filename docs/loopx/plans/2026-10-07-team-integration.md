@@ -9,7 +9,7 @@ slices:
     status: done
     depends: [P-001]
   - id: P-003
-    status: in_progress
+    status: done
     depends: [P-002]
 ---
 
@@ -67,3 +67,5 @@ Run the final combined build, real HTTP smoke and isolated local Fork acceptance
 - USDC at $1 and Fork historical price changes remain explicit demo assumptions.
 - Upstream RPC availability can block a fresh Fork run; no retry or Mock substitution may hide it.
 - Resume from the frontmatter; use the captured source commits and current clean/merged state before fetching new team changes.
+
+Publication: [PR #3](https://github.com/cinderharbor7/xjy/pull/3), open against main. Published integration branch tracks `origin/codex/integrate-guardian`; main is unchanged. GitHub CI results are recorded separately from local acceptance.

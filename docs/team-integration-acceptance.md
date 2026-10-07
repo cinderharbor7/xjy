@@ -1,6 +1,6 @@
 # 团队集成验收：A/B/C/D
 
-日期：2026-10-07（Asia/Shanghai）。集成分支 `codex/integrate-guardian`，目标 `main`，共同基线 `bc1d504`。纳入 A `f14699e`、B `21eab08`、C `c062479`、D `dba34bf`（执行实现 `eef9e09`）。保留各分支提交历史；本任务创建 PR，不将 main覆盖或自动合并。
+日期：2026-10-07（Asia/Shanghai）。集成分支 `codex/integrate-guardian`，目标 `main`，共同基线 `bc1d504`。纳入 A `f14699e`、B `21eab08`、C `c062479`、D `dba34bf`（执行实现 `eef9e09`）。保留各分支提交历史；集成 [PR #3](https://github.com/cinderharbor7/xjy/pull/3) 已创建，不将 main覆盖或自动合并。
 
 ## 新鲜工程检查
 
