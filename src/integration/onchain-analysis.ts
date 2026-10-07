@@ -4,7 +4,7 @@ import { validateWallet, type EthereumReadClient } from "@/modules/onchain/ether
 import { readEthereumData } from "@/modules/onchain/live-data";
 import { EthereumReadError } from "@/modules/onchain/read-error";
 import { EthereumDataResultSchema, type EthereumDataResult } from "@/modules/onchain/read-results";
-import { OnchainAnalysisService } from "@/modules/risk/onchain-analysis.service";
+import { OnchainAnalysisService, type OnchainInvestigationFactory } from "@/modules/risk/onchain-analysis.service";
 
 export const ONCHAIN_ANALYSIS_LIMITATIONS = [
   "Risk score uses deterministic heuristic rules, not a fitted or calibrated prediction model.",
@@ -25,6 +25,7 @@ export async function analyzeOnchainData(
   client: EthereumReadClient,
   wallet: string,
   read: typeof readEthereumData = readEthereumData,
+  investigationFactory?: OnchainInvestigationFactory,
 ): Promise<OnchainAnalysisResult> {
   const requestedWallet = validateWallet(wallet);
   // Read failures propagate; A owns RPC sanitization and this composition has no fallback.
@@ -39,8 +40,10 @@ export async function analyzeOnchainData(
     || data.market.state.timestamp !== data.signal.windowEnd) {
     throw new EthereumReadError("INVALID_CHAIN_DATA", "The analysis requires one wallet and one shared Ethereum snapshot.");
   }
-  const riskAnalysis = RiskAnalysisSchema.parse(await new OnchainAnalysisService().analyze(
+  const riskAnalysis = RiskAnalysisSchema.parse(await new OnchainAnalysisService(undefined, investigationFactory).analyze(
     data.portfolio.state, data.market.state, data.signal,
   ));
-  return { ...data, analysisMethod: "SELL_PRESSURE_HEURISTIC", riskAnalysis, limitations: [...ONCHAIN_ANALYSIS_LIMITATIONS] };
+  const limitations = [...ONCHAIN_ANALYSIS_LIMITATIONS] as string[];
+  if (investigationFactory) limitations[4] = "No policy evaluation, signing, transaction broadcast or monitoring is performed. Investigation uses the explicitly supplied adapter.";
+  return { ...data, analysisMethod: "SELL_PRESSURE_HEURISTIC", riskAnalysis, limitations };
 }

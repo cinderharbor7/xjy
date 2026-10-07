@@ -346,6 +346,7 @@ function render() {
   const featurePages = [
     "/guardian",
     "/investigate",
+    "/report",
     "/risk-lab",
     "/position",
     "/attestations",
@@ -355,6 +356,8 @@ function render() {
     const module =
       path === "/guardian"
         ? import("./pages/guardian.js")
+        : path === "/report"
+          ? import("./pages/report.js")
         : path === "/attestations"
           ? import("./pages/attestations.js")
           : import("./pages/research.js");
@@ -374,6 +377,7 @@ function render() {
       {
         "/guardian": "保护实验",
         "/investigate": "交易核验",
+        "/report": "真实异动报告",
         "/risk-lab": "ETH 风险研究",
         "/position": "Aave 仓位",
         "/attestations": "报告存证",
@@ -737,11 +741,11 @@ if (state.market.mode === "live" && (location.pathname === "/"
 } else render();
 
 function homeTools() {
-  return '<section class="workspace-paths" aria-label="研究工作台"><div><h2>从观察到核验</h2><p>沿着资产数据，找到有出处的结论。</p></div><a href="/investigate"><strong>交易核验</strong><span>Ethereum 外层事实与指定池兑换</span></a><a href="/risk-lab"><strong>风险研究</strong><span>ETH 研究模型与证据样本</span></a><a href="/guardian"><strong>保护实验</strong><span>单钱包策略与结果核验</span></a><a href="/attestations"><strong>报告存证</strong><span>BOT 测试网上的内容完整性</span></a></section>';
+  return '<section class="workspace-paths" aria-label="研究工作台"><div><h2>从观察到核验</h2><p>沿着资产数据，找到有出处的结论。</p></div><a href="/report"><strong>真实异动报告</strong><span>同一观察的量化、证据与未知项</span></a><a href="/investigate"><strong>交易核验</strong><span>Ethereum 外层事实与指定池兑换</span></a><a href="/risk-lab"><strong>风险研究</strong><span>ETH 研究模型与证据样本</span></a><a href="/guardian"><strong>保护实验</strong><span>单钱包策略与结果核验</span></a><a href="/attestations"><strong>报告存证</strong><span>BOT 测试网上的内容完整性</span></a></section>';
 }
 function coinTools(c) {
   return c.id === "ETH"
-    ? '<section class="coin-workbench"><div><h2>围绕 ETH 继续研究</h2><p>市场指纹、主网只读核验、研究样本和保护实验分别保留其数据口径。</p></div><nav aria-label="ETH 工作台"><a href="/investigate">核验交易</a><a href="/risk-lab">风险研究</a><a href="/guardian">保护实验</a><a href="/attestations">报告存证</a></nav></section>'
+    ? '<section class="coin-workbench"><div><h2>围绕 ETH 继续研究</h2><p>市场指纹、主网只读核验、研究样本和保护实验分别保留其数据口径。</p></div><nav aria-label="ETH 工作台"><a href="/report">真实异动报告</a><a href="/investigate">核验交易</a><a href="/risk-lab">风险研究</a><a href="/guardian">保护实验</a><a href="/attestations">报告存证</a></nav></section>'
     : '<div class="notice">该币种提供数据指纹与收藏；交易核验、风险研究和保护实验目前为 ETH 专属，尚未扩展到 ' +
         esc(c.id) +
         "。</div>";

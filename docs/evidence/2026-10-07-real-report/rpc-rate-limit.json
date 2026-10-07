@@ -1,0 +1,31 @@
+{
+  "providerHostname": "eth.drpc.org",
+  "purpose": "Read-only diagnosis, raw errors and endpoint credentials not saved",
+  "failures": [
+    {
+      "id": 18,
+      "step": "getBlock",
+      "ok": false,
+      "causes": [
+        {
+          "name": "RpcRequestError",
+          "code": 15,
+          "rateLimited": true,
+          "timeout": false,
+          "unsupported": false
+        },
+        {
+          "code": 15,
+          "rateLimited": true,
+          "timeout": false,
+          "unsupported": false
+        }
+      ],
+      "ms": 264
+    },
+    {
+      "complete": false,
+      "code": "RPC_READ_FAILED"
+    }
+  ]
+}

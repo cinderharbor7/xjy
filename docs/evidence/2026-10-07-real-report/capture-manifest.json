@@ -1,0 +1,35 @@
+{
+  "baseCommit": "9039c209b778ea0ad9d79fb45ae55c0bb590bbb3",
+  "branch": "codex/real-investigation-report",
+  "uncommittedWorkingTree": true,
+  "recordedAt": "2026-10-07T14:59:42.549814+00:00",
+  "sourceFiles": {
+    "src/modules/onchain/ethereum-reader.ts": "7b2f456aefbe564d92d477424b07aae36be5dffebeb081742c8d357746ea9656",
+    "src/modules/risk/onchain-analysis.service.ts": "a499af9a201237acc87481fc4763c933a3370aeb178e23d6860527c92d10ae8d",
+    "src/integration/onchain-analysis.ts": "2e746cd674c5beef56befc9cbc2252e2dcd15ee5de225ba6f2755f42ed82399d",
+    "src/integration/onchain-report.ts": "12e5f329037297667ff38c1e9cd7c2c357179717d9964c5fd3e8314eb1474252",
+    "src/integration/onchain-report.contracts.ts": "0d22b3a453aacb55dcd1d1249026ab37a7918dcbc31c58dab110a872d1d41b6e",
+    "src/app/api/onchain-analysis/route.ts": "d044e067fdf2787a0309c8728a751422fce8c05bad706e22db4bd130dc7a03ce",
+    "server/api.ts": "7cea44b3f15c06b55645e21a998542021812786a0d22454375b41f75ace0b80a",
+    "server/index.ts": "25385d35898caadf35628d999d5661cf2f5fcac466945bbab9c2fbe5c9543250",
+    "web/pages/report.js": "df11d822e1c8e73c4b78773db482196e80484684975d35fcdc49377d84131ee2",
+    "web/app.js": "6c2f688a26eee0a9c93cc39c1fc70e549a58b80f2e91632b98f481fc317cc877",
+    "web/index.html": "0c05c4f20d4382eef6806720a8e0fb210635e480e25b3edbce48919eeba9d2d0",
+    "src/modules/investigation/ai-investigation.adapter.ts": "6e958afadb4b5a1015c1d16fbc4e510ab2a8f22d2a156f7e864a943bfeafdaf7"
+  },
+  "offlineChecks": {
+    "testsPassed": 1043,
+    "testsSkipped": 6,
+    "typecheck": "passed",
+    "build": "passed",
+    "httpRoutes": 12,
+    "fingerprintTestsPassed": 5
+  },
+  "online": {
+    "cliComplete": "passed once",
+    "httpComplete": "passed once",
+    "browserLiveSuccess": "passed once with real RPC and DeepSeek; earlier failures retained",
+    "rpcStability": "not passed; public rate limit",
+    "aiLive": "real DeepSeek calls passed: saved observation, controlled evidence-poor, invalid-credential failure, and one complete live HTTP/browser run"
+  }
+}

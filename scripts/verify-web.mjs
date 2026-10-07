@@ -61,6 +61,7 @@ try {
     "/coins/WETH",
     "/guardian",
     "/investigate",
+    "/report",
     "/risk-lab",
     "/position",
     "/attestations",

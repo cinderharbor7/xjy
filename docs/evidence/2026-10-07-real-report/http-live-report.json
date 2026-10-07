@@ -1,0 +1,504 @@
+{
+  "mode": "LIVE_READ_ONLY",
+  "network": "ethereum-mainnet",
+  "scope": {
+    "portfolioAssets": [
+      "ETH_NATIVE",
+      "USDC"
+    ],
+    "marketSource": "CHAINLINK_ETH_USD",
+    "volatilityDefinition": "min(100, abs(priceChange1hPct) * 10); price-change proxy, not statistical volatility",
+    "signalPool": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+    "signalWindowSeconds": 300,
+    "signalDefinition": "Single-pool WETH gross sells normalized to ETH; actual USDC output valued at event-block Chainlink USDC/USD"
+  },
+  "section": "all",
+  "portfolio": {
+    "state": {
+      "wallet": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "totalUsd": 14792.907140813928,
+      "riskAssetUsd": 14755.718583166697,
+      "defensiveAssetUsd": 37.18855764722964,
+      "riskExposurePct": 99.74860548171341,
+      "assets": [
+        {
+          "symbol": "ETH",
+          "amount": 5.7535220303394325,
+          "usdValue": 14755.718583166697,
+          "category": "RISK"
+        },
+        {
+          "symbol": "USDC",
+          "tokenAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "amount": 37.192124,
+          "usdValue": 37.18855764722964,
+          "category": "DEFENSIVE"
+        }
+      ],
+      "timestamp": "2026-10-07T14:25:23.000Z",
+      "blockNumber": 26141090
+    },
+    "evidence": [
+      {
+        "blockHash": "0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671",
+        "blockNumber": 26141090,
+        "description": "Native ETH balance for 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045: 5.7535220303394325 ETH.",
+        "source": "https://etherscan.io/block/26141090",
+        "type": "BLOCK"
+      },
+      {
+        "blockHash": "0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671",
+        "blockNumber": 26141090,
+        "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "description": "USDC balance for 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045: 37.192124 USDC.",
+        "source": "https://etherscan.io/block/26141090",
+        "type": "BLOCK"
+      },
+      {
+        "blockHash": "0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671",
+        "blockNumber": 26141090,
+        "contractAddress": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+        "description": "Chainlink ETH/USD roundId=129127208515966895706, updatedAt=1791381755 (2026-10-07T14:02:35.000Z), answeredInRound=129127208515966895706; observed at block=26141090, timestamp=2026-10-07T14:25:23.000Z.",
+        "source": "https://etherscan.io/block/26141090",
+        "type": "BLOCK"
+      },
+      {
+        "blockHash": "0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671",
+        "blockNumber": 26141090,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141090, timestamp=2026-10-07T14:25:23.000Z.",
+        "source": "https://etherscan.io/block/26141090",
+        "type": "BLOCK"
+      }
+    ]
+  },
+  "market": {
+    "state": {
+      "asset": "ETH",
+      "priceUsd": 2564.6410156,
+      "priceChange5mPct": 0,
+      "priceChange1hPct": -0.041664272267705194,
+      "volatilityScore": 0.41664272267705194,
+      "timestamp": "2026-10-07T14:25:23.000Z"
+    },
+    "evidence": [
+      {
+        "blockHash": "0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671",
+        "blockNumber": 26141090,
+        "contractAddress": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+        "description": "CURRENT ETH/USD oracle snapshot; volatilityScore uses the absolute 1h oracle-change proxy; Chainlink ETH/USD roundId=129127208515966895706, updatedAt=1791381755 (2026-10-07T14:02:35.000Z), answeredInRound=129127208515966895706; observed at block=26141090, timestamp=2026-10-07T14:25:23.000Z.",
+        "source": "https://etherscan.io/block/26141090",
+        "type": "BLOCK"
+      },
+      {
+        "blockHash": "0x2125a5873aade5454397665989466e45e614c44af1543697858f2f13b3572e40",
+        "blockNumber": 26141065,
+        "contractAddress": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+        "description": "5m ETH/USD target=2026-10-07T14:20:23.000Z, actualBlockTimestamp=2026-10-07T14:20:23.000Z; Chainlink ETH/USD roundId=129127208515966895706, updatedAt=1791381755 (2026-10-07T14:02:35.000Z), answeredInRound=129127208515966895706; observed at block=26141065, timestamp=2026-10-07T14:20:23.000Z.",
+        "source": "https://etherscan.io/block/26141065",
+        "type": "BLOCK"
+      },
+      {
+        "blockHash": "0xdf5fe7cdc39372dd15efe9686cc8c573fd1b072d4d0d1ad56a2f9b5fbbf6ffde",
+        "blockNumber": 26140794,
+        "contractAddress": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+        "description": "1h ETH/USD target=2026-10-07T13:25:23.000Z, actualBlockTimestamp=2026-10-07T13:25:23.000Z; Chainlink ETH/USD roundId=129127208515966895705, updatedAt=1791378143 (2026-10-07T13:02:23.000Z), answeredInRound=129127208515966895705; observed at block=26140794, timestamp=2026-10-07T13:25:23.000Z.",
+        "source": "https://etherscan.io/block/26140794",
+        "type": "BLOCK"
+      }
+    ]
+  },
+  "signal": {
+    "signalType": "DEX_SELL_PRESSURE",
+    "asset": "ETH",
+    "windowStart": "2026-10-07T14:20:23.000Z",
+    "windowEnd": "2026-10-07T14:25:23.000Z",
+    "currentSellVolumeUsd": 4437.921271919115,
+    "baselineSellVolumeUsd": 217458.139223334,
+    "anomalyRatio": 0.020408163556303024,
+    "txCount": 5,
+    "uniqueWallets": 4,
+    "evidence": [
+      {
+        "blockHash": "0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671",
+        "blockNumber": 26141090,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Uniswap V3 WETH/USDC 0.05% single pool; ETH gross sells, not net flow. Current [2026-10-07T14:20:23.000Z, 2026-10-07T14:25:23.000Z); baseline is the immediately preceding equal window. Statistics use all 45 unique Swap events; event evidence is limited to 20 samples.",
+        "source": "https://etherscan.io/block/26141090",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x0515ef1d15c9a8dfc8c8299ea3d25b3ab3bab387f24c2e24e07cf6d11f2a5342",
+        "blockHash": "0xaff275c076ea5469976f2ee9c36899234293ce65cb1f0bdee160f5a7a8397b15",
+        "blockNumber": 26141042,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=2; USDC output=43370.650951, USD=43366.492139280315; tx.from=0xc8df1a5953aa7f62a35ff1501e0c10eb3c33ebfe; timestamp=2026-10-07T14:15:47.000Z.",
+        "source": "https://etherscan.io/tx/0x0515ef1d15c9a8dfc8c8299ea3d25b3ab3bab387f24c2e24e07cf6d11f2a5342",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0xaff275c076ea5469976f2ee9c36899234293ce65cb1f0bdee160f5a7a8397b15",
+        "blockNumber": 26141042,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141042, timestamp=2026-10-07T14:15:47.000Z.",
+        "source": "https://etherscan.io/block/26141042",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x4906bd28c6218b41b835aa25a3f4043169b87f17d10d68bedeb458f6bc615776",
+        "blockHash": "0x9c8ffacd40aa51ace8ed7414af5c8ada2b9e54a9e8bc9665b7bb1e4b3fea18b2",
+        "blockNumber": 26141043,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=18; USDC output=65617.529839, USD=65611.23777406373; tx.from=0x81dc771e308c76c3e06f635abed7fb24830fb824; timestamp=2026-10-07T14:15:59.000Z.",
+        "source": "https://etherscan.io/tx/0x4906bd28c6218b41b835aa25a3f4043169b87f17d10d68bedeb458f6bc615776",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x9c8ffacd40aa51ace8ed7414af5c8ada2b9e54a9e8bc9665b7bb1e4b3fea18b2",
+        "blockNumber": 26141043,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141043, timestamp=2026-10-07T14:15:59.000Z.",
+        "source": "https://etherscan.io/block/26141043",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x678d25872c914a4084e080d9428e8e3c5b64f44e801ddcb9c8580f48ebca3d96",
+        "blockHash": "0x9c8ffacd40aa51ace8ed7414af5c8ada2b9e54a9e8bc9665b7bb1e4b3fea18b2",
+        "blockNumber": 26141043,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=297; USDC output=20.46888, USD=20.466917239096798; tx.from=0xd9bc5189fa908e9626ff0713d6a979a639566f48; timestamp=2026-10-07T14:15:59.000Z.",
+        "source": "https://etherscan.io/tx/0x678d25872c914a4084e080d9428e8e3c5b64f44e801ddcb9c8580f48ebca3d96",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x9c8ffacd40aa51ace8ed7414af5c8ada2b9e54a9e8bc9665b7bb1e4b3fea18b2",
+        "blockNumber": 26141043,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141043, timestamp=2026-10-07T14:15:59.000Z.",
+        "source": "https://etherscan.io/block/26141043",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0xc181528109b2e29ecb42f55322fbefda8b0f11f2700608f6f59e2ab86601212d",
+        "blockHash": "0x02c936f28853b3b68f32dc9002567e4ce398b9ad6d107d8b059fd8d233697ab7",
+        "blockNumber": 26141044,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=50; USDC output=255.775667, USD=255.75114067129138; tx.from=0x29ae9c537c556f52dce0f2106299ddcffc9eebc4; timestamp=2026-10-07T14:16:11.000Z.",
+        "source": "https://etherscan.io/tx/0xc181528109b2e29ecb42f55322fbefda8b0f11f2700608f6f59e2ab86601212d",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x02c936f28853b3b68f32dc9002567e4ce398b9ad6d107d8b059fd8d233697ab7",
+        "blockNumber": 26141044,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141044, timestamp=2026-10-07T14:16:11.000Z.",
+        "source": "https://etherscan.io/block/26141044",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x37df3a45972ad3eea9a15b446221f2b6909e0e5303b4d16ba344f3aff08d18fa",
+        "blockHash": "0x02c936f28853b3b68f32dc9002567e4ce398b9ad6d107d8b059fd8d233697ab7",
+        "blockNumber": 26141044,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=548; USDC output=103.589446, USD=103.57951280802305; tx.from=0xe1cc4a0a542fc78b889b2c38534c0611c6131428; timestamp=2026-10-07T14:16:11.000Z.",
+        "source": "https://etherscan.io/tx/0x37df3a45972ad3eea9a15b446221f2b6909e0e5303b4d16ba344f3aff08d18fa",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x02c936f28853b3b68f32dc9002567e4ce398b9ad6d107d8b059fd8d233697ab7",
+        "blockNumber": 26141044,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141044, timestamp=2026-10-07T14:16:11.000Z.",
+        "source": "https://etherscan.io/block/26141044",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x7fe3042cc6fbf8f0e06c4395179af4174aeaabd5cad69b9c6c5e6e8972ec4cec",
+        "blockHash": "0xab4d45569e07e2d4f59a60d2c9dfd53ac9f0fcedbb252574fc31f44f984d5fb7",
+        "blockNumber": 26141045,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=140; USDC output=15.193107, USD=15.19165013296977; tx.from=0x9b2ac3cd4655bff19afa2ff506f4afe806d2a1f0; timestamp=2026-10-07T14:16:23.000Z.",
+        "source": "https://etherscan.io/tx/0x7fe3042cc6fbf8f0e06c4395179af4174aeaabd5cad69b9c6c5e6e8972ec4cec",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0xab4d45569e07e2d4f59a60d2c9dfd53ac9f0fcedbb252574fc31f44f984d5fb7",
+        "blockNumber": 26141045,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141045, timestamp=2026-10-07T14:16:23.000Z.",
+        "source": "https://etherscan.io/block/26141045",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x247d83037e46fc8b95da2c6c82ded6e530c6c7f5949b559335bdcc6aeabe1be8",
+        "blockHash": "0x29d2ef4b54cdf010b41e464ec074ab18fdb3156469939e3e729709b59d03ffeb",
+        "blockNumber": 26141046,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=84; USDC output=2532.143371, USD=2531.900563772155; tx.from=0xcfb1526cf6858dc850e6a550179680b0c0f1d25a; timestamp=2026-10-07T14:16:35.000Z.",
+        "source": "https://etherscan.io/tx/0x247d83037e46fc8b95da2c6c82ded6e530c6c7f5949b559335bdcc6aeabe1be8",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x29d2ef4b54cdf010b41e464ec074ab18fdb3156469939e3e729709b59d03ffeb",
+        "blockNumber": 26141046,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141046, timestamp=2026-10-07T14:16:35.000Z.",
+        "source": "https://etherscan.io/block/26141046",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0xbaca0df4a3e0c46fcf07a6068956501fa619d06f04cc8e5366dfbf4025cff024",
+        "blockHash": "0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c",
+        "blockNumber": 26141059,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=6; USDC output=29405.099599, USD=29402.279943999452; tx.from=0x5934e06498db785ff26807161ce9d09063231321; timestamp=2026-10-07T14:19:11.000Z.",
+        "source": "https://etherscan.io/tx/0xbaca0df4a3e0c46fcf07a6068956501fa619d06f04cc8e5366dfbf4025cff024",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c",
+        "blockNumber": 26141059,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141059, timestamp=2026-10-07T14:19:11.000Z.",
+        "source": "https://etherscan.io/block/26141059",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0xe2d4825a15baa43d04bf6db8a28aa0315b0b8e56056a6a5cf737c0c22b132721",
+        "blockHash": "0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c",
+        "blockNumber": 26141059,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=120; USDC output=118.917957, USD=118.90655395710327; tx.from=0x9506cfc79db8b0fdac703fbd3e3697142b158070; timestamp=2026-10-07T14:19:11.000Z.",
+        "source": "https://etherscan.io/tx/0xe2d4825a15baa43d04bf6db8a28aa0315b0b8e56056a6a5cf737c0c22b132721",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c",
+        "blockNumber": 26141059,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141059, timestamp=2026-10-07T14:19:11.000Z.",
+        "source": "https://etherscan.io/block/26141059",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0xdcfb85c4149ee67b84802014d84d19b189084f06954e43ce1467ab97f02ed74f",
+        "blockHash": "0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c",
+        "blockNumber": 26141059,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=952; USDC output=71512.202168, USD=71505.34486293411; tx.from=0x8f47a238c7701247ee8469ddc37ac1df121cfcce; timestamp=2026-10-07T14:19:11.000Z.",
+        "source": "https://etherscan.io/tx/0xdcfb85c4149ee67b84802014d84d19b189084f06954e43ce1467ab97f02ed74f",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c",
+        "blockNumber": 26141059,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141059, timestamp=2026-10-07T14:19:11.000Z.",
+        "source": "https://etherscan.io/block/26141059",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x105f8a92ed237714833ec1cc722507abf47c7ec76ade0d16a39d12396cc3364a",
+        "blockHash": "0xc3cd14f378ced7a89640a34f687742ee07456ddfc72598296e5a06f891ad7ee3",
+        "blockNumber": 26141060,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=449; USDC output=2969.016946, USD=2968.7322469650485; tx.from=0xe9b81d014ecbee0404edb8cfaf010a05e733f919; timestamp=2026-10-07T14:19:23.000Z.",
+        "source": "https://etherscan.io/tx/0x105f8a92ed237714833ec1cc722507abf47c7ec76ade0d16a39d12396cc3364a",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0xc3cd14f378ced7a89640a34f687742ee07456ddfc72598296e5a06f891ad7ee3",
+        "blockNumber": 26141060,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141060, timestamp=2026-10-07T14:19:23.000Z.",
+        "source": "https://etherscan.io/block/26141060",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x1793b869bd38a56d27af2b7402f6735f2bbe3f41d13af2dac58901452def9ca5",
+        "blockHash": "0x769c49638d6baafa62ca32aa959d20503e4672fb33e961015762523945a117f2",
+        "blockNumber": 26141061,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Baseline WETH sell (normalized to ETH), logIndex=96; USDC output=1558.405353, USD=1558.255917510701; tx.from=0x505f03064a6272c8a9bd3813c5c3119ab4263598; timestamp=2026-10-07T14:19:35.000Z.",
+        "source": "https://etherscan.io/tx/0x1793b869bd38a56d27af2b7402f6735f2bbe3f41d13af2dac58901452def9ca5",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x769c49638d6baafa62ca32aa959d20503e4672fb33e961015762523945a117f2",
+        "blockNumber": 26141061,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141061, timestamp=2026-10-07T14:19:35.000Z.",
+        "source": "https://etherscan.io/block/26141061",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x8b6939b14f734a4037d141af0d4b8810f6c703cc76b47793c8e7c75ca63a5abf",
+        "blockHash": "0x4ea36478b73b6a8bcd00454860dd96f0369ed8be1c6f6dcd5376f96119b91b27",
+        "blockNumber": 26141066,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Current WETH sell (normalized to ETH), logIndex=323; USDC output=441.451738, USD=441.40940719284316; tx.from=0x4d619c8d5735d0e4446db5366b3d2cc993a266c0; timestamp=2026-10-07T14:20:35.000Z.",
+        "source": "https://etherscan.io/tx/0x8b6939b14f734a4037d141af0d4b8810f6c703cc76b47793c8e7c75ca63a5abf",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x4ea36478b73b6a8bcd00454860dd96f0369ed8be1c6f6dcd5376f96119b91b27",
+        "blockNumber": 26141066,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141066, timestamp=2026-10-07T14:20:35.000Z.",
+        "source": "https://etherscan.io/block/26141066",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0xb3ba47faf1b7c6f0d3e4f405a424f36578f1267c8a02e62a350103b6afc5f0e2",
+        "blockHash": "0xfabe7823962bb29ba3ba5a98f97f732ed3fb8ab60073508e57458d3f647a3973",
+        "blockNumber": 26141078,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Current WETH sell (normalized to ETH), logIndex=12; USDC output=36.6849, USD=36.681382284939; tx.from=0x8a1b966763dbb6a43e07f7b08cbafcf3e05c8747; timestamp=2026-10-07T14:22:59.000Z.",
+        "source": "https://etherscan.io/tx/0xb3ba47faf1b7c6f0d3e4f405a424f36578f1267c8a02e62a350103b6afc5f0e2",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0xfabe7823962bb29ba3ba5a98f97f732ed3fb8ab60073508e57458d3f647a3973",
+        "blockNumber": 26141078,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141078, timestamp=2026-10-07T14:22:59.000Z.",
+        "source": "https://etherscan.io/block/26141078",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x00bde08447f3e52bd6721e7ac77ccca4e60e8ec08a46f589d668a670ded4d543",
+        "blockHash": "0x125bb8e3ac9816400068c0a1e0bcdac7e9cf76feefcdc4c6e06d2db0947d547c",
+        "blockNumber": 26141079,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Current WETH sell (normalized to ETH), logIndex=112; USDC output=76.125491, USD=76.11819132666801; tx.from=0x9bad167734ee46e064d794fcfeec6927b767ac21; timestamp=2026-10-07T14:23:11.000Z.",
+        "source": "https://etherscan.io/tx/0x00bde08447f3e52bd6721e7ac77ccca4e60e8ec08a46f589d668a670ded4d543",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x125bb8e3ac9816400068c0a1e0bcdac7e9cf76feefcdc4c6e06d2db0947d547c",
+        "blockNumber": 26141079,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141079, timestamp=2026-10-07T14:23:11.000Z.",
+        "source": "https://etherscan.io/block/26141079",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x9829451340072f64702bc054d29e85a55a944338fa7ee7a03364f9dc04911a4e",
+        "blockHash": "0x064366c6558b7d317004db92b27716b19dea22ded9ef1ade8ca2252f485f57e6",
+        "blockNumber": 26141082,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Current WETH sell (normalized to ETH), logIndex=581; USDC output=3300.578434, USD=3300.2619415339636; tx.from=0x2054659ed9990677a3da7bf67dfa51918426188a; timestamp=2026-10-07T14:23:47.000Z.",
+        "source": "https://etherscan.io/tx/0x9829451340072f64702bc054d29e85a55a944338fa7ee7a03364f9dc04911a4e",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0x064366c6558b7d317004db92b27716b19dea22ded9ef1ade8ca2252f485f57e6",
+        "blockNumber": 26141082,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141082, timestamp=2026-10-07T14:23:47.000Z.",
+        "source": "https://etherscan.io/block/26141082",
+        "type": "BLOCK"
+      },
+      {
+        "txHash": "0x1687118aee252305287960ea3735c6edfcabd2670e44c59aaba658724ab16fea",
+        "blockHash": "0xf4f37a90dbf6670db2cfba81c51ec75b79de70c084c1f3b3ec324383e06bb949",
+        "blockNumber": 26141085,
+        "contractAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "description": "Current WETH sell (normalized to ETH), logIndex=35; USDC output=583.506302, USD=583.4503495807012; tx.from=0x4d619c8d5735d0e4446db5366b3d2cc993a266c0; timestamp=2026-10-07T14:24:23.000Z.",
+        "source": "https://etherscan.io/tx/0x1687118aee252305287960ea3735c6edfcabd2670e44c59aaba658724ab16fea",
+        "type": "CONTRACT_EVENT"
+      },
+      {
+        "blockHash": "0xf4f37a90dbf6670db2cfba81c51ec75b79de70c084c1f3b3ec324383e06bb949",
+        "blockNumber": 26141085,
+        "contractAddress": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+        "description": "Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141085, timestamp=2026-10-07T14:24:23.000Z.",
+        "source": "https://etherscan.io/block/26141085",
+        "type": "BLOCK"
+      }
+    ]
+  },
+  "analysisMethod": "SELL_PRESSURE_HEURISTIC",
+  "riskAnalysis": {
+    "riskScore": 20,
+    "confidence": 0.69,
+    "riskExposurePct": 99.74860548171341,
+    "stressTests": [
+      {
+        "priceChangePct": -5,
+        "projectedPortfolioUsd": 14055.121211655593,
+        "projectedLossUsd": 737.7859291583354
+      },
+      {
+        "priceChangePct": -10,
+        "projectedPortfolioUsd": 13317.335282497259,
+        "projectedLossUsd": 1475.571858316669
+      },
+      {
+        "priceChangePct": -15,
+        "projectedPortfolioUsd": 12579.549353338924,
+        "projectedLossUsd": 2213.3577874750044
+      }
+    ],
+    "investigation": {
+      "summary": "ETH DEX gross sell volume is 0.02× the equal-length previous window over 2026-10-07T14:20:23.000Z–2026-10-07T14:25:23.000Z.",
+      "primaryCause": "ETH gross sell volume is lower than the preceding equal-length DEX window.",
+      "evidence": [
+        "Aggregate: $4437.921271919115 gross sells vs $217458.139223334 baseline (0.02×) over 5 sell transactions and 4 unique wallets — source: A OnchainSignalState.",
+        "BLOCK block 0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671 (block 26141090): Uniswap V3 WETH/USDC 0.05% single pool; ETH gross sells, not net flow. Current [2026-10-07T14:20:23.000Z, 2026-10-07T14:25:23.000Z); baseline is the immediately preceding equal window. Statistics use all 45 unique Swap events; event evidence is limited to 20 samples. — source: https://etherscan.io/block/26141090",
+        "CONTRACT_EVENT tx 0x0515ef1d15c9a8dfc8c8299ea3d25b3ab3bab387f24c2e24e07cf6d11f2a5342 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141042): Baseline WETH sell (normalized to ETH), logIndex=2; USDC output=43370.650951, USD=43366.492139280315; tx.from=0xc8df1a5953aa7f62a35ff1501e0c10eb3c33ebfe; timestamp=2026-10-07T14:15:47.000Z. — source: https://etherscan.io/tx/0x0515ef1d15c9a8dfc8c8299ea3d25b3ab3bab387f24c2e24e07cf6d11f2a5342",
+        "BLOCK block 0xaff275c076ea5469976f2ee9c36899234293ce65cb1f0bdee160f5a7a8397b15 (block 26141042): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141042, timestamp=2026-10-07T14:15:47.000Z. — source: https://etherscan.io/block/26141042",
+        "CONTRACT_EVENT tx 0x4906bd28c6218b41b835aa25a3f4043169b87f17d10d68bedeb458f6bc615776 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141043): Baseline WETH sell (normalized to ETH), logIndex=18; USDC output=65617.529839, USD=65611.23777406373; tx.from=0x81dc771e308c76c3e06f635abed7fb24830fb824; timestamp=2026-10-07T14:15:59.000Z. — source: https://etherscan.io/tx/0x4906bd28c6218b41b835aa25a3f4043169b87f17d10d68bedeb458f6bc615776",
+        "BLOCK block 0x9c8ffacd40aa51ace8ed7414af5c8ada2b9e54a9e8bc9665b7bb1e4b3fea18b2 (block 26141043): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141043, timestamp=2026-10-07T14:15:59.000Z. — source: https://etherscan.io/block/26141043",
+        "CONTRACT_EVENT tx 0x678d25872c914a4084e080d9428e8e3c5b64f44e801ddcb9c8580f48ebca3d96 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141043): Baseline WETH sell (normalized to ETH), logIndex=297; USDC output=20.46888, USD=20.466917239096798; tx.from=0xd9bc5189fa908e9626ff0713d6a979a639566f48; timestamp=2026-10-07T14:15:59.000Z. — source: https://etherscan.io/tx/0x678d25872c914a4084e080d9428e8e3c5b64f44e801ddcb9c8580f48ebca3d96",
+        "BLOCK block 0x9c8ffacd40aa51ace8ed7414af5c8ada2b9e54a9e8bc9665b7bb1e4b3fea18b2 (block 26141043): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141043, timestamp=2026-10-07T14:15:59.000Z. — source: https://etherscan.io/block/26141043",
+        "CONTRACT_EVENT tx 0xc181528109b2e29ecb42f55322fbefda8b0f11f2700608f6f59e2ab86601212d @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141044): Baseline WETH sell (normalized to ETH), logIndex=50; USDC output=255.775667, USD=255.75114067129138; tx.from=0x29ae9c537c556f52dce0f2106299ddcffc9eebc4; timestamp=2026-10-07T14:16:11.000Z. — source: https://etherscan.io/tx/0xc181528109b2e29ecb42f55322fbefda8b0f11f2700608f6f59e2ab86601212d",
+        "BLOCK block 0x02c936f28853b3b68f32dc9002567e4ce398b9ad6d107d8b059fd8d233697ab7 (block 26141044): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141044, timestamp=2026-10-07T14:16:11.000Z. — source: https://etherscan.io/block/26141044",
+        "CONTRACT_EVENT tx 0x37df3a45972ad3eea9a15b446221f2b6909e0e5303b4d16ba344f3aff08d18fa @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141044): Baseline WETH sell (normalized to ETH), logIndex=548; USDC output=103.589446, USD=103.57951280802305; tx.from=0xe1cc4a0a542fc78b889b2c38534c0611c6131428; timestamp=2026-10-07T14:16:11.000Z. — source: https://etherscan.io/tx/0x37df3a45972ad3eea9a15b446221f2b6909e0e5303b4d16ba344f3aff08d18fa",
+        "BLOCK block 0x02c936f28853b3b68f32dc9002567e4ce398b9ad6d107d8b059fd8d233697ab7 (block 26141044): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141044, timestamp=2026-10-07T14:16:11.000Z. — source: https://etherscan.io/block/26141044",
+        "CONTRACT_EVENT tx 0x7fe3042cc6fbf8f0e06c4395179af4174aeaabd5cad69b9c6c5e6e8972ec4cec @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141045): Baseline WETH sell (normalized to ETH), logIndex=140; USDC output=15.193107, USD=15.19165013296977; tx.from=0x9b2ac3cd4655bff19afa2ff506f4afe806d2a1f0; timestamp=2026-10-07T14:16:23.000Z. — source: https://etherscan.io/tx/0x7fe3042cc6fbf8f0e06c4395179af4174aeaabd5cad69b9c6c5e6e8972ec4cec",
+        "BLOCK block 0xab4d45569e07e2d4f59a60d2c9dfd53ac9f0fcedbb252574fc31f44f984d5fb7 (block 26141045): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141045, timestamp=2026-10-07T14:16:23.000Z. — source: https://etherscan.io/block/26141045",
+        "CONTRACT_EVENT tx 0x247d83037e46fc8b95da2c6c82ded6e530c6c7f5949b559335bdcc6aeabe1be8 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141046): Baseline WETH sell (normalized to ETH), logIndex=84; USDC output=2532.143371, USD=2531.900563772155; tx.from=0xcfb1526cf6858dc850e6a550179680b0c0f1d25a; timestamp=2026-10-07T14:16:35.000Z. — source: https://etherscan.io/tx/0x247d83037e46fc8b95da2c6c82ded6e530c6c7f5949b559335bdcc6aeabe1be8",
+        "BLOCK block 0x29d2ef4b54cdf010b41e464ec074ab18fdb3156469939e3e729709b59d03ffeb (block 26141046): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141046, timestamp=2026-10-07T14:16:35.000Z. — source: https://etherscan.io/block/26141046",
+        "CONTRACT_EVENT tx 0xbaca0df4a3e0c46fcf07a6068956501fa619d06f04cc8e5366dfbf4025cff024 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141059): Baseline WETH sell (normalized to ETH), logIndex=6; USDC output=29405.099599, USD=29402.279943999452; tx.from=0x5934e06498db785ff26807161ce9d09063231321; timestamp=2026-10-07T14:19:11.000Z. — source: https://etherscan.io/tx/0xbaca0df4a3e0c46fcf07a6068956501fa619d06f04cc8e5366dfbf4025cff024",
+        "BLOCK block 0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c (block 26141059): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141059, timestamp=2026-10-07T14:19:11.000Z. — source: https://etherscan.io/block/26141059",
+        "CONTRACT_EVENT tx 0xe2d4825a15baa43d04bf6db8a28aa0315b0b8e56056a6a5cf737c0c22b132721 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141059): Baseline WETH sell (normalized to ETH), logIndex=120; USDC output=118.917957, USD=118.90655395710327; tx.from=0x9506cfc79db8b0fdac703fbd3e3697142b158070; timestamp=2026-10-07T14:19:11.000Z. — source: https://etherscan.io/tx/0xe2d4825a15baa43d04bf6db8a28aa0315b0b8e56056a6a5cf737c0c22b132721",
+        "BLOCK block 0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c (block 26141059): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141059, timestamp=2026-10-07T14:19:11.000Z. — source: https://etherscan.io/block/26141059",
+        "CONTRACT_EVENT tx 0xdcfb85c4149ee67b84802014d84d19b189084f06954e43ce1467ab97f02ed74f @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141059): Baseline WETH sell (normalized to ETH), logIndex=952; USDC output=71512.202168, USD=71505.34486293411; tx.from=0x8f47a238c7701247ee8469ddc37ac1df121cfcce; timestamp=2026-10-07T14:19:11.000Z. — source: https://etherscan.io/tx/0xdcfb85c4149ee67b84802014d84d19b189084f06954e43ce1467ab97f02ed74f",
+        "BLOCK block 0x7bbe14366af7eb093ca24da0a87f23138ba26a23e0620529a8b2e9d1488b5a4c (block 26141059): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141059, timestamp=2026-10-07T14:19:11.000Z. — source: https://etherscan.io/block/26141059",
+        "CONTRACT_EVENT tx 0x105f8a92ed237714833ec1cc722507abf47c7ec76ade0d16a39d12396cc3364a @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141060): Baseline WETH sell (normalized to ETH), logIndex=449; USDC output=2969.016946, USD=2968.7322469650485; tx.from=0xe9b81d014ecbee0404edb8cfaf010a05e733f919; timestamp=2026-10-07T14:19:23.000Z. — source: https://etherscan.io/tx/0x105f8a92ed237714833ec1cc722507abf47c7ec76ade0d16a39d12396cc3364a",
+        "BLOCK block 0xc3cd14f378ced7a89640a34f687742ee07456ddfc72598296e5a06f891ad7ee3 (block 26141060): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141060, timestamp=2026-10-07T14:19:23.000Z. — source: https://etherscan.io/block/26141060",
+        "CONTRACT_EVENT tx 0x1793b869bd38a56d27af2b7402f6735f2bbe3f41d13af2dac58901452def9ca5 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141061): Baseline WETH sell (normalized to ETH), logIndex=96; USDC output=1558.405353, USD=1558.255917510701; tx.from=0x505f03064a6272c8a9bd3813c5c3119ab4263598; timestamp=2026-10-07T14:19:35.000Z. — source: https://etherscan.io/tx/0x1793b869bd38a56d27af2b7402f6735f2bbe3f41d13af2dac58901452def9ca5",
+        "BLOCK block 0x769c49638d6baafa62ca32aa959d20503e4672fb33e961015762523945a117f2 (block 26141061): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141061, timestamp=2026-10-07T14:19:35.000Z. — source: https://etherscan.io/block/26141061",
+        "CONTRACT_EVENT tx 0x8b6939b14f734a4037d141af0d4b8810f6c703cc76b47793c8e7c75ca63a5abf @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141066): Current WETH sell (normalized to ETH), logIndex=323; USDC output=441.451738, USD=441.40940719284316; tx.from=0x4d619c8d5735d0e4446db5366b3d2cc993a266c0; timestamp=2026-10-07T14:20:35.000Z. — source: https://etherscan.io/tx/0x8b6939b14f734a4037d141af0d4b8810f6c703cc76b47793c8e7c75ca63a5abf",
+        "BLOCK block 0x4ea36478b73b6a8bcd00454860dd96f0369ed8be1c6f6dcd5376f96119b91b27 (block 26141066): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141066, timestamp=2026-10-07T14:20:35.000Z. — source: https://etherscan.io/block/26141066",
+        "CONTRACT_EVENT tx 0xb3ba47faf1b7c6f0d3e4f405a424f36578f1267c8a02e62a350103b6afc5f0e2 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141078): Current WETH sell (normalized to ETH), logIndex=12; USDC output=36.6849, USD=36.681382284939; tx.from=0x8a1b966763dbb6a43e07f7b08cbafcf3e05c8747; timestamp=2026-10-07T14:22:59.000Z. — source: https://etherscan.io/tx/0xb3ba47faf1b7c6f0d3e4f405a424f36578f1267c8a02e62a350103b6afc5f0e2",
+        "BLOCK block 0xfabe7823962bb29ba3ba5a98f97f732ed3fb8ab60073508e57458d3f647a3973 (block 26141078): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141078, timestamp=2026-10-07T14:22:59.000Z. — source: https://etherscan.io/block/26141078",
+        "CONTRACT_EVENT tx 0x00bde08447f3e52bd6721e7ac77ccca4e60e8ec08a46f589d668a670ded4d543 @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141079): Current WETH sell (normalized to ETH), logIndex=112; USDC output=76.125491, USD=76.11819132666801; tx.from=0x9bad167734ee46e064d794fcfeec6927b767ac21; timestamp=2026-10-07T14:23:11.000Z. — source: https://etherscan.io/tx/0x00bde08447f3e52bd6721e7ac77ccca4e60e8ec08a46f589d668a670ded4d543",
+        "BLOCK block 0x125bb8e3ac9816400068c0a1e0bcdac7e9cf76feefcdc4c6e06d2db0947d547c (block 26141079): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141079, timestamp=2026-10-07T14:23:11.000Z. — source: https://etherscan.io/block/26141079",
+        "CONTRACT_EVENT tx 0x9829451340072f64702bc054d29e85a55a944338fa7ee7a03364f9dc04911a4e @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141082): Current WETH sell (normalized to ETH), logIndex=581; USDC output=3300.578434, USD=3300.2619415339636; tx.from=0x2054659ed9990677a3da7bf67dfa51918426188a; timestamp=2026-10-07T14:23:47.000Z. — source: https://etherscan.io/tx/0x9829451340072f64702bc054d29e85a55a944338fa7ee7a03364f9dc04911a4e",
+        "BLOCK block 0x064366c6558b7d317004db92b27716b19dea22ded9ef1ade8ca2252f485f57e6 (block 26141082): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141082, timestamp=2026-10-07T14:23:47.000Z. — source: https://etherscan.io/block/26141082",
+        "CONTRACT_EVENT tx 0x1687118aee252305287960ea3735c6edfcabd2670e44c59aaba658724ab16fea @ contract 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640 (block 26141085): Current WETH sell (normalized to ETH), logIndex=35; USDC output=583.506302, USD=583.4503495807012; tx.from=0x4d619c8d5735d0e4446db5366b3d2cc993a266c0; timestamp=2026-10-07T14:24:23.000Z. — source: https://etherscan.io/tx/0x1687118aee252305287960ea3735c6edfcabd2670e44c59aaba658724ab16fea",
+        "BLOCK block 0xf4f37a90dbf6670db2cfba81c51ec75b79de70c084c1f3b3ec324383e06bb949 (block 26141085): Chainlink USDC/USD roundId=73786976294838206488, updatedAt=1791308231 (2026-10-06T17:37:11.000Z), answeredInRound=73786976294838206488; observed at block=26141085, timestamp=2026-10-07T14:24:23.000Z. — source: https://etherscan.io/block/26141085",
+        "Portfolio risk exposure 99.74860548171341%; signal-augmented risk score 20/100."
+      ],
+      "uncertainties": [
+        "Gross ETH sell volume does not net buys and does not by itself establish a directional price move.",
+        "evidence.length samples the window; it is not txCount and cannot be extrapolated to uniqueWallets.",
+        "The frozen schema validates reference format and internal consistency, not that the transactions exist.",
+        "Confidence measures how well the supplied references cover the window, not the probability that ETH keeps falling."
+      ],
+      "confidence": 0.69
+    },
+    "recommendedAction": "NONE"
+  },
+  "limitations": [
+    "Risk score uses deterministic heuristic rules, not a fitted or calibrated prediction model.",
+    "Confidence measures distinct reference coverage and transaction count; it does not independently verify truth or predict a price fall.",
+    "The observation covers native ETH and USDC holdings and one Uniswap V3 WETH/USDC pool; it does not cover the entire market.",
+    "volatilityScore is a one-hour price-change proxy, not statistical volatility.",
+    "No LLM, policy evaluation, signing, transaction broadcast or monitoring is performed."
+  ],
+  "investigationMode": "RULES",
+  "checkedAt": "2026-10-07T14:26:11.502Z"
+}

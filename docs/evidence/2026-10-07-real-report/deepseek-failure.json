@@ -1,0 +1,7 @@
+{
+  "recordedAt": "2026-10-07T14:58:43.169Z",
+  "testType": "controlled invalid credential against real DeepSeek endpoint",
+  "httpStatus": 401,
+  "code": "AI_REQUEST_FAILED",
+  "noFallback": true
+}

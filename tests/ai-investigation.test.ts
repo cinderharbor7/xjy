@@ -78,6 +78,16 @@ function respond(value: unknown) {
 afterEach(() => vi.restoreAllMocks());
 
 describe("explicit AI investigation", () => {
+  it("sends an explicitly configured non-thinking request without changing the default", async () => {
+    const fetcher = respond(await modelResult());
+    const configured = { ...options, thinkingMode: "disabled" as const };
+    await new AiInvestigationAdapter(signal, configured).investigate(portfolio, market, risk);
+    expect(JSON.parse(fetcher.mock.calls[0][1]!.body as string).thinking).toEqual({ type: "disabled" });
+    fetcher.mockResolvedValueOnce(Response.json({ choices: [{ message: { content: JSON.stringify(await modelResult()) } }] }));
+    await new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk);
+    expect(JSON.parse(fetcher.mock.calls[1][1]!.body as string)).not.toHaveProperty("thinking");
+  });
+
   it.each([undefined, "", "  "])("rejects missing key instead of returning a rule report (%s)", (apiKey) => {
     expect(() => new AiInvestigationAdapter(signal, { apiKey })).toThrow("AI_CONFIGURATION_REQUIRED");
   });

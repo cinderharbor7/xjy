@@ -26,6 +26,15 @@ slices:
   - id: P-008
     status: done
     depends: [P-007]
+  - id: P-009
+    status: in_progress
+    depends: [P-008]
+  - id: P-010
+    status: pending
+    depends: [P-009]
+  - id: P-011
+    status: pending
+    depends: [P-009, P-010]
 ---
 
 # Hackathon 冻结方案执行交接
@@ -166,9 +175,40 @@ Aave 隐藏验收：977 passed / 6 skipped、typecheck/build 和隔离 HTTP 11 �
 > verify: `pnpm typecheck；pnpm test；pnpm build；pnpm test:http；pnpm test:fingerprint；pnpm contract:check；GitHub CI`
 > review: `独立 exact diff 安全审阅；事实引用/置信度/输入快照/超时/来源标签；重要问题修复后复验`
 
+## P-009 真实只读报告与 RPC 查询效率
+
+用户要求完成剩余 TODO，按此前建议采用新增 `/report` 与 `POST /api/onchain-analysis`，保留旧 `/api/eth-risk` 样本合同。报告展示同一观察的 Portfolio、Market、两个相邻窗口卖压、规则 Risk、证据、解释与未知项；不保证异常或固定高分。历史区块定位改为从 anchor 向前指数括界再二分，不假设出块间隔，不增加重试、备用 RPC 或 Mock 回退。
+
+本地代码与受控页面回归已通过（1041 passed / 6 skipped，typecheck/build、隔离 HTTP 12 路由）。实际 CLI 与 HTTP 各成功读取过完整快照；同轮浏览器请求仍限流失败。dRPC code=15 的限流诊断、完整成功 JSON 已保存到 `docs/evidence/2026-10-07-real-report/`。已向用户请求专用 RPC；公共节点稳定性和成功页面在线流程不能标为通过。浏览器确认 RPC/缺AI配置失败均无旧报告，历史备份可正确显示事实/解释/未知项；真实 AI 待凭据。
+
+> writes: `src/modules/onchain/ethereum-reader.ts`, `src/integration/onchain-report.contracts.ts`, `src/integration/onchain-report.ts`, `src/app/api/onchain-analysis/`, `server/`, `web/`, `tests/`, `docs/onchain-report.md`
+> anchors: `用户完成剩余TODO; D-012/AC-012/TC-011; 旧API和领域合同不变; 同源只读; 失败不填Mock`
+> verify: `pnpm typecheck; pnpm test; pnpm build; pnpm test:http; 实际RPC完整报告及真实交易核验; 页面功能验收`
+> review: `独立审阅exact diff: 输入/同源/安全错误/范围/窗口/证据/无交易权限`
+
+## P-010 显式 AI 调查与在线验收
+
+新报告可显式选择规则解释或 AI 调查，既有 Guardian 和 CLI 默认规则不变。复用已审阅 AI Adapter，服务器读取配置，浏览器不接收密钥或 endpoint。配置缺失先拒绝，无规则 fallback。真实模式附明确调查来源；风险计算仍为未校准启发式。用户已回答“留着，我自己到时候会给你”：凭据暂不提供，代码和受控测试继续，真实外部模型验收保持待完成。
+
+> writes: `src/modules/risk/onchain-analysis.service.ts`, `src/integration/onchain-analysis.ts`, `src/integration/onchain-report.ts`, `tests/`, `.env.example`, `README.md`
+> anchors: `用户模型稍后提供; D-012/AC-012/TC-012; D-011既有AI边界; 非自主调查/非执行授权`
+> verify: `规则/AI成功、缺凭据、证据不足、模型错误受控测试; 配置后真实AI正常/不足/失败验收; 未在线运行不得标完成`
+> review: `独立exact diff安全审阅; 引用/未知项/置信度上限/服务端密钥/默认流程不变`
+
+P-010 后续进展（2026-10-07 22:58）：用户提供 DeepSeek 本地凭据，服务器配置 flash 并显式关闭 thinking。历史完整快照和受控证据不足输入调用真实模型通过，受控无效凭据 HTTP401 明确失败无 fallback；默认思考曾截断 JSON 的诊断及公开结果见真实报告验收。完整1043 passed / 6 skipped、typecheck/build通过，独立审阅无重要发现。随后真实RPC→AI HTTP200和浏览器生成均实际成功一次（区块26141257/26141263）；详情及JSON见验收记录。公共RPC稳定性仍未通过，完整录像/发布/提交继续等待。
+
+## P-011 演示材料、发布与提交收尾
+
+准备固定真实案例、日期/范围明确的历史输出备份与两分钟讲稿。录像须实际录制并核验可播放；未录制不能用截图或文稿代称。运行检查通过后展示可审阅改动，Git合并/发布在用户明确确认后执行；正式比赛提交及回执按主办方要求和用户操作证据记录。BOT、主网交易、校准与收益预测不扩大进本轮。
+
+> writes: `README.md`, `docs/demo-cases.md`, `docs/demo-runbook.md`, `验收记录与历史实测备份`
+> anchors: `用户剩余TODO5/6; AC-008/TC-006; 视频、发布、正式提交分别举证; 不虚构用户/效果`
+> verify: `最终typecheck/test/build/http; 两分钟讲稿与实际能力一致; 录屏可播放; 经确认Git合并发布; 提交成功回执`
+> review: `材料来源/日期/模式准确; 待办及未验证项保留; 不混淆历史和实时`
+
 ## Integration And Final Verification
 
-本计划覆盖 AC-001–011、D-001–011、TC-001–010；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。P-001–005 保留当时的边界；P-006 记录后续授权的 D 迁移与必要修复；P-007 记录公开行情逐项换真。公共领域合同、核心 Policy/Executor 与事件状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
+本计划覆盖 AC-001–012、D-001–012、TC-001–012；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。P-001–005 保留当时的边界；P-006 记录后续授权的 D 迁移与必要修复；P-007 记录公开行情逐项换真；P-009–011 记录用户后续报告/AI/收尾任务。公共领域合同、核心 Policy/Executor 与事件状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
 
 修改前基线为 2026-10-07 15:54 的 `pnpm test`：**896 passed / 2 skipped**。历史运行验收见 [交易核验记录](../../transaction-check.md) 和 [团队集成验收](../../team-integration-acceptance.md)。只有新鲜命令/实际操作才可证明最终结果；后续经授权修改代码时重新跑相应检查。
 
@@ -188,8 +228,8 @@ Aave 隐藏验收：977 passed / 6 skipped、typecheck/build 和隔离 HTTP 11 �
 
 ## Handoff And Residual Risks
 
-Blockers: 本轮文档冻结与已批准的材料准备没有待定软件设计选择。实时 RPC 曾返回 `RPC_READ_FAILED`，必须重新核验；网络故障未解决时不能将在线验收记为通过，明确标注历史录屏。
+Blockers: P-009 在线稳定性仍需专用 RPC（公共节点已实测限流/历史读取失败）；模型凭据已配置；P-010 在历史/受控输入上的真实模型验收已通过，完整实时 HTTP/页面已各成功一次，公共RPC稳定性仍未通过。完整主线视频、Git发布确认和正式提交回执仍未完成。不能以受控测试、一次HTTP成功或历史备份替代这些要求。
 
 Residual risks: 真实 Agent 协作未交付，创新性和场景价值仍需方法、案例与实测支持；没有用户采用或付费证据。三项能力尚未形成完整真实自动链路。Fork/网络、导师反馈、内部认领、提交格式和 BOT 主网状态都按实际结果记录；截止时间不为未完成部署延期。
 
-Resume note: 从冻结方案与本计划 frontmatter 恢复，先检查实际产物，再更新对应 slice 状态。当前是方案交接，不是材料完成或提交成功。新增源码、模型、Git、部署或外部消息动作需用户新任务，不重开产品方向。
+Resume note: `codex/real-investigation-report` 已有真实报告/显式AI接线与受控测试；用户现已授权提交并 push 此候选分支，main 合并未获本轮授权。3102 为本轮隔离 Mock journal + 真实只读 RPC 预览，不触碰3101旧状态。先检查用户是否已配置专用RPC与模型凭据（仅显示是否配置，勿打印值），完成在线验收与视频，再按明确用户确认执行Git发布；正式比赛提交需实际材料与回执。用户已授权当前源码/接线任务，不重新问同一范围；主网执行/BOT/外部消息不在本轮。

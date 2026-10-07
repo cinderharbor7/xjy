@@ -1,6 +1,22 @@
 # Ethereum 异动调查原型 · Risk Guardian
 
+## 2026-10-07 Update · 真实报告收尾（本地候选版）
+
+新增 `/report` 与 `POST /api/onchain-analysis`：输入钱包，读取同一快照的原生 ETH/USDC 持仓、Chainlink 行情和 Uniswap V3 单池相邻五分钟卖压，展示规则风险、事实、解释、未知项和链上引用。旧 Risk Lab 样本与 Guardian Mock/Fork 保留。报告无交易权限，不要求钱包连接；真实数据可能正常或风险较低，不能固定演示高分。
+
+页面可显式选择 RULES 或 AI。AI 接线已实现；用户提供凭据后，**DeepSeek 在已保存真实快照及受控边界输入上已实测通过**，完整实时 HTTP 和浏览器链路已各成功一次，公共 RPC 稳定性仍未通过。缺配置、RPC/模型失败明确报错，不回退规则、旧数据或 Mock。默认旧 CLI/Guardian 装配不变；这是固定工具读侧＋模型解释，不称自主调查 Agent。
+
+历史区块查找从当前锚点向前括界再二分，不假设出块间隔。完整 CLI 已实际读取成功一次（区块 `26141022`，观察时间 `2026-10-07T14:11:47.000Z`）：卖压 `0.4960×`，Risk `20`，Confidence `0.72`。随后公共 RPC 的 HTTP/CLI 测试仍有失败；dRPC 抓到限流，另一个公共节点历史合约读取失败。**查询优化不能保证公共 RPC 稳定，真实 HTTP 收尾仍需可用的专用 RPC。** 没有修改本地私密 `.env.local`，没有加入自动重试或备用节点。
+
+本地检查：1043 passed / 6 skipped，typecheck/build 通过，隔离 HTTP 12 页面及旧 Mock 闭环/重复事件阻止通过；新报告受控测试 42 项。独立审阅无重要代码发现。新接口实际 HTTP 200 成功报告见[实测 JSON](docs/evidence/2026-10-07-real-report/http-live-report.json)，区块 `26141090`、Risk `20`；但浏览器后续仍遇限流，此前成功页面在线验收未通过；本次模型配置后已成功一次。浏览器已检查 RPC 失败与 AI 缺配置提示；DeepSeek 后续实测见[验收更新](docs/real-report-acceptance.md)，不把历史输入的模型成功算作完整在线页面验收。
+
+启动：`pnpm install --frozen-lockfile` → 配置本地 `ETHEREUM_RPC_URL` → `pnpm dev` → `/report`。AI 只在明确选择后运行，配置说明见[真实报告接口](docs/onchain-report.md)。讲稿、网络失败备份与提交清单见[演示手册](docs/demo-runbook.md)。候选分支 `codex/real-investigation-report`；发布状态以 GitHub 分支为准，本节不代表合入 main 或完成比赛提交。
+
+剩余：专用 RPC 完整 HTTP/页面验收；公共 RPC 稳定性验收（AI HTTP/页面已各成功一次）；完整主线录屏；确认发布后 Git 集成、正式比赛提交及回执。Mock 收藏、Risk Lab 实验、独立 Mock/Fork 保护保持清楚标签，主网交易与 BOT 部署不纳入本轮。
+
 ## 2026-10-07 Update · B/C 交付整合
+
+以下为当时发布记录，后续接线进度以顶部真实报告 Update 为准。
 
 A 的真实只读代码已在 main。本轮移植 B 的解释材料、AI 调查 Adapter 和测试，整合 C v2 验收记录；B 的独立初始化 Git 历史不覆盖主仓。
 

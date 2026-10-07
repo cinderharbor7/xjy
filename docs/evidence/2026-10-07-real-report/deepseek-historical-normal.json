@@ -1,0 +1,29 @@
+{
+  "recordedAt": "2026-10-07T14:57:59.355Z",
+  "name": "historical-normal",
+  "inputType": "saved real HTTP observation; not current RPC",
+  "provider": "DeepSeek",
+  "model": "deepseek-flash",
+  "elapsedMs": 3534,
+  "result": {
+    "summary": "AI 推断（未经独立核实）：该观察显示一个 DEX_SELL_PRESSURE 信号：在 2026-10-07T14:20:23Z 至 14:25:23Z 的 5 分钟窗口内，单一 Uniswap V3 WETH/USDC 池的 ETH 毛卖出额约为 4437.92 美元，仅为前一等长窗口基线 217458.14 美元的约 0.02 倍，涉及 5 笔卖出交易和 4 个独立钱包。同时，所附组合快照显示风险资产占比约 99.75%，ETH 价格 1 小时变动约 -0.04%。",
+    "primaryCause": "AI 推断（未经独立核实）：该信号反映的是单一池内 ETH 毛卖出额相对前一窗口显著偏低，而非卖出压力升高；这属于窗口间成交活跃度差异的统计观察，不能据此推断市场整体方向或钱包意图。",
+    "evidence": [
+      "Aggregate: $4437.921271919115 gross sells vs $217458.139223334 baseline (0.02×) over 5 sell transactions and 4 unique wallets — source: A OnchainSignalState.",
+      "BLOCK block 0xdf1fc30b657a529a5fcb04aebe6a5d24b687b7384ee66ab0115fa59c3473c671 (block 26141090): Uniswap V3 WETH/USDC 0.05% single pool; ETH gross sells, not net flow. Current [2026-10-07T14:20:23.000Z, 2026-10-07T14:25:23.000Z); baseline is the immediately preceding equal window. Statistics use all 45 unique Swap events; event evidence is limited to 20 samples. — source: https://etherscan.io/block/26141090",
+      "Portfolio risk exposure 99.74860548171341%; signal-augmented risk score 20/100."
+    ],
+    "uncertainties": [
+      "Gross ETH sell volume does not net buys and does not by itself establish a directional price move.",
+      "evidence.length samples the window; it is not txCount and cannot be extrapolated to uniqueWallets.",
+      "The frozen schema validates reference format and internal consistency, not that the transactions exist.",
+      "Confidence measures how well the supplied references cover the window, not the probability that ETH keeps falling.",
+      "仅覆盖单一 Uniswap V3 WETH/USDC 池，不能代表整个 ETH 市场；毛卖出额未与买入额净额化。",
+      "基线窗口卖出额异常偏高，可能受少数大额交易影响，使当前窗口的比值偏低。",
+      "事件证据仅抽样 20 条，统计基于 45 个 Swap 事件，样本代表性有限。",
+      "组合快照与信号时间接近但非同一数据源，风险占比高不等于价格会下跌。",
+      "AI prose is an unverified interpretation; matching references does not establish causation or factual correctness."
+    ],
+    "confidence": 0.35
+  }
+}

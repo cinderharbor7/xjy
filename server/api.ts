@@ -4,6 +4,7 @@ import * as policy from "../src/app/api/policy/route";
 import * as position from "../src/app/api/position/route";
 import * as investigation from "../src/app/api/transaction-checks/route";
 import * as research from "../src/app/api/eth-risk/route";
+import * as onchainAnalysis from "../src/app/api/onchain-analysis/route";
 import { market, detail } from "./fingerprint.js";
 type Handler = (request: Request) => Response | Promise<Response>;
 const routes: Record<string, Record<string, Handler>> = {
@@ -13,6 +14,7 @@ const routes: Record<string, Record<string, Handler>> = {
   "/api/position": { POST: position.POST },
   "/api/transaction-checks": { POST: investigation.POST },
   "/api/eth-risk": { GET: research.GET },
+  "/api/onchain-analysis": { POST: onchainAnalysis.POST },
   "/api/market": {
     GET: async () =>
       Response.json(await market(), {

@@ -30,7 +30,7 @@ const vite = production
       await import("vite")
     ).createServer({ server: { middlewareMode: true }, appType: "spa" });
 const publicRoutes =
-  /^\/(?:coins\/[A-Za-z0-9-]+|guardian|investigate|risk-lab|position|attestations|collection)?\/?$/;
+  /^\/(?:coins\/[A-Za-z0-9-]+|guardian|investigate|report|risk-lab|position|attestations|collection)?\/?$/;
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(

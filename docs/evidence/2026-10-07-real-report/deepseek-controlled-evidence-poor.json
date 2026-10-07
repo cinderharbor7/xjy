@@ -1,0 +1,28 @@
+{
+  "recordedAt": "2026-10-07T14:58:01.956Z",
+  "name": "controlled-evidence-poor",
+  "inputType": "controlled evidence-poor derivative; not real sparse-window observation",
+  "provider": "DeepSeek",
+  "model": "deepseek-flash",
+  "elapsedMs": 2599,
+  "result": {
+    "summary": "AI 推断（未经独立核实）：该观察显示一个以太坊地址的资产几乎全部为 ETH，风险敞口约 99.75%，同时出现一笔约 4437.92 美元的 DEX 卖出信号，但相对基线仅为 0.02 倍。",
+    "primaryCause": "AI 推断（未经独立核实）：信号为单笔、单钱包的 DEX 卖出，规模远低于基线，且组合高度集中于 ETH，因此该卖出信号本身不足以代表市场整体抛压。",
+    "evidence": [
+      "Aggregate: $4437.921271919115 gross sells vs $217458.139223334 baseline (0.02×) over 1 sell transactions and 1 unique wallets — source: A OnchainSignalState.",
+      "Portfolio risk exposure 99.74860548171341%; signal-augmented risk score 20/100."
+    ],
+    "uncertainties": [
+      "Gross ETH sell volume does not net buys and does not by itself establish a directional price move.",
+      "evidence.length samples the window; it is not txCount and cannot be extrapolated to uniqueWallets.",
+      "The frozen schema validates reference format and internal consistency, not that the transactions exist.",
+      "Confidence measures how well the supplied references cover the window, not the probability that ETH keeps falling.",
+      "未提供该笔交易的具体池子、代币对或交易路径，无法判断其代表性。",
+      "仅一个时间窗口和一个钱包，无法推断更广泛的市场行为或后续走势。",
+      "组合数据为某一时点快照，未反映后续资产变动。",
+      "信号中的证据列表为空，缺少可核验的链上细节。",
+      "AI prose is an unverified interpretation; matching references does not establish causation or factual correctness."
+    ],
+    "confidence": 0.03
+  }
+}

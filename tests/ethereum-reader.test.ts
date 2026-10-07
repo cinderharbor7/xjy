@@ -165,6 +165,21 @@ describe("EthereumSnapshot capture and historical blocks", () => {
     await expect(snapshot.atOrBefore(99_999)).rejects.toMatchObject({ code: "INVALID_CHAIN_DATA" });
   });
 
+  it("brackets a recent target without reading unrelated ancient blocks", async () => {
+    const { client, getBlock } = fixture();
+    const anchor = 26_000_000n;
+    getBlock.mockImplementation(async (parameters) => {
+      const number = parameters?.blockNumber ?? anchor;
+      if (number < anchor - 64n) throw new Error("Ancient history must not be requested for this target");
+      return { number, hash: hashes[0], timestamp: 400_000_000n + number * 12n };
+    });
+    const snapshot = await EthereumSnapshot.capture(client);
+    const result = await snapshot.atOrBefore(snapshot.anchor.seconds - 300);
+    expect(result.number).toBe(anchor - 25n);
+    expect(getBlock.mock.calls.length).toBeLessThan(15);
+    expect((await snapshot.atOrBefore(snapshot.anchor.seconds - 301)).number).toBe(anchor - 26n);
+  });
+
   it.each([-1, 100_071, 100_000.5, NaN, Infinity])("rejects observation time outside the snapshot %s", async (seconds) => {
     const { client } = fixture();
     const snapshot = await EthereumSnapshot.capture(client);

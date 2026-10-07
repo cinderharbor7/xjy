@@ -114,8 +114,16 @@ export class EthereumSnapshot {
         throw new EthereumReadError("INVALID_ARGUMENT", "The observation time must be within the captured Ethereum snapshot.");
       }
       if (seconds === this.anchor.seconds) return this.anchor;
-      let low = 0n;
       let high = this.anchor.number;
+      let distance = 1n;
+      let low = high > distance ? high - distance : 0n;
+      // Bracket from the anchor rather than probing unrelated ancient history.
+      // No block-time assumption: expand until the target is bracketed or genesis.
+      while ((await this.getBlock(low)).seconds > seconds && low > 0n) {
+        high = low;
+        distance *= 2n;
+        low = this.anchor.number > distance ? this.anchor.number - distance : 0n;
+      }
       while (low < high) {
         const middle = (low + high + 1n) / 2n;
         if ((await this.getBlock(middle)).seconds <= seconds) low = middle;
