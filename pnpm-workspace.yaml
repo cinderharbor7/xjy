@@ -1,0 +1,6 @@
+allowBuilds:
+  bufferutil: false
+  esbuild@0.28.2: true
+  utf-8-validate: false
+minimumReleaseAgeExclude:
+  - '@aave-dao/aave-address-book@4.71.3'

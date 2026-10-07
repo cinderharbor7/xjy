@@ -1,0 +1,28 @@
+name: Guardian checks
+on:
+  pull_request:
+  push:
+    branches: [main, 'd/**']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm contract:check
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:fingerprint
+      - run: pnpm build
+      - run: pnpm test:http
+      - run: pnpm test:sculpture
+      # Local Fork acceptance is explicit opt-in; CI has no signing key or mainnet RPC.
