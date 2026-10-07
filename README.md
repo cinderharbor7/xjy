@@ -10,7 +10,7 @@
 
 本地检查：1043 passed / 6 skipped，typecheck/build 通过，隔离 HTTP 12 页面及旧 Mock 闭环/重复事件阻止通过；新报告受控测试 42 项。独立审阅无重要代码发现。新接口实际 HTTP 200 成功报告见[实测 JSON](docs/evidence/2026-10-07-real-report/http-live-report.json)，区块 `26141090`、Risk `20`；但浏览器后续仍遇限流，此前成功页面在线验收未通过；本次模型配置后已成功一次。浏览器已检查 RPC 失败与 AI 缺配置提示；DeepSeek 后续实测见[验收更新](docs/real-report-acceptance.md)，不把历史输入的模型成功算作完整在线页面验收。
 
-启动：`pnpm install --frozen-lockfile` → 配置本地 `ETHEREUM_RPC_URL` → `pnpm dev` → `/report`。AI 只在明确选择后运行，配置说明见[真实报告接口](docs/onchain-report.md)。讲稿、网络失败备份与提交清单见[演示手册](docs/demo-runbook.md)。候选分支 `codex/real-investigation-report`；发布状态以 GitHub 分支为准，本节不代表合入 main 或完成比赛提交。
+启动：`pnpm install --frozen-lockfile` → 配置本地 `ETHEREUM_RPC_URL` → `pnpm dev` → `/report`。AI 只在明确选择后运行，配置说明见[真实报告接口](docs/onchain-report.md)。讲稿、网络失败备份与提交清单见[演示手册](docs/demo-runbook.md)。本功能已合入 main（`86a3d14`）；比赛演示材料（D 统一稿）：[PPT 逐页内容](docs/hackathon/presentation.md)、[6 分钟讲稿](docs/hackathon/talk-script.md)、[提交说明](docs/hackathon/submission.md)。正式比赛提交与回执仍未完成。
 
 剩余：专用 RPC 完整 HTTP/页面验收；公共 RPC 稳定性验收（AI HTTP/页面已各成功一次）；完整主线录屏；确认发布后 Git 集成、正式比赛提交及回执。Mock 收藏、Risk Lab 实验、独立 Mock/Fork 保护保持清楚标签，主网交易与 BOT 部署不纳入本轮。
 
