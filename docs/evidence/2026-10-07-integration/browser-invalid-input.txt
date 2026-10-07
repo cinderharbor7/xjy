@@ -1,0 +1,44 @@
+[p1 "ETH 交易核验 · 只读 MVP" | space "本地集成 Demo 验收"(1): 1 managed, 0 untracked — p1* "ETH 交易核验 · 只读 MVP"]
+root
+  container
+    container
+      container
+        anchor [ref=43, loc=href:/, url=http://127.0.0.1:3101/]
+          text "← 返回 Guardian Demo"
+        text "LIVE READ ONLY · Ethereum 主网"
+      container
+        paragraph
+          text "ETH 交易核验 · MVP"
+        heading
+          text "大额转账，"
+          text "就等于有人在卖吗？"
+        paragraph
+          text "把消息中的交易哈希贴进来，查看链上实际记录了什么、哪些结论有证据、哪些还不能确定。"
+        paragraph
+          text "当前覆盖：Ethereum 主网外层交易 + Uniswap V3 WETH/USDC 0.05% 单池。输入不会触发签名、转账或交易。"
+      container "先核查一笔交易"
+        heading
+          text "先核查一笔交易"
+        form
+          text "Ethereum 交易哈希（Tx Hash）"
+          container
+            textbox [ref=44, loc=css:input[name="txHash"]]
+              text "0x1111111111111111111111111111111111111111"
+            button [ref=45]
+              text "核验交易"
+          paragraph
+            text "在区块浏览器的交易详情或链上异动消息中复制完整 Tx Hash。"
+          button [ref=46]
+            text "填入真实大额转账示例（20,059.2 ETH）"
+          paragraph
+            text "示例只填入历史交易哈希；点击「核验交易」仍会从真实 RPC 读取，不使用 Mock 结果。"
+      alert
+        text "请输入完整的 Ethereum 交易哈希：以 0x 开头，后面有 64 位十六进制字符。这里需要交易哈希，不是钱包地址。"
+      text "只读核验 · 不提供买卖指令 · 报告只覆盖本次查询的交易与指定池"
+    alert
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root

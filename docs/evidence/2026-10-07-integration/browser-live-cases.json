@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-07T09:54:52.370Z",
+  "cases": [
+    {
+      "name": "sell",
+      "hash": "0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9",
+      "previousReportCleared": true,
+      "visible": {
+        "title": "本池日志确认存在 WETH 换 USDC 的兑换",
+        "queryTime": "2026-10-07T09:54:49.409Z",
+        "table": [
+          "12\t卖出 WETH → 收到 USDC\t0.198\t517.590594"
+        ],
+        "uncertainties": "现在还不能确认什么\n事实读取来自单个配置 RPC，浏览器链接供独立核查；未做多节点或密码学验证。\n兑换核验只覆盖 Ethereum 主网 Uniswap V3 WETH/USDC 0.05% 单池，不覆盖其他池、DEX 或链。\n未读取内部调用 trace、后续资金路径或交易所成交；不能确定整笔交易的净买卖方向。\n发送地址是链上地址，未核验所属机构或个人，也无法确认转账动机。\n链上交易与行情先后发生不证明因果；本报告不判断是否导致 ETH 下跌，也不提供买卖建议。\nUSDC 数量按代币 decimals 计算，未读取历史美元报价；不能当作等额美元价值。",
+        "error": []
+      }
+    },
+    {
+      "name": "buy",
+      "hash": "0x6cf0da2d2749fe1f12c8120f03f29fa4b5c4e0964f1117f2787a11c5a6ee25dc",
+      "previousReportCleared": true,
+      "visible": {
+        "title": "本池日志确认存在 USDC 换 WETH 的兑换",
+        "queryTime": "2026-10-07T09:54:52.227Z",
+        "table": [
+          "1049\t买入 WETH ← 支出 USDC\t0.099098067895988648\t259.31045"
+        ],
+        "uncertainties": "现在还不能确认什么\n事实读取来自单个配置 RPC，浏览器链接供独立核查；未做多节点或密码学验证。\n兑换核验只覆盖 Ethereum 主网 Uniswap V3 WETH/USDC 0.05% 单池，不覆盖其他池、DEX 或链。\n未读取内部调用 trace、后续资金路径或交易所成交；不能确定整笔交易的净买卖方向。\n发送地址是链上地址，未核验所属机构或个人，也无法确认转账动机。\n链上交易与行情先后发生不证明因果；本报告不判断是否导致 ETH 下跌，也不提供买卖建议。\nUSDC 数量按代币 decimals 计算，未读取历史美元报价；不能当作等额美元价值。",
+        "error": []
+      }
+    }
+  ]
+}

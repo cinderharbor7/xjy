@@ -6,7 +6,7 @@ slices:
     status: pending
     depends: []
   - id: P-002
-    status: pending
+    status: in_progress
     depends: []
   - id: P-003
     status: pending
@@ -14,6 +14,12 @@ slices:
   - id: P-004
     status: pending
     depends: [P-003]
+  - id: P-005
+    status: done
+    depends: []
+  - id: P-006
+    status: in_progress
+    depends: [P-005]
 ---
 
 # Hackathon 冻结方案执行交接
@@ -27,6 +33,10 @@ slices:
 展示两条既有真实读侧：A→B 的单次量化观察及独立交易核验；Guardian Mock/Fork 为独立应用实验。真实确定性量化已经存在，真实 AI/Agent 调查尚未交付；既有启发式分数不是预测概率，真实信号也尚未贯通持续交易监控。材料不能把三段拼成已完成的自主保护闭环。
 
 本计划只安排现有入口的检查、案例证据、方法说明、AI 对照、材料与排练，不授予源码/API/合同/事件状态修改、模型接入、主网部署、Git 发布或外部消息权限。`ready` 仅表示已批准的原型提交准备可执行，不表示商业或完整 Agent 能力通过。新增能力需用户另行明确授权与验收，随后更新冻结文件。
+
+2026-10-07 用户另行授权“先看能不能在本地整合”。P-005 记录这次本地候选版与验证，沿用其余 P-* 编号，不扩大软件功能、签名或发布权限。
+
+2026-10-07 用户查看 D 的 `codex/unified-vanilla-fingerprints` 后明确要求“合并”。P-006 记录这一新授权：保留 A/B/C 候选材料，整合 D 已提交的原生前端、同源 Node 服务、指纹与 BOT 测试网存证模块，经新鲜验收后通过 PR 合入 main。此前仅本地整合的权限边界是当时记录；本次允许必要的整合修复、commit/push/PR merge，不授权实际钱包签名、合约部署、NFT 铸造或主网交易。既有用户 computer use 验收请求继续适用于整合后的页面，不把 D 的 DOM 测试当作浏览器验收。
 
 ## P-001 一致的比赛场景与表达
 
@@ -44,6 +54,8 @@ D 与队长统一 PPT、讲稿和提交说明。每个人能在 30 秒说出：�
 A 提供当前可读的真实窗口与至少两笔支持范围内的交易。C 顺序复核窗口、基线、倍数、金额、方向、区块、出处和失败情况。真实观察不要求出现异常或固定 Risk 91；窗口与历史交易不同日期时必须分开解释，不能声称当前指标预判了历史事件。
 
 案例范围和既有证据见 [交易核验记录](../../transaction-check.md) 与 [团队集成验收](../../team-integration-acceptance.md)。在线失败如实报错；录屏/保存输出只作标明日期和模式的历史记录，不冒充在线成功。不把单笔 USDC 数量当作美元金额，不把单池无卖出当成全链无卖出。
+
+2026-10-07 A 的新鲜主网读取与案例输出已整理到 [A → B / D 交付](../../demo-cases.md)：16:49—16:50 的共同窗口及三笔重新核验的交易。当前窗口比值为 0.0258，未制造异常。原始 JSON、采集时间和来源 commit 已保存。这是 A 16:53 交付时的记录；其后引入的 C 记录和本地 HTTP 复核见 P-005 与[本地验收](../../local-integration-acceptance.md)，Fork/浏览器仍未记为通过。
 
 C 同时复核独立保护实验：实际选择 Mock 或本机 Fork，Policy 门控、独立 after、重复事件拒绝及未知回执不重播。不删除 journal 或绕过去重；没有跑过的模式不记为通过。Fork 仅按既有许可和配置执行，不扩大钱包或交易范围。本 slice 整理验收证据；发现源码问题先记录，不隐含授予修改权限。
 
@@ -81,6 +93,36 @@ BOT 是独立事项：现有未集成分支与主网部署未验收，Gas 申请
 > anchors: `AC-001/008; D-001/007; TC-006`
 > verify: `pnpm typecheck；pnpm test；pnpm build；实际提交清单、视频/链接/运行说明、成功回执；检查命令和未运行项分别记录`
 > review: `最终材料不承诺未经验证的客户、收益、因果、Agent 或主网部署`
+
+## P-005 A/B/C 本地整合候选版
+
+在独立 worktree，以 `origin/main` 的 `7d6ceec` 为基线，整合 A `c57962c` 与 B `db3e0f0`；从 C `9b8df50` 只引入验收文档。用户授权本地整合，本轮不提交新 commit、不 push、不改变 main 或主工作区。
+
+C 的父提交 `bbfde9c` 校准研究不纳入冻结候选版：它使用与现行 Risk Score 不同的分数、含跨年度标签窗口，并模拟产品没有的自动买回，尚不能支撑调整默认策略。研究原分支保持不变，本轮不修复或重新运行该研究。
+
+本地只校正文档证据问题：B 的估算耗时与未附原始记录的搜索不能称为已验证优势；示意报告改为引用 A 完整 JSON，AI 对照维持待验证。C 的 logIndex 与历史交易时间口径按链上事实修正，同一 RPC 的两种调用不称为独立数据源验证。公共源码、Schema、依赖、Policy/Executor、事件存储保持基线内容。
+
+完成条件为：本地候选版无合并冲突，文档链接及保存 JSON 与合同一致，typecheck/test/build 通过；真实 AI 对照、Fork、最终提交仍不计完成。HTTP 实测只在独立工作区/端口、Mock 模式和新 journal 上运行，不能更改主工作区配置或旧状态。
+
+本次实际结果见[本地整合验收](../../local-integration-acceptance.md)：技术检查与 Mock HTTP 通过，真实交易 HTTP 返回 `RPC_READ_FAILED` 未计成功；两名独立审阅者复核候选内容，文档发现已修。P-005 的完成只表示本地候选版已可复查，不表示其他 slice、在线主网、Agent 或比赛提交完成。
+
+> writes: `docs/b-deliverables/`, `docs/c-acceptance-review.md`, `本计划`, `docs/local-integration-acceptance.md`, `docs/evidence/2026-10-07-integration/`；已有 A 证据仅原样引入
+> anchors: `用户2026-10-07本地整合请求; AC-002/003/007/008; D-002/004/005/007; TC-002/003/006`
+> verify: `pnpm typecheck；pnpm test；pnpm build；git diff --check；Markdown 本地链接、JSON/schema 与源码未变核查；如实际运行 HTTP，记录模式/状态及未运行项`
+> review: `全部候选 diff；数据和未知项口径；未校准研究不改变默认策略；不把估算写为实测；保护原 journal 和权限`
+
+## P-006 D 原生前端整合与 main 合并
+
+固定 D 来源为 `a3f227238011cc0a56b8a40bc87caf0583a8da02`，保留其提交历史及 P-005 中已审阅的 A/B/C 材料。前端由 Next/React 迁移到 `web/` 的原生 JS/Vite 和 `server/` 同源 HTTP；Guardian 移到 `/guardian`，交易核验等既有深链接保留。公共领域合同与核心 Policy/Executor/事件安全语义保持稳定，必要修复只解决合并和实际验收发现的问题，不另行设计产品功能。
+
+使用已有隔离 worktree，保留旧 journal；新 HTTP/页面检查使用另一个明确命名的 Mock journal。真实只读查询如实记录 RPC 成功或失败。指纹默认 Demo，行情/新闻源缺失不伪造；BOT 测试网模块、模拟报告与真正 Ethereum 证据分别标明。没有进行钱包连接、签名、部署或铸造就不能记为通过。
+
+合并完成条件是整合 diff 独立审阅无未解决的 Critical/Important 问题，typecheck/test/build 及仓库新增的 HTTP、指纹与构建回归通过，浏览器实际检查首页、Guardian 与只读调查入口；README 启动步骤与新路径一致。创建并附加集成 PR，经检查后合入 main，验证远端 main 包含该集成 commit；不删除队友分支或改写远端历史。
+
+> writes: `D 来源分支的整合 diff`, `必要修复与相应测试`, `README.md`, `docs/unified-frontend.md`, `docs/local-integration-acceptance.md`, `本计划`, `docs/evidence/2026-10-07-integration/`
+> anchors: `用户2026-10-07明确合并请求; 公共合同稳定; A/B/C证据保留; 既有computer use验收授权; 不广播未授权交易`
+> verify: `pnpm install --frozen-lockfile；pnpm typecheck；pnpm test；pnpm build；pnpm test:fingerprint；pnpm contract:check；pnpm test:http；pnpm test:sculpture；实际浏览器入口/报告/Mock闭环；git diff --check；GitHub PR/main状态`
+> review: `整合exact diff；HTTP同源/钱包/事件状态；前端证据与未知项；钱包确认和公开配置；运行及文档迁移；无未授权部署或秘密提交`
 
 ## Integration And Final Verification
 

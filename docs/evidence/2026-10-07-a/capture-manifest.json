@@ -1,0 +1,54 @@
+{
+  "artifactKind": "DATED_LIVE_READ_CAPTURE",
+  "notice": "Captured from live Ethereum mainnet reads at the recorded times; these saved files are historical records, not a live response or runtime fallback. SHA-256 detects file changes; it does not prove the RPC data are authentic.",
+  "sourceCommit": "7d6ceec32bd48b9a2b4075ab4cedceeb1e644ab0",
+  "captureBranch": "codex/a-demo-evidence",
+  "rpcProfile": "One server-configured Ethereum mainnet RPC; endpoint and environment contents omitted. No independent provider comparison.",
+  "walletScope": "Native ETH + USDC only; the public sample address is not a project-controlled execution wallet and no identity attribution is claimed.",
+  "files": [
+    {
+      "command": "pnpm --silent data:analyze --wallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --json",
+      "startedAt": "2026-10-07T08:49:42.215279+00:00",
+      "finishedAt": "2026-10-07T08:50:23.200771+00:00",
+      "exitCode": 0,
+      "file": "onchain-analysis.json",
+      "sha256": "e8c1d4c1f3e506de9a977515af91eb3b632974e9349e33de91df0f60c4b10c50"
+    },
+    {
+      "case": "native-transfer",
+      "txHash": "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a",
+      "entrypoint": "checkTransaction(txHash) from src/integration/transaction-check.ts",
+      "startedAt": "2026-10-07T08:50:36.556249+00:00",
+      "finishedAt": "2026-10-07T08:50:43.347819+00:00",
+      "exitCode": 0,
+      "file": "native-transfer.json",
+      "sha256": "30d797b6cfefe30a25adcd7c4b7ef9e97aa41ab5a65ee9143bd8f9164a577f29"
+    },
+    {
+      "case": "pool-sell",
+      "txHash": "0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9",
+      "entrypoint": "checkTransaction(txHash) from src/integration/transaction-check.ts",
+      "startedAt": "2026-10-07T08:50:43.348998+00:00",
+      "finishedAt": "2026-10-07T08:50:47.560133+00:00",
+      "exitCode": 0,
+      "file": "pool-sell.json",
+      "sha256": "f30a4d070db11c9ac5f1a1249f2c1611aa1ed4107e41d8c4529661c6658fae1c"
+    },
+    {
+      "case": "pool-buy",
+      "txHash": "0x6cf0da2d2749fe1f12c8120f03f29fa4b5c4e0964f1117f2787a11c5a6ee25dc",
+      "entrypoint": "checkTransaction(txHash) from src/integration/transaction-check.ts",
+      "startedAt": "2026-10-07T08:50:47.561461+00:00",
+      "finishedAt": "2026-10-07T08:50:52.259800+00:00",
+      "exitCode": 0,
+      "file": "pool-buy.json",
+      "sha256": "68092f0521d5ae90f26c6449b820914f2c82705f0bb1a88252535496ab0fc49a"
+    }
+  ],
+  "notRun": [
+    "HTTP/browser re-acceptance by D",
+    "Fork/mainnet transactions",
+    "AI or LLM investigation",
+    "AI comparison or user-demand validation"
+  ]
+}

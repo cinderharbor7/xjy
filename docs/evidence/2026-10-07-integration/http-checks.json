@@ -1,0 +1,2800 @@
+{
+  "artifactKind": "DATED_HTTP_ACCEPTANCE_CAPTURE",
+  "sourceCommit": "7d6ceec32bd48b9a2b4075ab4cedceeb1e644ab0",
+  "candidateBranch": "codex/integrate-abc-local",
+  "baseUrl": "http://127.0.0.1:3101",
+  "guardianMode": "MOCK",
+  "notice": "Guardian executions and transaction hashes in Guardian responses are Mock only; no signing or blockchain execution. Transaction-check endpoint independently requests live Ethereum reads; the recorded valid-hash request failed with RPC_READ_FAILED. These captures are dated historical records, never runtime fallback. No browser interaction, Fork or AI benchmark was performed.",
+  "records": [
+    {
+      "method": "GET",
+      "path": "/",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.583145+00:00",
+      "finishedAt": "2026-10-07T09:36:21.600326+00:00",
+      "cacheControl": "s-maxage=31536000",
+      "body": {
+        "htmlLength": 10788
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/investigate",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.600786+00:00",
+      "finishedAt": "2026-10-07T09:36:21.605171+00:00",
+      "cacheControl": "s-maxage=31536000",
+      "body": {
+        "htmlLength": 9001
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/monitor",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.605432+00:00",
+      "finishedAt": "2026-10-07T09:36:21.610491+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "enabled": false,
+        "halted": false,
+        "busy": false,
+        "recoveryCount": 0,
+        "recovery": {
+          "intervalMs": 10000,
+          "maxAgeMs": 30000,
+          "consecutive": 3,
+          "maxVolatility": 40,
+          "minChange5m": -0.5,
+          "minChange1h": -2
+        },
+        "events": [],
+        "sources": "MOCK balances, market changes, investigation and execution; no chain transactions."
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/policy?wallet=0x1111111111111111111111111111111111111111",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.610695+00:00",
+      "finishedAt": "2026-10-07T09:36:21.617278+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "config": {
+          "minRiskScore": 80,
+          "minConfidence": 0.85,
+          "minRiskExposurePct": 70,
+          "maxDeRiskPct": 30,
+          "allowedRiskAssets": [
+            "ETH"
+          ],
+          "allowedDefensiveAssets": [
+            "USDC"
+          ]
+        },
+        "version": 1,
+        "supportedRiskAssets": [
+          "ETH"
+        ],
+        "supportedDefensiveAssets": [
+          "USDC"
+        ]
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/policy",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.617653+00:00",
+      "finishedAt": "2026-10-07T09:36:21.624159+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "config": {
+          "minRiskScore": 80,
+          "minConfidence": 0.85,
+          "minRiskExposurePct": 70,
+          "maxDeRiskPct": 30,
+          "allowedRiskAssets": [
+            "ETH"
+          ],
+          "allowedDefensiveAssets": [
+            "USDC"
+          ]
+        },
+        "version": 2,
+        "supportedRiskAssets": [
+          "ETH"
+        ],
+        "supportedDefensiveAssets": [
+          "USDC"
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/rescue",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.624369+00:00",
+      "finishedAt": "2026-10-07T09:36:21.651984+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "before": {
+          "wallet": "0x1111111111111111111111111111111111111111",
+          "totalUsd": 30000,
+          "riskAssetUsd": 30000,
+          "defensiveAssetUsd": 0,
+          "riskExposurePct": 100,
+          "assets": [
+            {
+              "symbol": "ETH",
+              "amount": 10,
+              "usdValue": 30000,
+              "category": "RISK"
+            },
+            {
+              "symbol": "USDC",
+              "amount": 0,
+              "usdValue": 0,
+              "category": "DEFENSIVE"
+            }
+          ],
+          "timestamp": "2026-10-07T09:36:21.631Z"
+        },
+        "market": {
+          "asset": "ETH",
+          "priceUsd": 2700,
+          "priceChange5mPct": -3,
+          "priceChange1hPct": -10,
+          "volatilityScore": 82,
+          "timestamp": "2026-10-07T09:36:21.632Z"
+        },
+        "riskAnalysis": {
+          "riskScore": 91,
+          "confidence": 0.88,
+          "riskExposurePct": 100,
+          "stressTests": [
+            {
+              "priceChangePct": -5,
+              "projectedPortfolioUsd": 28500,
+              "projectedLossUsd": 1500
+            },
+            {
+              "priceChangePct": -10,
+              "projectedPortfolioUsd": 27000,
+              "projectedLossUsd": 3000
+            },
+            {
+              "priceChangePct": -15,
+              "projectedPortfolioUsd": 25500,
+              "projectedLossUsd": 4500
+            }
+          ],
+          "investigation": {
+            "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+            "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+            "evidence": [
+              "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+              "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+              "Mock volatility score is 82/100.",
+              "Demo risk score is 91/100."
+            ],
+            "uncertainties": [
+              "Mock data only: no blockchain balances or live market data were read.",
+              "No LLM was called; confidence is a fixed demo value.",
+              "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+              "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+            ],
+            "confidence": 0.88
+          },
+          "recommendedAction": "SWAP_TO_SAFE"
+        },
+        "policyDecision": {
+          "triggered": true,
+          "action": "SWAP_TO_SAFE",
+          "sourceAsset": "ETH",
+          "targetAsset": "USDC",
+          "reduceExposurePct": 30,
+          "reasons": [
+            "Risk score 91 > 80: passed.",
+            "Confidence 0.88 > 0.85: passed.",
+            "Risk exposure 100% > 70%: passed.",
+            "De-risk limit 30 percentage points > 0: passed.",
+            "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+            "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+            "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+          ]
+        },
+        "execution": {
+          "success": true,
+          "action": "SWAP_TO_SAFE",
+          "sourceAsset": "ETH",
+          "targetAsset": "USDC",
+          "sourceAmount": 3,
+          "targetAmount": 8100,
+          "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+          "timestamp": "2026-10-07T09:36:21.646Z"
+        },
+        "after": {
+          "wallet": "0x1111111111111111111111111111111111111111",
+          "totalUsd": 27000,
+          "riskAssetUsd": 18900,
+          "defensiveAssetUsd": 8100,
+          "riskExposurePct": 70,
+          "assets": [
+            {
+              "symbol": "ETH",
+              "amount": 7,
+              "usdValue": 18900,
+              "category": "RISK"
+            },
+            {
+              "symbol": "USDC",
+              "amount": 8100,
+              "usdValue": 8100,
+              "category": "DEFENSIVE"
+            }
+          ],
+          "timestamp": "2026-10-07T09:36:21.646Z"
+        },
+        "verification": {
+          "status": "PASSED",
+          "reasons": [
+            "Passed: The re-read belongs to the same wallet.",
+            "Passed: The re-read evidence has not moved backwards or preceded execution.",
+            "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+            "Passed: The source balance reduction matches the execution receipt.",
+            "Passed: The defensive balance increase matches the execution receipt.",
+            "Passed: The executed source amount matches the approved percentage points at the market quote.",
+            "Passed: Asset identities and non-approved balances remain unchanged.",
+            "Passed: Risk exposure decreased from 100% to 70%."
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/rescue",
+      "status": 409,
+      "startedAt": "2026-10-07T09:36:21.652475+00:00",
+      "finishedAt": "2026-10-07T09:36:21.660631+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "type": "urn:xjy:guardian:EVENT_OCCUPIED",
+        "title": "Guardian request failed",
+        "status": 409,
+        "code": "EVENT_OCCUPIED",
+        "detail": "This risk event already owns its execution opportunity; the server continues observations.",
+        "instance": "/api/rescue"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/monitor",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.660934+00:00",
+      "finishedAt": "2026-10-07T09:36:21.668158+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "enabled": false,
+        "halted": false,
+        "busy": false,
+        "recoveryCount": 0,
+        "recovery": {
+          "intervalMs": 10000,
+          "maxAgeMs": 30000,
+          "consecutive": 3,
+          "maxVolatility": 40,
+          "minChange5m": -0.5,
+          "minChange1h": -2
+        },
+        "lastTickAt": "2026-10-07T09:36:21.645Z",
+        "latestAnalysis": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          }
+        },
+        "latestSession": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          },
+          "execution": {
+            "success": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "sourceAmount": 3,
+            "targetAmount": 8100,
+            "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "after": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 27000,
+            "riskAssetUsd": 18900,
+            "defensiveAssetUsd": 8100,
+            "riskExposurePct": 70,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 7,
+                "usdValue": 18900,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 8100,
+                "usdValue": 8100,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "verification": {
+            "status": "PASSED",
+            "reasons": [
+              "Passed: The re-read belongs to the same wallet.",
+              "Passed: The re-read evidence has not moved backwards or preceded execution.",
+              "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+              "Passed: The source balance reduction matches the execution receipt.",
+              "Passed: The defensive balance increase matches the execution receipt.",
+              "Passed: The executed source amount matches the approved percentage points at the market quote.",
+              "Passed: Asset identities and non-approved balances remain unchanged.",
+              "Passed: Risk exposure decreased from 100% to 70%."
+            ]
+          }
+        },
+        "events": [
+          {
+            "id": "857e96a1-0499-430a-bfc2-da547418e5ed",
+            "createdAt": "2026-10-07T09:36:21.645Z",
+            "status": "CONFIRMED",
+            "config": {
+              "minRiskScore": 80,
+              "minConfidence": 0.85,
+              "minRiskExposurePct": 70,
+              "maxDeRiskPct": 30,
+              "allowedRiskAssets": [
+                "ETH"
+              ],
+              "allowedDefensiveAssets": [
+                "USDC"
+              ]
+            },
+            "version": 2,
+            "analysis": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              }
+            },
+            "submissions": [],
+            "session": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              },
+              "execution": {
+                "success": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "sourceAmount": 3,
+                "targetAmount": 8100,
+                "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "after": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 27000,
+                "riskAssetUsd": 18900,
+                "defensiveAssetUsd": 8100,
+                "riskExposurePct": 70,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 7,
+                    "usdValue": 18900,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 8100,
+                    "usdValue": 8100,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "verification": {
+                "status": "PASSED",
+                "reasons": [
+                  "Passed: The re-read belongs to the same wallet.",
+                  "Passed: The re-read evidence has not moved backwards or preceded execution.",
+                  "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+                  "Passed: The source balance reduction matches the execution receipt.",
+                  "Passed: The defensive balance increase matches the execution receipt.",
+                  "Passed: The executed source amount matches the approved percentage points at the market quote.",
+                  "Passed: Asset identities and non-approved balances remain unchanged.",
+                  "Passed: Risk exposure decreased from 100% to 70%."
+                ]
+              }
+            },
+            "note": "Execution CONFIRMED; verification PASSED."
+          }
+        ],
+        "activeEvent": "857e96a1-0499-430a-bfc2-da547418e5ed",
+        "sources": "MOCK balances, market changes, investigation and execution; no chain transactions."
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/monitor",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.668715+00:00",
+      "finishedAt": "2026-10-07T09:36:21.675324+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "enabled": true,
+        "halted": false,
+        "busy": false,
+        "recoveryCount": 0,
+        "recovery": {
+          "intervalMs": 10000,
+          "maxAgeMs": 30000,
+          "consecutive": 3,
+          "maxVolatility": 40,
+          "minChange5m": -0.5,
+          "minChange1h": -2
+        },
+        "lastTickAt": "2026-10-07T09:36:21.645Z",
+        "latestAnalysis": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          }
+        },
+        "latestSession": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          },
+          "execution": {
+            "success": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "sourceAmount": 3,
+            "targetAmount": 8100,
+            "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "after": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 27000,
+            "riskAssetUsd": 18900,
+            "defensiveAssetUsd": 8100,
+            "riskExposurePct": 70,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 7,
+                "usdValue": 18900,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 8100,
+                "usdValue": 8100,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "verification": {
+            "status": "PASSED",
+            "reasons": [
+              "Passed: The re-read belongs to the same wallet.",
+              "Passed: The re-read evidence has not moved backwards or preceded execution.",
+              "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+              "Passed: The source balance reduction matches the execution receipt.",
+              "Passed: The defensive balance increase matches the execution receipt.",
+              "Passed: The executed source amount matches the approved percentage points at the market quote.",
+              "Passed: Asset identities and non-approved balances remain unchanged.",
+              "Passed: Risk exposure decreased from 100% to 70%."
+            ]
+          }
+        },
+        "events": [
+          {
+            "id": "857e96a1-0499-430a-bfc2-da547418e5ed",
+            "createdAt": "2026-10-07T09:36:21.645Z",
+            "status": "CONFIRMED",
+            "config": {
+              "minRiskScore": 80,
+              "minConfidence": 0.85,
+              "minRiskExposurePct": 70,
+              "maxDeRiskPct": 30,
+              "allowedRiskAssets": [
+                "ETH"
+              ],
+              "allowedDefensiveAssets": [
+                "USDC"
+              ]
+            },
+            "version": 2,
+            "analysis": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              }
+            },
+            "submissions": [],
+            "session": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              },
+              "execution": {
+                "success": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "sourceAmount": 3,
+                "targetAmount": 8100,
+                "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "after": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 27000,
+                "riskAssetUsd": 18900,
+                "defensiveAssetUsd": 8100,
+                "riskExposurePct": 70,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 7,
+                    "usdValue": 18900,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 8100,
+                    "usdValue": 8100,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "verification": {
+                "status": "PASSED",
+                "reasons": [
+                  "Passed: The re-read belongs to the same wallet.",
+                  "Passed: The re-read evidence has not moved backwards or preceded execution.",
+                  "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+                  "Passed: The source balance reduction matches the execution receipt.",
+                  "Passed: The defensive balance increase matches the execution receipt.",
+                  "Passed: The executed source amount matches the approved percentage points at the market quote.",
+                  "Passed: Asset identities and non-approved balances remain unchanged.",
+                  "Passed: Risk exposure decreased from 100% to 70%."
+                ]
+              }
+            },
+            "note": "Execution CONFIRMED; verification PASSED."
+          }
+        ],
+        "activeEvent": "857e96a1-0499-430a-bfc2-da547418e5ed",
+        "sources": "MOCK balances, market changes, investigation and execution; no chain transactions."
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/monitor",
+      "status": 200,
+      "startedAt": "2026-10-07T09:36:21.675739+00:00",
+      "finishedAt": "2026-10-07T09:36:21.681264+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "enabled": false,
+        "halted": false,
+        "busy": false,
+        "recoveryCount": 0,
+        "recovery": {
+          "intervalMs": 10000,
+          "maxAgeMs": 30000,
+          "consecutive": 3,
+          "maxVolatility": 40,
+          "minChange5m": -0.5,
+          "minChange1h": -2
+        },
+        "lastTickAt": "2026-10-07T09:36:21.645Z",
+        "latestAnalysis": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          }
+        },
+        "latestSession": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          },
+          "execution": {
+            "success": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "sourceAmount": 3,
+            "targetAmount": 8100,
+            "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "after": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 27000,
+            "riskAssetUsd": 18900,
+            "defensiveAssetUsd": 8100,
+            "riskExposurePct": 70,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 7,
+                "usdValue": 18900,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 8100,
+                "usdValue": 8100,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "verification": {
+            "status": "PASSED",
+            "reasons": [
+              "Passed: The re-read belongs to the same wallet.",
+              "Passed: The re-read evidence has not moved backwards or preceded execution.",
+              "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+              "Passed: The source balance reduction matches the execution receipt.",
+              "Passed: The defensive balance increase matches the execution receipt.",
+              "Passed: The executed source amount matches the approved percentage points at the market quote.",
+              "Passed: Asset identities and non-approved balances remain unchanged.",
+              "Passed: Risk exposure decreased from 100% to 70%."
+            ]
+          }
+        },
+        "events": [
+          {
+            "id": "857e96a1-0499-430a-bfc2-da547418e5ed",
+            "createdAt": "2026-10-07T09:36:21.645Z",
+            "status": "CONFIRMED",
+            "config": {
+              "minRiskScore": 80,
+              "minConfidence": 0.85,
+              "minRiskExposurePct": 70,
+              "maxDeRiskPct": 30,
+              "allowedRiskAssets": [
+                "ETH"
+              ],
+              "allowedDefensiveAssets": [
+                "USDC"
+              ]
+            },
+            "version": 2,
+            "analysis": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              }
+            },
+            "submissions": [],
+            "session": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              },
+              "execution": {
+                "success": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "sourceAmount": 3,
+                "targetAmount": 8100,
+                "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "after": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 27000,
+                "riskAssetUsd": 18900,
+                "defensiveAssetUsd": 8100,
+                "riskExposurePct": 70,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 7,
+                    "usdValue": 18900,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 8100,
+                    "usdValue": 8100,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "verification": {
+                "status": "PASSED",
+                "reasons": [
+                  "Passed: The re-read belongs to the same wallet.",
+                  "Passed: The re-read evidence has not moved backwards or preceded execution.",
+                  "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+                  "Passed: The source balance reduction matches the execution receipt.",
+                  "Passed: The defensive balance increase matches the execution receipt.",
+                  "Passed: The executed source amount matches the approved percentage points at the market quote.",
+                  "Passed: Asset identities and non-approved balances remain unchanged.",
+                  "Passed: Risk exposure decreased from 100% to 70%."
+                ]
+              }
+            },
+            "note": "Execution CONFIRMED; verification PASSED."
+          }
+        ],
+        "activeEvent": "857e96a1-0499-430a-bfc2-da547418e5ed",
+        "sources": "MOCK balances, market changes, investigation and execution; no chain transactions."
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/transaction-checks",
+      "status": 400,
+      "startedAt": "2026-10-07T09:36:21.681782+00:00",
+      "finishedAt": "2026-10-07T09:36:21.690452+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "type": "urn:xjy:transaction-check:INVALID_REQUEST",
+        "title": "交易核验未完成",
+        "status": 400,
+        "detail": "请提交 JSON 对象，仅包含完整的 Ethereum 交易哈希 txHash。",
+        "instance": "/api/transaction-checks",
+        "code": "INVALID_REQUEST"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/transaction-checks",
+      "status": 503,
+      "startedAt": "2026-10-07T09:36:21.691026+00:00",
+      "finishedAt": "2026-10-07T09:36:31.701526+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "type": "urn:xjy:transaction-check:RPC_READ_FAILED",
+        "title": "交易核验未完成",
+        "status": 503,
+        "detail": "RPC 读取失败，未生成结论。请检查服务配置后手动查询。",
+        "instance": "/api/transaction-checks",
+        "code": "RPC_READ_FAILED"
+      }
+    },
+    {
+      "phase": "after-process-restart",
+      "method": "GET",
+      "path": "/api/monitor",
+      "status": 200,
+      "startedAt": "2026-10-07T09:38:13.366865+00:00",
+      "finishedAt": "2026-10-07T09:38:13.435626+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "enabled": false,
+        "halted": false,
+        "busy": false,
+        "recoveryCount": 0,
+        "recovery": {
+          "intervalMs": 10000,
+          "maxAgeMs": 30000,
+          "consecutive": 3,
+          "maxVolatility": 40,
+          "minChange5m": -0.5,
+          "minChange1h": -2
+        },
+        "lastTickAt": "2026-10-07T09:36:21.645Z",
+        "latestAnalysis": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          }
+        },
+        "latestSession": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          },
+          "execution": {
+            "success": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "sourceAmount": 3,
+            "targetAmount": 8100,
+            "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "after": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 27000,
+            "riskAssetUsd": 18900,
+            "defensiveAssetUsd": 8100,
+            "riskExposurePct": 70,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 7,
+                "usdValue": 18900,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 8100,
+                "usdValue": 8100,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "verification": {
+            "status": "PASSED",
+            "reasons": [
+              "Passed: The re-read belongs to the same wallet.",
+              "Passed: The re-read evidence has not moved backwards or preceded execution.",
+              "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+              "Passed: The source balance reduction matches the execution receipt.",
+              "Passed: The defensive balance increase matches the execution receipt.",
+              "Passed: The executed source amount matches the approved percentage points at the market quote.",
+              "Passed: Asset identities and non-approved balances remain unchanged.",
+              "Passed: Risk exposure decreased from 100% to 70%."
+            ]
+          }
+        },
+        "events": [
+          {
+            "id": "857e96a1-0499-430a-bfc2-da547418e5ed",
+            "createdAt": "2026-10-07T09:36:21.645Z",
+            "status": "CONFIRMED",
+            "config": {
+              "minRiskScore": 80,
+              "minConfidence": 0.85,
+              "minRiskExposurePct": 70,
+              "maxDeRiskPct": 30,
+              "allowedRiskAssets": [
+                "ETH"
+              ],
+              "allowedDefensiveAssets": [
+                "USDC"
+              ]
+            },
+            "version": 2,
+            "analysis": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              }
+            },
+            "submissions": [],
+            "session": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              },
+              "execution": {
+                "success": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "sourceAmount": 3,
+                "targetAmount": 8100,
+                "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "after": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 27000,
+                "riskAssetUsd": 18900,
+                "defensiveAssetUsd": 8100,
+                "riskExposurePct": 70,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 7,
+                    "usdValue": 18900,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 8100,
+                    "usdValue": 8100,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "verification": {
+                "status": "PASSED",
+                "reasons": [
+                  "Passed: The re-read belongs to the same wallet.",
+                  "Passed: The re-read evidence has not moved backwards or preceded execution.",
+                  "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+                  "Passed: The source balance reduction matches the execution receipt.",
+                  "Passed: The defensive balance increase matches the execution receipt.",
+                  "Passed: The executed source amount matches the approved percentage points at the market quote.",
+                  "Passed: Asset identities and non-approved balances remain unchanged.",
+                  "Passed: Risk exposure decreased from 100% to 70%."
+                ]
+              }
+            },
+            "note": "Execution CONFIRMED; verification PASSED."
+          }
+        ],
+        "activeEvent": "857e96a1-0499-430a-bfc2-da547418e5ed",
+        "sources": "MOCK balances, market changes, investigation and execution; no chain transactions."
+      }
+    },
+    {
+      "phase": "after-process-restart",
+      "method": "POST",
+      "path": "/api/rescue",
+      "status": 409,
+      "startedAt": "2026-10-07T09:38:13.435663+00:00",
+      "finishedAt": "2026-10-07T09:38:13.445064+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "type": "urn:xjy:guardian:EVENT_OCCUPIED",
+        "title": "Guardian request failed",
+        "status": 409,
+        "code": "EVENT_OCCUPIED",
+        "detail": "This risk event already owns its execution opportunity; the server continues observations.",
+        "instance": "/api/rescue"
+      }
+    },
+    {
+      "phase": "after-process-restart",
+      "method": "POST",
+      "path": "/api/rescue",
+      "status": 403,
+      "startedAt": "2026-10-07T09:38:13.445111+00:00",
+      "finishedAt": "2026-10-07T09:38:13.455068+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "type": "urn:xjy:guardian:WALLET_MISMATCH",
+        "title": "Guardian request failed",
+        "status": 403,
+        "code": "WALLET_MISMATCH",
+        "detail": "Only the server-bound demo wallet is permitted.",
+        "instance": "/api/rescue"
+      }
+    },
+    {
+      "phase": "after-process-restart",
+      "method": "GET",
+      "path": "/api/monitor",
+      "status": 200,
+      "startedAt": "2026-10-07T09:38:13.455083+00:00",
+      "finishedAt": "2026-10-07T09:38:13.459225+00:00",
+      "cacheControl": "no-store",
+      "body": {
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "mode": "MOCK",
+        "enabled": false,
+        "halted": false,
+        "busy": false,
+        "recoveryCount": 0,
+        "recovery": {
+          "intervalMs": 10000,
+          "maxAgeMs": 30000,
+          "consecutive": 3,
+          "maxVolatility": 40,
+          "minChange5m": -0.5,
+          "minChange1h": -2
+        },
+        "lastTickAt": "2026-10-07T09:36:21.645Z",
+        "latestAnalysis": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          }
+        },
+        "latestSession": {
+          "before": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 30000,
+            "riskAssetUsd": 30000,
+            "defensiveAssetUsd": 0,
+            "riskExposurePct": 100,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 10,
+                "usdValue": 30000,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 0,
+                "usdValue": 0,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.631Z"
+          },
+          "market": {
+            "asset": "ETH",
+            "priceUsd": 2700,
+            "priceChange5mPct": -3,
+            "priceChange1hPct": -10,
+            "volatilityScore": 82,
+            "timestamp": "2026-10-07T09:36:21.632Z"
+          },
+          "riskAnalysis": {
+            "riskScore": 91,
+            "confidence": 0.88,
+            "riskExposurePct": 100,
+            "stressTests": [
+              {
+                "priceChangePct": -5,
+                "projectedPortfolioUsd": 28500,
+                "projectedLossUsd": 1500
+              },
+              {
+                "priceChangePct": -10,
+                "projectedPortfolioUsd": 27000,
+                "projectedLossUsd": 3000
+              },
+              {
+                "priceChangePct": -15,
+                "projectedPortfolioUsd": 25500,
+                "projectedLossUsd": 4500
+              }
+            ],
+            "investigation": {
+              "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+              "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+              "evidence": [
+                "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                "Mock volatility score is 82/100.",
+                "Demo risk score is 91/100."
+              ],
+              "uncertainties": [
+                "Mock data only: no blockchain balances or live market data were read.",
+                "No LLM was called; confidence is a fixed demo value.",
+                "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+              ],
+              "confidence": 0.88
+            },
+            "recommendedAction": "SWAP_TO_SAFE"
+          },
+          "policyDecision": {
+            "triggered": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "reduceExposurePct": 30,
+            "reasons": [
+              "Risk score 91 > 80: passed.",
+              "Confidence 0.88 > 0.85: passed.",
+              "Risk exposure 100% > 70%: passed.",
+              "De-risk limit 30 percentage points > 0: passed.",
+              "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+              "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+              "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+            ]
+          },
+          "execution": {
+            "success": true,
+            "action": "SWAP_TO_SAFE",
+            "sourceAsset": "ETH",
+            "targetAsset": "USDC",
+            "sourceAmount": 3,
+            "targetAmount": 8100,
+            "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "after": {
+            "wallet": "0x1111111111111111111111111111111111111111",
+            "totalUsd": 27000,
+            "riskAssetUsd": 18900,
+            "defensiveAssetUsd": 8100,
+            "riskExposurePct": 70,
+            "assets": [
+              {
+                "symbol": "ETH",
+                "amount": 7,
+                "usdValue": 18900,
+                "category": "RISK"
+              },
+              {
+                "symbol": "USDC",
+                "amount": 8100,
+                "usdValue": 8100,
+                "category": "DEFENSIVE"
+              }
+            ],
+            "timestamp": "2026-10-07T09:36:21.646Z"
+          },
+          "verification": {
+            "status": "PASSED",
+            "reasons": [
+              "Passed: The re-read belongs to the same wallet.",
+              "Passed: The re-read evidence has not moved backwards or preceded execution.",
+              "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+              "Passed: The source balance reduction matches the execution receipt.",
+              "Passed: The defensive balance increase matches the execution receipt.",
+              "Passed: The executed source amount matches the approved percentage points at the market quote.",
+              "Passed: Asset identities and non-approved balances remain unchanged.",
+              "Passed: Risk exposure decreased from 100% to 70%."
+            ]
+          }
+        },
+        "events": [
+          {
+            "id": "857e96a1-0499-430a-bfc2-da547418e5ed",
+            "createdAt": "2026-10-07T09:36:21.645Z",
+            "status": "CONFIRMED",
+            "config": {
+              "minRiskScore": 80,
+              "minConfidence": 0.85,
+              "minRiskExposurePct": 70,
+              "maxDeRiskPct": 30,
+              "allowedRiskAssets": [
+                "ETH"
+              ],
+              "allowedDefensiveAssets": [
+                "USDC"
+              ]
+            },
+            "version": 2,
+            "analysis": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              }
+            },
+            "submissions": [],
+            "session": {
+              "before": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 30000,
+                "riskAssetUsd": 30000,
+                "defensiveAssetUsd": 0,
+                "riskExposurePct": 100,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 10,
+                    "usdValue": 30000,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 0,
+                    "usdValue": 0,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.631Z"
+              },
+              "market": {
+                "asset": "ETH",
+                "priceUsd": 2700,
+                "priceChange5mPct": -3,
+                "priceChange1hPct": -10,
+                "volatilityScore": 82,
+                "timestamp": "2026-10-07T09:36:21.632Z"
+              },
+              "riskAnalysis": {
+                "riskScore": 91,
+                "confidence": 0.88,
+                "riskExposurePct": 100,
+                "stressTests": [
+                  {
+                    "priceChangePct": -5,
+                    "projectedPortfolioUsd": 28500,
+                    "projectedLossUsd": 1500
+                  },
+                  {
+                    "priceChangePct": -10,
+                    "projectedPortfolioUsd": 27000,
+                    "projectedLossUsd": 3000
+                  },
+                  {
+                    "priceChangePct": -15,
+                    "projectedPortfolioUsd": 25500,
+                    "projectedLossUsd": 4500
+                  }
+                ],
+                "investigation": {
+                  "summary": "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure.",
+                  "primaryCause": "Mock market decline combined with concentrated risk-asset exposure.",
+                  "evidence": [
+                    "Mock portfolio risk exposure is 100% with $30,000 in risk assets.",
+                    "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour.",
+                    "Mock volatility score is 82/100.",
+                    "Demo risk score is 91/100."
+                  ],
+                  "uncertainties": [
+                    "Mock data only: no blockchain balances or live market data were read.",
+                    "No LLM was called; confidence is a fixed demo value.",
+                    "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered.",
+                    "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+                  ],
+                  "confidence": 0.88
+                },
+                "recommendedAction": "SWAP_TO_SAFE"
+              },
+              "policyDecision": {
+                "triggered": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "reduceExposurePct": 30,
+                "reasons": [
+                  "Risk score 91 > 80: passed.",
+                  "Confidence 0.88 > 0.85: passed.",
+                  "Risk exposure 100% > 70%: passed.",
+                  "De-risk limit 30 percentage points > 0: passed.",
+                  "A held risk asset with positive value is on the user-approved risk allowlist: passed.",
+                  "A user-approved defensive target is available with no conflicting portfolio category: passed.",
+                  "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+                ]
+              },
+              "execution": {
+                "success": true,
+                "action": "SWAP_TO_SAFE",
+                "sourceAsset": "ETH",
+                "targetAsset": "USDC",
+                "sourceAmount": 3,
+                "targetAmount": 8100,
+                "txHash": "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b",
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "after": {
+                "wallet": "0x1111111111111111111111111111111111111111",
+                "totalUsd": 27000,
+                "riskAssetUsd": 18900,
+                "defensiveAssetUsd": 8100,
+                "riskExposurePct": 70,
+                "assets": [
+                  {
+                    "symbol": "ETH",
+                    "amount": 7,
+                    "usdValue": 18900,
+                    "category": "RISK"
+                  },
+                  {
+                    "symbol": "USDC",
+                    "amount": 8100,
+                    "usdValue": 8100,
+                    "category": "DEFENSIVE"
+                  }
+                ],
+                "timestamp": "2026-10-07T09:36:21.646Z"
+              },
+              "verification": {
+                "status": "PASSED",
+                "reasons": [
+                  "Passed: The re-read belongs to the same wallet.",
+                  "Passed: The re-read evidence has not moved backwards or preceded execution.",
+                  "Passed: The swap direction remains RISK → user-approved DEFENSIVE.",
+                  "Passed: The source balance reduction matches the execution receipt.",
+                  "Passed: The defensive balance increase matches the execution receipt.",
+                  "Passed: The executed source amount matches the approved percentage points at the market quote.",
+                  "Passed: Asset identities and non-approved balances remain unchanged.",
+                  "Passed: Risk exposure decreased from 100% to 70%."
+                ]
+              }
+            },
+            "note": "Execution CONFIRMED; verification PASSED."
+          }
+        ],
+        "activeEvent": "857e96a1-0499-430a-bfc2-da547418e5ed",
+        "sources": "MOCK balances, market changes, investigation and execution; no chain transactions."
+      }
+    }
+  ]
+}
