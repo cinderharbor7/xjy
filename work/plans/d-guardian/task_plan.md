@@ -19,7 +19,9 @@ Implementation complete. C 30d5bbb merged into D branch. SQLite policy/version/l
 - Final production HTTP smoke verified same-origin browser headers after Next URL normalization, foreign-origin rejection and duplicate 409. No visual/browser inspection.
 - Native Anvil installed under ignored .guardian/tools; acceptance used disposable generated keys in child process environments only and stopped its own nodes/servers.
 - Next-generated forwarding headers and separate instrumentation/route error-class bundles required integration repairs; tests cover both.
-- GitHub CLI authentication returns suspended-account 403; Git fetch works. Commit/push/PR delivery is next; do not merge main.
+- Implementation committed as 583207e and pushed to origin/d/guardian-monitor-integration. Draft PR: https://github.com/cinderharbor7/xjy/pull/1 (base main). Existing Git credential used for repo-scoped PR operations because the unrelated cached gh login failed; no credentials were printed or persisted.
+- GitHub Actions workflow added (Node 24, frozen pnpm install, route type generation, typecheck, tests, build); push check run 37563200158 passed. Main was not merged or pushed. Incoming next-env.d.ts changes remain uncommitted and unchanged.
+- Implementation, local acceptance and GitHub review delivery are complete. Remaining team work: review draft PR; A real read modules and B real anomaly/investigation/recovery calibration. No real mainnet execution or visual validation claimed.
 
 ## Acceptance
 Policy normalization/version/wallet/origin errors; server-driven start/pause/restart; repeated/concurrent/manual calls; unknown receipt and reread failures; market recovery hysteresis; no raw errors/keys; HTTP smoke, typecheck, tests, build. Fork end-to-end only claimed if actually executed. Commit/push branch and create draft PR if access permits; never merge main.
