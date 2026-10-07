@@ -32,6 +32,11 @@ describe("rescue result presentation", () => {
     expect(render(createElement(ExecutionBadge, { execution: failed }))).toContain("Failed");
     expect(render(createElement(ExecutionBadge, { execution: { success: false, action: "NONE", timestamp: failed.timestamp } }))).toContain("Skipped");
   });
+  it("shows an unresolved broadcast as pending rather than a confirmed failure", () => {
+    const execution: ExecutionResult = { success: false, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC", timestamp: "2026-10-07T00:00:00Z", error: "SUBMITTED_UNKNOWN: Receipt lookup only." };
+    expect(render(createElement(ExecutionBadge, { execution }))).toContain("Pending receipt");
+    expect(render(createElement(ExecutionBadge, { execution: { ...execution, error: "PRE_SUBMIT_FAILED: Transport interrupted." }, pending: true }))).toContain("Pending receipt");
+  });
 
   it("plots stress values against the before snapshot with aligned 100/50/0 percent ticks", () => {
     const tests = [

@@ -13,7 +13,8 @@ import { PolicyService } from "@/modules/policy/policy.service";
 import { ExecutionService } from "@/modules/execution/execution.service";
 import { MockExecutionAdapter } from "@/modules/execution/mock-execution.adapter";
 import { RescueOrchestrator, type RescueServices } from "@/modules/rescue/rescue.orchestrator";
-import { runRescueSession } from "@/integration/rescue";
+import { createMockRescueOrchestrator } from "@/integration/rescue";
+import { createGuardian } from "@/integration/guardian/runtime";
 
 function fixture() {
   const state = new MockScenarioState(DEMO_WALLET);
@@ -203,9 +204,9 @@ describe("Guardian orchestration", () => {
     expect(executor).not.toHaveBeenCalled();
   });
 
-  it("isolates repeated and concurrent Mock sessions", async () => {
+  it("isolates explicit standalone Mock fixtures (not the managed HTTP entry point)", async () => {
     vi.stubEnv("MOCK_MODE", "true");
-    const sessions = await Promise.all([runRescueSession("same-wallet"), runRescueSession("same-wallet"), runRescueSession("other-wallet")]);
+    const sessions = await Promise.all([createMockRescueOrchestrator("same-wallet").runRescueSession("same-wallet"), createMockRescueOrchestrator("same-wallet").runRescueSession("same-wallet"), createMockRescueOrchestrator("other-wallet").runRescueSession("other-wallet")]);
     for (const session of sessions) {
       expect(session.before.assets[0].amount).toBe(10);
       expect(session.after!.assets.map((asset) => asset.amount)).toEqual([7, 8100]);
@@ -215,6 +216,6 @@ describe("Guardian orchestration", () => {
 
   it.each(["false", "invalid"])("fails fast for unavailable mode %s", async (mode) => {
     vi.stubEnv("MOCK_MODE", mode);
-    await expect(runRescueSession(DEMO_WALLET)).rejects.toThrow("MOCK_MODE");
+    expect(() => createGuardian()).toThrow("MOCK_MODE");
   });
 });

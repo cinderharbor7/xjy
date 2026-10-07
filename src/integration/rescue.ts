@@ -27,12 +27,10 @@ export function createMockRescueOrchestrator(wallet: string, policyConfig: Polic
 }
 
 export async function runRescueSession(wallet: string): Promise<RescueSession> {
-  const mode = process.env.MOCK_MODE ?? "true";
-  if (mode !== "true") {
-    throw new Error(mode === "false"
-      ? "MOCK_MODE=false is unsupported: real Guardian adapters have not been implemented."
-      : "MOCK_MODE must be true for this demo.");
-  }
-  // A fresh simulation per request isolates repeated and concurrent demo sessions.
-  return createMockRescueOrchestrator(wallet).runRescueSession(wallet);
+  const { getGuardian } = await import("./guardian/runtime");
+  const monitor = getGuardian();
+  monitor.assertWallet(wallet);
+  const session = await monitor.tick(true);
+  if (!session) throw new Error("No session available.");
+  return session;
 }
