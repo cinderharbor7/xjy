@@ -8,6 +8,8 @@
 
 入口：`/` 资产观察、`/coins/ETH` 币种详情、`/guardian` 保护实验、`/investigate` 交易核验、`/risk-lab` 风险研究、`/position` Aave 只读、`/attestations` 报告存证、`/collection` 指纹收藏。
 
+逐项替换 Mock 的第一项：资产首页和有行情的币种页默认读取现有公开快照（Binance Spot USDT 交易对；全市场情绪来自 Alternative.me）。加载/读取失败显示缺失，过期来源明确标记；只有手动“切换演示”才显示样本。明确选择会在本浏览器会话保留。WETH/USDC 身份页不捏造行情；这些数据未成为 Guardian 自动交易输入。
+
 运行：`pnpm dev`；生产构建与运行：`pnpm build`、`pnpm start`。默认端口仍为 3000。已有服务运行时，可在构建后使用 `pnpm dev:preview` 打开 **3100 端口的隔离 Mock 预览**，不改动原 `.guardian` 状态。集成阶段已实际操作新版首页、保护实验和真实交易核验；指纹 GPU、移动端排版及真实钱包交互仍待验收。
 
 完整结构、迁移映射和验证方式见 [统一前端说明](docs/unified-frontend.md)。[货币指纹 PRD](docs/currency-fingerprint/PRD.md)记录数据与 NFT 子能力。下方保留历史项目背景和验收记录；涉及旧 Next 前端、原首页地址及旧视觉结构时，以本节和统一前端说明为准。
@@ -50,6 +52,12 @@ A、B、C、D 的第一版交付已通过 [PR #3](https://github.com/cinderharbo
 - 真实读取与本机执行：A→B 主网单次只读分析通过；本机 Anvil Fork 的 HTTP → Policy → swap → 独立 after → 验证通过；Aave 独立只读页面也完成浏览器查询验收。
 
 **当前尚未接通真实链上信号驱动的持续调查和交易监控。** 首页监控仍使用 Demo 风险变化和 Mock investigation；真实主网分析目前是单次只读入口。BOT 存证分支未纳入本次集成，也没有完成主网部署验收。详细范围与证据见 [团队集成验收](docs/team-integration-acceptance.md)。
+
+## Mock 指纹收藏 Demo
+
+首页或币种详情点击“收藏此刻/收藏这枚指纹” → “确认 Mock 收藏” → “查看 Mock 收藏”。全部 10 个已登记币种共用流程，包括无行情的 WETH/USDC 中性指纹；无需钱包、合约或 Gas。当前图像、行情来源和时间固定保存到浏览器，刷新后保留，明确标为 **MOCK / 未上链**；不生成假的交易 hash 或 Token ID。
+
+`/collection` 分开展示 Mock 与真实 BOT 测试网记录。真实铸造须从弹窗“另行选择 BOT 测试网铸造”进入，仍需钱包确认。Mock 记录不跨浏览器/设备同步，清除浏览器数据会丢失；存储失败会报错。真实 NFT、pending 和 Guardian 数据保持原样。
 
 ## BOT Chain 风险调查报告存证
 

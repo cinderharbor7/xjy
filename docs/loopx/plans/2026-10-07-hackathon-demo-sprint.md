@@ -20,6 +20,9 @@ slices:
   - id: P-006
     status: done
     depends: [P-005]
+  - id: P-007
+    status: done
+    depends: []
 ---
 
 # Hackathon 冻结方案执行交接
@@ -126,9 +129,22 @@ C 的父提交 `bbfde9c` 校准研究不纳入冻结候选版：它使用与现�
 > verify: `pnpm install --frozen-lockfile；pnpm typecheck；pnpm test；pnpm build；pnpm test:fingerprint；pnpm contract:check；pnpm test:http；pnpm test:sculpture；实际浏览器入口/报告/Mock闭环；git diff --check；GitHub PR/main状态`
 > review: `整合exact diff；HTTP同源/钱包/事件状态；前端证据与未知项；钱包确认和公开配置；运行及文档迁移；无未授权部署或秘密提交`
 
+## P-007 逐项替换 Mock：公开行情第一项
+
+用户明确要求逐项换成真实能力。沿用同一计划记录进展；第一项复用现有 `/api/market` 与币种数据读侧，让首页和有行情的币种页默认读取公开快照。只在明确手动选择时使用 Demo，失败保留缺失/错误或明确标注过期，不补样本。保留已验收的本地 Mock 收藏和真实 NFT 边界；来源、时间与 USDT 单位清楚。
+
+验收需包含默认ETH首次加载、公开读成功、网络错误、空数组/错误模式、手动Demo往返、收藏回归与实际公开API结果。本项完成不代表所有Mock已替换。后续真实A→B网页报告、真实Agent和执行逐项处理，当前不据此捏造模型/Confidence，不自动进入主网交易。下一项若涉及尚未确定的接口/权限或所需凭据，先明确实际决策。
+
+实际完成：2026-10-07 19:47，typecheck 通过；完整测试 976 passed / 6 skipped；build 通过；隔离 HTTP 检查 11 路由、静态资源、同源保护、Policy 版本与重复事件阻止通过。只读独立审阅未发现明确缺陷。实际 `/api/market` 返回 `live` / Binance Spot，快照时间 `2026-10-07T11:38:52.952Z`，ETH 报价 2573.37 USDT（仅该次快照，非当前价格承诺），8 个币种；情绪为 Alternative.me 全市场数据。生产预览已重新构建，未进行视觉验收、钱包签名或真实交易。
+
+> writes: `web/app.js`, `tests/frontend/`, `README.md`, `冻结文档D-010`, `本计划`
+> anchors: `用户逐项换真请求; AC-010; D-010; TC-009; 保留AC-009/D-009/TC-008`
+> verify: `pnpm typecheck；pnpm test；pnpm build；pnpm test:http；实际/api/market读取；git diff --check`
+> review: `公开/样本状态与报价来源；失败不填Mock；真实铸造/Guardian不变`
+
 ## Integration And Final Verification
 
-本计划覆盖 AC-001–008、D-001–008、TC-001–007；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。P-001–005 保留当时的边界；P-006 记录后续授权的 D 迁移与必要修复。公共领域合同、核心 Policy/Executor 与事件状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
+本计划覆盖 AC-001–010、D-001–010、TC-001–009；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。P-001–005 保留当时的边界；P-006 记录后续授权的 D 迁移与必要修复；P-007 记录公开行情逐项换真。公共领域合同、核心 Policy/Executor 与事件状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
 
 修改前基线为 2026-10-07 15:54 的 `pnpm test`：**896 passed / 2 skipped**。历史运行验收见 [交易核验记录](../../transaction-check.md) 和 [团队集成验收](../../team-integration-acceptance.md)。只有新鲜命令/实际操作才可证明最终结果；后续经授权修改代码时重新跑相应检查。
 

@@ -2,6 +2,7 @@ import { identityAssets, esc, pct, time as timestamp } from "./ui.js";
 import "./style.css";
 import {
   sampleMarket,
+  coins as registeredCoins,
   sampleHistory,
   visualParameters,
   candleStats,
@@ -30,6 +31,8 @@ import {
   queryPendingTransaction,
   errorMessage,
 } from "./fingerprint/nft.js";
+
+import { mockCollections, saveMockCollection, MOCK_COLLECTION_KEY } from "./fingerprint/mock-collection.js";
 
 const $ = (s, root = document) => root.querySelector(s);
 const money = (n) =>
@@ -66,8 +69,20 @@ const change = (c) =>
   `<span class="change ${c.change >= 0 ? "positive" : "negative"}">${c.change == null ? "—" : `${c.change >= 0 ? "+" : ""}${pct(c.change)}`} <span class="text-[9px] opacity-70">24h</span></span>`;
 const coinCanvas = (c, small = false) =>
   `<canvas data-coin="${c.id}" ${small ? 'data-size="small"' : ""} class="${small ? "" : "fingerprint-main"}" role="img" aria-label="${c.name} 数据指纹：振幅 ${pct(c.amplitude)}，24 小时成交额 ${compact(c.volume)}"></canvas>`;
+function unavailableMarket() {
+  return {
+    mode: "live", source: { status: "unavailable", name: "Binance Spot" },
+    sentiment: { value: null, mode: "unavailable", asOf: null }, fetchedAt: null,
+    coins: sampleMarket().coins.map((c) => ({ ...c, price: null, high: null, low: null,
+      change: null, volume: null, amplitude: null, trades: null, mode: "unavailable", asOf: null })),
+  };
+}
+function initialMarket() {
+  try { if (sessionStorage.getItem("verdant.market-mode") === "demo") return sampleMarket(); } catch {}
+  return unavailableMarket();
+}
 let state = {
-  market: sampleMarket(),
+  market: initialMarket(),
   filter: "全部",
   query: "",
   sort: "featured",
@@ -108,7 +123,7 @@ function art(c) {
 function home() {
   const c = state.market.coins[0];
   return `<div class="intro-line"><p>观察市场的另一种方式</p>${statusControl()}</div>
-  <section class="hero" aria-label="焦点币种"><div class="hero-copy"><div class="feature-tag">本期观察 · 编辑精选</div><h1>${c.name}</h1><div class="hero-subtitle">${c.cn} / 数据、指纹与证据</div><p class="hero-description">从形态观察市场，从数据追溯变化。<br>每一个币种，都有可以理解的指纹。</p><div class="hero-price">${c.price == null ? "—" : "$" + money(c.price)}${change(c)}</div><div class="hero-actions"><a href="/coins/${c.id}" class="button-primary">查看币种详情 <span aria-hidden="true">↗</span></a><button class="button-secondary" data-action="mint" data-coin="${c.id}">收藏此刻</button></div><div class="hero-bottom"><span>24h 成交额 ${compact(c.volume)} USDT</span><span>${statusName[c.mode]}</span></div></div>${art(c)}</section>
+  <section class="hero" aria-label="焦点币种"><div class="hero-copy"><div class="feature-tag">本期观察 · 编辑精选</div><h1>${c.name}</h1><div class="hero-subtitle">${c.cn} / 数据、指纹与证据</div><p class="hero-description">从形态观察市场，从数据追溯变化。<br>每一个币种，都有可以理解的指纹。</p><div class="hero-price">${c.price == null ? "—" : money(c.price) + " USDT"}${change(c)}</div><div class="hero-actions"><a href="/coins/${c.id}" class="button-primary">查看币种详情 <span aria-hidden="true">↗</span></a><button class="button-secondary" data-action="mint" data-coin="${c.id}">收藏此刻</button></div><div class="hero-bottom"><span>24h 成交额 ${compact(c.volume)} USDT</span><span>${statusName[c.mode]}</span></div></div>${art(c)}</section>
   <div class="legend-strip"><span>一枚指纹，多个数据维度</span><div class="legend-items"><span><i></i>色彩映射情绪</span><span><i></i>形态映射振幅</span><span><i></i>节奏映射活跃</span></div><button data-action="guide" class="text-button">指纹如何生成 ↗</button></div>
   ${homeTools()}<section class="catalogue" aria-labelledby="catalogue-title"><div class="section-head"><div><h2 id="catalogue-title">资产图鉴<small>${state.market.coins.length} 个币种</small></h2><p>每一种货币，都有自己的市场性格。</p></div><label class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg><input id="search" type="search" placeholder="搜索名称或币种" aria-label="搜索名称或币种" value="${esc(state.query)}"></label></div><div class="filter-bar"><div class="filters" aria-label="币种类别">${["全部", "公链", "DeFi", "价值存储", "社区"].map((f) => `<button data-filter="${f}" class="filter ${state.filter === f ? "active" : ""}" aria-pressed="${state.filter === f}">${f}</button>`).join("")}</div><select id="sort" class="sort-select" aria-label="币种排序"><option value="featured">精选排序</option><option value="change">24h 涨幅优先</option><option value="volume">成交额优先</option></select></div><div class="coin-grid" id="coin-grid"></div><p class="catalogue-foot" id="catalogue-foot"></p></section>`;
 }
@@ -127,7 +142,7 @@ function renderCards() {
     ? rows
         .map(
           (c) =>
-            `<a class="coin-card" href="/coins/${c.id}" aria-label="查看 ${c.name} 指纹详情"><div class="coin-art">${coinCanvas(c, true)}</div><div><div class="coin-name">${c.name}<small>${c.id}</small></div><div class="coin-meta"><span>${c.cn}</span><span class="category">${c.category}</span></div><div class="coin-stats"><span>成交额 ${compact(c.volume)}</span><span>振幅 ${pct(c.amplitude)}</span></div></div><div class="coin-price">${c.price == null ? "—" : "$" + money(c.price)}${change(c)}<div class="source-mini">${statusName[c.mode]} ↗</div></div></a>`,
+            `<a class="coin-card" href="/coins/${c.id}" aria-label="查看 ${c.name} 指纹详情"><div class="coin-art">${coinCanvas(c, true)}</div><div><div class="coin-name">${c.name}<small>${c.id}</small></div><div class="coin-meta"><span>${c.cn}</span><span class="category">${c.category}</span></div><div class="coin-stats"><span>成交额 ${compact(c.volume)}</span><span>振幅 ${pct(c.amplitude)}</span></div></div><div class="coin-price">${c.price == null ? "—" : money(c.price) + " USDT"}${change(c)}<div class="source-mini">${statusName[c.mode]} ↗</div></div></a>`,
         )
         .join("")
     : `<div class="empty-state"><h2>没有匹配的指纹</h2><p>试试币种缩写，或清除当前筛选。</p><button class="button-secondary" data-action="reset">清除筛选</button></div>`;
@@ -137,7 +152,7 @@ function renderCards() {
   mount();
 }
 function detailPage(c) {
-  return `<div class="intro-line"><div class="breadcrumb"><a href="/">探索图鉴</a><span>/</span><span>${c.name}</span></div>${statusControl()}</div><section class="detail-hero"><div class="detail-overview"><div class="feature-tag">货币指纹 / ${c.id}</div><h1>${c.name}</h1><div class="coin-identity"><span>${c.cn}</span><span>${c.id}</span><span class="category">${c.category}</span></div><p class="detail-description">${c.description}</p><div class="detail-price">${c.price == null ? "—" : "$" + money(c.price)}${change(c)}</div><dl class="detail-metrics"><div><dt>24h 成交额 / USDT</dt><dd>${compact(c.volume)}</dd></div><div><dt>24h 日内振幅</dt><dd>${pct(c.amplitude)}</dd></div><div><dt>24h 最高 / USDT</dt><dd>${money(c.high)}</dd></div><div><dt>24h 最低 / USDT</dt><dd>${money(c.low)}</dd></div></dl><div class="flex gap-3 flex-wrap"><button class="button-primary" data-action="mint" data-coin="${c.id}" ${c.price == null ? "disabled" : ""}>收藏这枚指纹 <span>↗</span></button><a class="button-secondary" href="${c.website}" target="_blank" rel="noopener noreferrer">官方网站 ↗</a></div></div><div class="detail-art"><div class="view-toggle" aria-label="指纹视图"><button data-view="contour" class="active">纹理指纹</button><button data-view="sculpture">流体形态</button></div><div id="detail-art-content" class="h-full">${art(c)}</div></div></section>${coinTools(c)}<div id="detail-data" class="detail-sections"><div class="panel span-all loading">正在读取币种数据…</div></div>`;
+  return `<div class="intro-line"><div class="breadcrumb"><a href="/">探索图鉴</a><span>/</span><span>${c.name}</span></div>${statusControl()}</div><section class="detail-hero"><div class="detail-overview"><div class="feature-tag">货币指纹 / ${c.id}</div><h1>${c.name}</h1><div class="coin-identity"><span>${c.cn}</span><span>${c.id}</span><span class="category">${c.category}</span></div><p class="detail-description">${c.description}</p><div class="detail-price">${c.price == null ? "—" : money(c.price) + " USDT"}${change(c)}</div><dl class="detail-metrics"><div><dt>24h 成交额 / USDT</dt><dd>${compact(c.volume)}</dd></div><div><dt>24h 日内振幅</dt><dd>${pct(c.amplitude)}</dd></div><div><dt>24h 最高 / USDT</dt><dd>${money(c.high)}</dd></div><div><dt>24h 最低 / USDT</dt><dd>${money(c.low)}</dd></div></dl><div class="flex gap-3 flex-wrap"><button class="button-primary" data-action="mint" data-coin="${c.id}">收藏这枚指纹 <span>↗</span></button><a class="button-secondary" href="${c.website}" target="_blank" rel="noopener noreferrer">官方网站 ↗</a></div></div><div class="detail-art"><div class="view-toggle" aria-label="指纹视图"><button data-view="contour" class="active">纹理指纹</button><button data-view="sculpture">流体形态</button></div><div id="detail-art-content" class="h-full">${art(c)}</div></div></section>${coinTools(c)}<div id="detail-data" class="detail-sections"><div class="panel span-all loading">正在读取币种数据…</div></div>`;
 }
 function priceChart(history) {
   if (history.length < 2) return '<div class="loading">暂无可用价格序列</div>';
@@ -287,7 +302,14 @@ async function loadDetail(c, version) {
 }
 function collectionPage() {
   const items = collections();
-  return `<div class="section-head mt-5"><div><h2>我的收藏<small>${items.length} 枚</small></h2><p>将一个市场瞬间，留成链上的数字标本。</p></div><button class="button-secondary" data-action="network">BOT 测试网设置</button></div><div class="notice">这里展示当前钱包在本浏览器成功铸造的记录。转让后的最新所有权请以区块浏览器为准。</div>${items.length ? `<div class="collection-grid">${items.map((item) => `<article class="collection-card"><img src="${esc(item.metadata.image)}" alt="${esc(item.metadata.name)}"/><div><h3>${esc(item.metadata.name)}</h3><p>Token #${esc(item.tokenId)} / BOT Chain</p><p>${timestamp(item.capturedAt)}</p><a href="${NETWORK.blockExplorerUrls[0]}/tx/${esc(item.tx)}" target="_blank" rel="noopener">查看链上记录 ↗</a></div></article>`).join("")}</div>` : `<div class="empty-state mt-8"><div class="text-5xl text-slate-400">◌</div><h2>${wallet.account ? "你的第一枚指纹，留给此刻。" : "连接钱包，查看你的收藏。"}</h2><p>在币种详情页保存一份数据快照，<br>将它铸造为 BOT Chain 测试网上的 NFT。</p><div class="flex gap-3 justify-center"><a href="/" class="button-primary">探索指纹图鉴</a>${wallet.account ? "" : '<button class="button-secondary" data-action="wallet">连接钱包</button>'}</div></div>`}`;
+  let mockItems, mockError;
+  try { mockItems = mockCollections(); } catch (error) { mockError = error.message; }
+  const demo = mockError
+    ? `<p role="alert" class="error-band">${esc(mockError)}</p>`
+    : mockItems.length
+      ? `<div class="collection-grid">${mockItems.map((item) => `<article class="collection-card" data-collection-mode="MOCK"><img src="${esc(item.metadata.image)}" alt="${esc(item.metadata.name)}"/><div><h3>${esc(item.metadata.name)}</h3><p>MOCK · 本地快照 · 未上链</p><p>${timestamp(item.metadata.properties.capturedAt)}</p><p>行情来源：${esc(statusName[item.metadata.properties.sourceMode])}</p><a href="/coins/${encodeURIComponent(item.metadata.properties.symbol)}">查看币种详情 ↗</a></div></article>`).join("")}</div>`
+      : '<div class="empty-state"><h3>还没有 Mock 收藏</h3><p>选择任意已登记币种，收藏此刻的指纹。无需连接钱包。</p><a href="/" class="button-primary">探索指纹图鉴</a></div>';
+  return `<div class="section-head mt-5"><div><h2>我的收藏</h2><p>本地 Demo 与 BOT 测试网收藏分别展示。</p></div></div><section class="workspace-panel" data-collection-section="MOCK"><h2>Mock 收藏 · ${mockItems ? mockItems.length : "—"} 枚</h2><div class="notice">MOCK MODE · 未上链。仅保存在当前浏览器，刷新后保留；清除浏览器数据或更换设备不会同步。</div>${demo}</section><section class="workspace-panel" data-collection-section="BOT_TESTNET"><div class="section-head"><h2>BOT 测试网收藏 · ${items.length} 枚</h2><button class="button-secondary" data-action="network">BOT 测试网设置</button></div><div class="notice">这里展示当前钱包在本浏览器成功铸造的记录。转让后的最新所有权请以区块浏览器为准，与 Mock 收藏分开。</div>${items.length ? `<div class="collection-grid">${items.map((item) => `<article class="collection-card" data-collection-mode="BOT_TESTNET"><img src="${esc(item.metadata.image)}" alt="${esc(item.metadata.name)}"/><div><h3>${esc(item.metadata.name)}</h3><p>Token #${esc(item.tokenId)} / BOT Chain</p><p>${timestamp(item.capturedAt)}</p><a href="${NETWORK.blockExplorerUrls[0]}/tx/${esc(item.tx)}" target="_blank" rel="noopener">查看链上记录 ↗</a></div></article>`).join("")}</div>` : `<div class="empty-state"><h3>${wallet.account ? "尚无本浏览器铸造记录" : "连接钱包查看测试网收藏"}</h3><p>真实测试网铸造需单独选择并在钱包确认。</p>${wallet.account ? "" : '<button class="button-secondary" data-action="wallet">连接钱包</button>'}</div>`}</section>`;
 }
 function mount() {
   cleanup();
@@ -383,11 +405,22 @@ async function loadMarket() {
   } catch {}
   if (state.busy) return;
   state.busy = true;
+  state.market = unavailableMarket();
   render();
   try {
     const response = await fetch("/api/market");
     if (!response.ok) throw new Error("公开数据服务暂不可用");
-    state.market = await response.json();
+    const data = await response.json();
+    if (data?.mode !== "live" || !Array.isArray(data.coins)
+      || data.coins.length !== registeredCoins.length
+      || !data.coins.every((c, i) => c?.id === registeredCoins[i].id && typeof c.name === "string"
+        && ["live", "stale", "unavailable"].includes(c.mode)
+        && ["price", "high", "low", "change", "volume", "amplitude", "trades"].every((key) => c[key] === null || Number.isFinite(c[key])))
+      || !data.sentiment || !["live", "stale", "unavailable"].includes(data.sentiment.mode)
+      || !(data.sentiment.value === null || Number.isFinite(data.sentiment.value))
+      || !["live", "stale", "unavailable"].includes(data.source?.status))
+      throw new Error("公开行情响应无效，未使用演示数据补齐。");
+    state.market = data;
     if (state.market.source.status !== "live")
       toast("行情源暂不可用，缺失值以 — 显示；可切回演示模式。");
   } catch (error) {
@@ -405,7 +438,17 @@ function modal(title, content) {
 function guide() {
   modal(
     "读懂一枚货币指纹",
-    `<p>它是一份市场数据的视觉切片。同样的数据与参数会生成相同的静态收藏版本，动态视图则让结构更容易被观察。</p><div class="guide-row"><strong>色彩</strong><span>币种拥有固定基础色相；Alternative.me 全市场恐惧贪婪指数影响色彩分布。它不代表某个币的独立新闻情绪。</span></div><div class="guide-row"><strong>形态</strong><span>日内振幅 =（24h 最高价 − 最低价）÷ 开盘价。振幅越大，纹理起伏越明显；15% 为视觉映射上限。</span></div><div class="guide-row"><strong>节奏</strong><span>24h USDT 成交额经 log10 归一化，影响动态速度。不同币种之间可以在同一尺度下观察。</span></div><div class="guide-row"><strong>收藏</strong><span>将此刻参数生成固定的矢量纹理版 NFT。SVG 图像、数值、来源状态和时间一并写入链上；流体视图是同组参数的另一种呈现。</span></div><p>首页焦点是编辑精选，不是收益排行。缺失数据使用中性形态并显示 —；演示数据会显式标记。漂亮的指纹不等于安全的资产。</p><button class="button-primary mt-3" data-action="close">明白了</button>`,
+    `<p>它是一份市场数据的视觉切片。同样的数据与参数会生成相同的静态收藏版本，动态视图则让结构更容易被观察。</p><div class="guide-row"><strong>色彩</strong><span>币种拥有固定基础色相；Alternative.me 全市场恐惧贪婪指数影响色彩分布。它不代表某个币的独立新闻情绪。</span></div><div class="guide-row"><strong>形态</strong><span>日内振幅 =（24h 最高价 − 最低价）÷ 开盘价。振幅越大，纹理起伏越明显；15% 为视觉映射上限。</span></div><div class="guide-row"><strong>节奏</strong><span>24h USDT 成交额经 log10 归一化，影响动态速度。不同币种之间可以在同一尺度下观察。</span></div><div class="guide-row"><strong>收藏</strong><span>默认 Mock 收藏将此刻图像、数值、来源状态和时间保存在当前浏览器，明确标为未上链。另行选择 BOT 测试网铸造时才需要钱包确认；流体视图是同组参数的另一种呈现。</span></div><p>首页焦点是编辑精选，不是收益排行。缺失数据使用中性形态并显示 —；演示数据会显式标记。漂亮的指纹不等于安全的资产。</p><button class="button-primary mt-3" data-action="close">明白了</button>`,
+  );
+}
+function mockCollectionDialog(c) {
+  const sentiment = c.visualIdentity
+    ? { value: null, mode: "unavailable", asOf: null }
+    : state.market.sentiment;
+  currentEdition = createEdition(c, sentiment);
+  modal(
+    "Mock 收藏此刻的指纹",
+    `<div class="notice">MOCK MODE · 未上链。无需钱包、不消耗 Gas，仅保存本地指纹快照。</div><div class="mint-preview"><img src="${currentEdition.metadata.image}" alt="${esc(c.name)} 指纹快照"><div><h3>${esc(c.name)}</h3><p>行情来源：${esc(statusName[c.mode])}</p><p>快照时间：${timestamp(currentEdition.snapshot.capturedAt)}</p><p>此快照不会随后续行情变化。</p></div></div><div class="mint-actions"><button class="button-primary" data-action="confirm-mock-collection">确认 Mock 收藏</button><button class="button-secondary" data-action="download">下载快照</button><button class="text-button" data-action="real-mint" data-coin="${esc(c.id)}">另行选择 BOT 测试网铸造</button></div><p id="mock-progress" role="status"></p>`,
   );
 }
 function mintDialog(c) {
@@ -591,11 +634,28 @@ document.addEventListener("click", async (event) => {
         render();
         break;
       case "mint":
-        mintDialog(
+        mockCollectionDialog(
           [...state.market.coins, ...identityAssets].find(
             (c) => c.id === button.dataset.coin,
           ),
         );
+        break;
+      case "confirm-mock-collection":
+        button.disabled = true;
+        try {
+          saveMockCollection(currentEdition);
+          $("#mock-progress").textContent = "Mock 收藏已保存 · 未上链。刷新后可在收藏页查看。";
+          button.dataset.action = "view-mock-collection";
+          button.textContent = "查看 Mock 收藏";
+        } finally { button.disabled = false; }
+        break;
+      case "view-mock-collection":
+        $("#modal").close();
+        history.pushState(null, "", "/collection");
+        render();
+        break;
+      case "real-mint":
+        mintDialog([...state.market.coins, ...identityAssets].find((c) => c.id === button.dataset.coin));
         break;
       case "network":
         networkDialog();
@@ -664,37 +724,17 @@ $("#modal").addEventListener("cancel", (e) => {
 });
 window.addEventListener("storage", (event) => {
   if (event.key === "cfp.pending.968.v1" && $("#modal").open) pendingControls(true);
+  if (event.key === MOCK_COLLECTION_KEY && location.pathname === "/collection") render();
 });
+window.addEventListener("popstate", render);
 // Native URLs keep all existing workbench deep links usable without a client framework.
 if (location.hash.startsWith("#/coin/"))
   location.replace("/coins/" + encodeURIComponent(location.hash.split("/")[2]));
 else if (location.hash === "#/collection") location.replace("/collection");
-render();
-try {
-  if (
-    sessionStorage.getItem("verdant.market-mode") === "live" &&
-    (location.pathname === "/" || location.pathname.startsWith("/coins/"))
-  ) {
-    state.market = {
-      mode: "live",
-      source: { status: "unavailable" },
-      sentiment: { value: null, mode: "unavailable" },
-      fetchedAt: null,
-      coins: sampleMarket().coins.map((c) => ({
-        ...c,
-        price: null,
-        high: null,
-        low: null,
-        change: null,
-        volume: null,
-        amplitude: null,
-        trades: null,
-        mode: "unavailable",
-      })),
-    };
-    void loadMarket();
-  }
-} catch {}
+if (state.market.mode === "live" && (location.pathname === "/"
+  || (location.pathname.startsWith("/coins/") && !currentCoin()?.visualIdentity))) {
+  void loadMarket();
+} else render();
 
 function homeTools() {
   return '<section class="workspace-paths" aria-label="研究工作台"><div><h2>从观察到核验</h2><p>沿着资产数据，找到有出处的结论。</p></div><a href="/investigate"><strong>交易核验</strong><span>Ethereum 外层事实与指定池兑换</span></a><a href="/risk-lab"><strong>风险研究</strong><span>ETH 研究模型与证据样本</span></a><a href="/guardian"><strong>保护实验</strong><span>单钱包策略与结果核验</span></a><a href="/attestations"><strong>报告存证</strong><span>BOT 测试网上的内容完整性</span></a></section>';

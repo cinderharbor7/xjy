@@ -257,9 +257,11 @@ it("restores the pending hash in the UI and keeps deploy/mint disabled while exp
   localStorage.setItem(key, JSON.stringify({ id: crypto.randomUUID(), kind: "DEPLOY", owner, chainId: 968, status: "SUBMITTED", hash }));
   document.body.innerHTML = readFileSync("web/index.html", "utf8").match(/<body>([\s\S]*)<\/body>/)![1];
   history.replaceState(null, "", "/");
+  sessionStorage.setItem("verdant.market-mode", "demo");
   Object.defineProperty(document.querySelector("#modal"), "showModal", { value() { this.open = true; } });
   await import("../../web/app.js");
   document.querySelector<HTMLButtonElement>('[data-action="mint"]')!.click();
+  document.querySelector<HTMLButtonElement>('[data-action="real-mint"]')!.click();
   expect(document.querySelector<HTMLButtonElement>('[data-action="confirm-mint"]')!.disabled).toBe(true);
   expect(document.querySelector("#mint-progress")!.textContent).toContain(hash);
   expect(document.querySelector<HTMLButtonElement>('[data-action="query-nft"]')!.disabled).toBe(false);
