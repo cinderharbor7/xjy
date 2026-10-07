@@ -14,7 +14,7 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 
 ## 当前完成状态与开工准备
 
-截至 2026-10-07，**已完成的是 Guardian 工程骨架和单次运行的 Mock 闭环，尚未完成真实链上异常调查、持续监控或真实自动换币**。上述产品目标不代表这些能力已在当前仓库实现。
+截至 2026-10-07，**main 中已完成的是 Guardian 工程骨架和单次运行的 Mock 闭环，尚未接入真实链上异常调查、持续监控或 Fork 自动换币**。C 的 `c/policy-execution` 分支已有 Fork 执行适配器和测试代码（审阅基线 `2c2db4a`），尚未合入 main 或完成 HTTP → orchestrator 全流程验收。上述产品目标不代表这些能力已在主流程实现。
 
 | 内容 | 当前状态 |
 | --- | --- |
@@ -25,7 +25,8 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 | 链上信号与结构化证据 | `OnchainSignalState` / `OnchainEvidence` 已冻结并实现 Zod/infer 与测试；尚未接入运行流程，现有调查 evidence 仍为 `string[]`、confidence 固定为 0.88 |
 | 持续监控与异常触发调查 | 尚未实现；当前每次请求都运行调查，并创建新的 Mock 场景 |
 | 同钱包跨轮重复/并发执行保护 | 尚未实现；Mock 状态内拒绝重复转换不等于持续监控下的保护 |
-| 四人下一阶段开发 | 职责已划分，本仓库尚未开始本轮真实能力接入；具体任务单待细化 |
+| Fork 执行适配器 | C 分支已有 Uniswap V2 执行与金额换算代码；钱包关系、链 ID 和集成要求见 D→C 交接，未完成主流程验收 |
+| 四人下一阶段开发 | 职责保持 A 读取、B 分析、C 策略/执行、D API/监控/集成；C/D 修改与验收清单见 [D2C-handoff.md](D2C-handoff.md) |
 | 团队共同代码基线 | 团队以 `main` 中的 Guardian Mock 骨架和冻结链上合同为共同基线，从同一提交创建各自工作分支 |
 
 现有冻结范围见 [Guardian Mock 设计](docs/loopx/design/2026-10-06-risk-guardian/需求设计文档.md) 与 [A→B 链上合同设计](docs/loopx/design/2026-10-06-onchain-contracts/需求设计文档.md)。两份记录中的“无未决问题”分别指 Mock 架构纠偏和这两个数据合同，不代表真实采集与持续监控已实现。
@@ -33,11 +34,19 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 A/B 已可按冻结合同分别开发采集与分析。后续实现任务仍需明确：
 
 - 第一版信号已确定为 `DEX_SELL_PRESSURE`；在采集任务中配置 DEX/池范围、窗口长度、交易识别和 USD 估值来源，在分析任务中确定异常阈值。
-- 在监控任务中确定调度和重复执行规则；链上信号保持独立，不放进 Portfolio。
-- 确认 36 小时交付范围，明确哪些能力接真实数据、哪些保留 Mock。
+- 按已确认的一次风险事件一次交易规则实现监控；继续确定轮询间隔、市场恢复指标、阈值和有效样本数，链上信号保持独立，不放进 Portfolio。
+- 在已确认的本机 Fork 范围内明确哪些读取、信号与调查接真实数据，哪些保留演示输入，并分别标识。
 - 为 ABCD 写明输入、输出、文件范围、交付节点和验收标准；开工时从 `main` 的同一提交创建各自的工作分支。
 
-**36 小时候选范围，尚未最终确认：** 一个 Ethereum 钱包、ETH 余额与价格读取、一种明确的链上资金异常、Agent 调查与可核验证据、Policy 门控、Mock 换币和效果展示。真实主网自动交易属于另一个需要明确授权与验收的里程碑。该范围是下一阶段建议，不是当前实现或完成时间保证。
+### 已确认的本轮范围（待实现与验收）
+
+**本机 Fork、固定一个测试钱包、持续监控并按策略自动交易，保留 WETH → USDC。** 当前代码用 ETH 符号表示交易用 WETH；原生 ETH 用于 gas。暂不扩展为较低风险币筛选、多阶段转换或主网自动交易。
+
+**同一次风险事件只交易一次，之后继续监控；市场风险恢复后再次超标且满足完整策略条件，才触发下一次。** 一次交易指一次获批减仓 swap，approve、风险检查、回执查询和余额重读不另计次数。已提交但状态未知时查询结果，不自动重发；交易成功但效果验证失败，也不能再次自动卖出。
+
+事件状态和已知交易需要服务端持久记录，刷新页面、程序重启或暂停/恢复不能清除防重复状态。市场恢复必须由约定的市场信号判定，不能把卖出后仓位下降、置信度下降或读取失败当成恢复。具体恢复指标、阈值、连续样本数和轮询间隔由 B/D 确定；交接文档里的示例参数尚未冻结。
+
+详细参数、现有适配器问题、待协调合同和验收清单见 [D → C 交接说明](D2C-handoff.md)。本节是已确认需求，不代表相关代码已经完成。
 
 ## 安装与运行
 
@@ -147,12 +156,12 @@ tests/
 
 | 开发者 | 主要目录 | 下一步职责 |
 | --- | --- | --- |
-| A | `src/modules/portfolio/`、`src/modules/market/` | 钱包 ETH 余额、ETH 行情及链上资金数据；按冻结的 `OnchainSignalState` 输出，采集实现目录在 A/D 集成任务中确定，不与 Portfolio 混用 |
-| B | `src/modules/risk/`、`src/modules/investigation/` | 消费冻结的链上信号与证据，开发异常识别、风险计算、压力测试和调查；只输出分析，不获得交易权限 |
-| C | `src/modules/policy/`、`src/modules/execution/` | 用户预设规则、白名单、额度与受限执行；配合监控规则防止重复动作，当前执行仍为 Mock |
-| D | `src/app/`、`src/integration/`、`src/modules/rescue/` | Dashboard、API、监控入口、异常触发与流程集成，负责执行后的独立重读和效果展示 |
+| A | `src/modules/portfolio/`、`src/modules/market/` | 钱包余额、行情及链上资金数据；与 D 统一 Fork WETH/USDC 余额和报价口径；按冻结的 `OnchainSignalState` 输出独立信号，不与 Portfolio 混用 |
+| B | `src/modules/risk/`、`src/modules/investigation/` | 消费链上信号与证据，开发异常识别、风险计算、压力测试和调查；与 D 定义市场风险恢复条件；只输出分析，不获得交易权限 |
+| C | `src/modules/policy/`、`src/modules/execution/` | 策略配置校验、白名单、额度与受限执行；修正并交付 Fork adapter、执行状态和接入说明，配合 D 防止重复交易；不负责 HTTP 路由或前端 |
+| D | `src/app/`、`src/integration/`、`src/modules/rescue/` | 配置 API/表单与存取、Dashboard、服务端持续监控、事件状态/去重/恢复、Fork 装配及执行后的独立重读和效果展示 |
 
-此表描述下一阶段的职责边界，不表示四名开发者已经开工，也不替代具体任务单。A/B 的数据交接边界已冻结，可各自从样例开发；真实 Adapter 的接入与监控任务需按上一节明确范围。
+此表描述职责边界，不代表各模块均已完成。A/B 的数据交接边界已冻结；C/D 按 [D2C-handoff.md](D2C-handoff.md) 修改和联调，公共合同由集成负责人协调，不能各自修改后默认兼容。
 
 `src/domain/` 是共同稳定边界，`src/mocks/` 与公共配置由集成负责人协调，顺序整合变更。Adapter 实现由各负责人维护，D 在 composition root 注入；业务层不知道具体 Mock 类型。可选 Aave 扩展单独维护，不能作为新 Portfolio 或短周期 Market 的替代源。
 
@@ -228,3 +237,11 @@ OpenAPI 文档验证范围为 JSON 解析、内部引用及示例对 Zod 合同�
 - [ ] 多次/并发请求隔离，没有自动重新入场、追加交易或真 txHash。
 - [ ] `/api/rescue` 严格输入与新 DTO/verification/error 合同一致；旧借贷格式不继续输出。
 - [ ] Aave 的 3 个专项测试保持通过；现有读取路径/字段/错误/NO_DEBT/canonical 要求不变，主核心不依赖它。
+
+本轮 Fork 自动监控的新增验收项（尚未完成）：
+
+- [ ] 固定测试钱包、签名地址、Fork 链配置和 WETH/USDC 读取一致，配置保存后按约定生效。
+- [ ] 服务端持续监控，在完整策略满足时自动执行；同一事件持续超标不重复 swap。
+- [ ] 只有市场风险满足恢复条件后再次超标，才建立新事件；减仓、数据缺失、重启和暂停/恢复不绕过去重。
+- [ ] 交易待确认时不重新广播 swap，执行后独立重读并如实展示 PASSED/FAILED；明确失败和验证失败的处理符合交接约定。
+- [ ] 页面正确区分 Mock、Fork 交易和演示分析输入；完成监控 → Policy → Fork 执行 → 重读 → 展示的全流程验收。
