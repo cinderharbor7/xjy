@@ -27,4 +27,10 @@ Integrate the complete currency-fingerprint project into xjy, replace all served
 - tests/frontend: DOM-only user actions, provenance/precision, invalid query, policy versioning, pending report transaction lock, tampered report rejection, all-asset navigation/search. No browser or screenshots.
 - scripts/verify-web.mjs: native server start with separate SQLite; 11 page URLs and static resources; cross-origin rejection; invalid tx hash; preserved risk mode; threshold change yields NONE, approved Mock run yields verification PASSED/70% risk exposure, second request blocked 409.
 - tests/fingerprint: local EVM 968 deploy, metadata, owner/hash, duplicate and invalid URI rejection, transfer. No public BOT transactions.
-- Unresolved limitations: user visual acceptance; optional Fork/local-registry endpoint suites skipped; third-party Zod annotation/Shader Park eval build warnings; optional Ganache native module falls back to JS. These did not fail build/tests.
+- Unresolved limitations: user visual acceptance; optional Fork/local-registry endpoint suites skipped; third-party Zod annotation warnings; optional Ganache native module falls back to JS.
+
+## Follow-up: production fluid rendering
+- Remote verified with ls-remote + fetch: feature branch absent, main does not contain 5705c98; no push or merge performed.
+- Reproduced source vs production Shader Park: source creates Mesh, minified production throws `ReferenceError: input is not defined` during runtime DSL compilation.
+- Fixed by precompiling DSL to GLSL at build time, loading one Three.js renderer in the browser; added contextual errors and resource cleanup instead of generic device blame.
+- Checks passed: 5 fluid lifecycle/material tests + existing home test; production regression creates all 8 materials with eval disabled and verifies browser compiler absent; typecheck and build. No browser or GPU visual check.

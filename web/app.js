@@ -9,6 +9,7 @@ import {
 import {
   mountFingerprints,
   mountSculpture,
+  sculptureFailureMessage,
   setMotionPaused,
   isMotionPaused,
 } from "./fingerprint/render.js";
@@ -104,7 +105,9 @@ function updateWallet() {
   if (location.pathname === "/collection") render();
 }
 watchWallet(updateWallet);
-void restoreWallet().then((connected) => { if (connected) updateWallet(); });
+void restoreWallet().then((connected) => {
+  if (connected) updateWallet();
+});
 function statusControl() {
   const m = state.market;
   return `<div class="data-control"><span><i class="status-dot ${m.mode === "live" && m.source.status === "live" ? "live" : ""}"></i>${m.mode === "demo" ? "演示数据" : statusName[m.source.status]}${m.fetchedAt ? " · " + new Date(m.fetchedAt).toLocaleTimeString("zh-CN", { hour12: false }) : ""}</span><button data-action="source" ${state.busy ? "disabled" : ""}>${state.busy ? "读取中…" : m.mode === "demo" ? "接入公开数据" : "切换演示"}</button>${m.mode === "live" ? '<button data-action="refresh" ' + (state.busy ? "disabled" : "") + ">刷新</button>" : ""}</div>`;
@@ -496,22 +499,36 @@ document.addEventListener("click", async (event) => {
       '<div class="sculpture-host" id="sculpture-host"></div><div class="art-toolbar"><span>流体形态 / Shader Park</span><button data-action="motion" aria-label="暂停动态图形">Ⅱ</button></div>';
     const host = $("#sculpture-host"),
       version = routeVersion;
+    const revert = (error) => {
+      if (
+        version !== routeVersion ||
+        state.view !== "sculpture" ||
+        !host.isConnected
+      )
+        return;
+      sculptureCleanup();
+      sculptureCleanup = () => {};
+      $("#detail-art-content").innerHTML = art(c);
+      state.view = "contour";
+      document
+        .querySelectorAll("[data-view]")
+        .forEach((b) =>
+          b.classList.toggle("active", b.dataset.view === "contour"),
+        );
+      mount();
+      toast(sculptureFailureMessage(error));
+    };
     try {
-      const dispose = await mountSculpture(host, c, state.market.sentiment);
+      const dispose = await mountSculpture(
+        host,
+        c,
+        state.market.sentiment,
+        revert,
+      );
       if (version !== routeVersion || state.view !== "sculpture") dispose();
       else sculptureCleanup = dispose;
     } catch (error) {
-      if (version === routeVersion) {
-        $("#detail-art-content").innerHTML = art(c);
-        state.view = "contour";
-        document
-          .querySelectorAll("[data-view]")
-          .forEach((b) =>
-            b.classList.toggle("active", b.dataset.view === "contour"),
-          );
-        mount();
-        toast("当前设备无法显示流体，已切回纹理指纹。");
-      }
+      revert(error);
     }
     return;
   }

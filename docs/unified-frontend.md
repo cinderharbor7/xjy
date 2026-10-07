@@ -122,3 +122,13 @@ HTTP 验证覆盖页面深链接、静态资源、同源限制、策略保存、
 本轮实际结果：TypeScript 检查和生产构建通过；Vitest **927 passed / 6 skipped**（包含 17 项新增原生前端/HTTP 分发测试）；指纹与本地 NFT 测试 **5 passed**；原报告合约编译一致性检查通过。隔离 HTTP 检查验证了 11 个页面路径、资源加载、同源限制、版本化策略、Mock 执行及重复事件拦截。3100 预览已返回 HTTP 200，初始为暂停的 MOCK 状态。
 
 现有边界继续有效：指纹默认演示；行情公开快照手动读取；新闻源失败不捏造结果；独立新闻情绪、全链 NFT 索引、指纹交易刷新恢复仍不是本次已实现能力。新前端没有增加真实 AI 调查或把多币种浏览扩展为多币种执行。
+
+## 流体形态的生产构建修复
+
+用户反馈生产预览无法显示流体。非浏览器复现表明：未打包 Shader Park 可创建材质，但原生产包运行 DSL 编译时报 `ReferenceError: input is not defined`。这属于构建兼容故障，原“当前设备无法显示”的提示不足以描述原因。
+
+现在由 `scripts/sculpture-source.mjs` 保存 DSL，`scripts/compile-sculpture.mjs` 在 `pnpm build` 时预编译为 `web/fingerprint/sculpture-shader.json`。浏览器只加载 `sculpture.js`、Three.js 和 GLSL，不再执行 Shader Park 的 JavaScript 编译器，也避免引入两份 Three.js。纹理绘制和 NFT SVG 未改变。
+
+失败状态分别处理资源/初始化错误、WebGL 上下文创建失败、着色器编译失败和上下文丢失，异常时释放资源并回到纹理视图。
+
+验证命令：先 `pnpm build`，再 `pnpm test:sculpture`。该回归会通过生产压缩构建创建 8 个币种的材质，禁止运行时 eval，校验生成着色器与源码一致；`tests/frontend/sculpture.test.ts` 检查初始化失败清理和上下文丢失等路径。验证不打开浏览器，不代表用户设备的实际 GPU 渲染或视觉已经验收。

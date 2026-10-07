@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "vite build",
+    "build": "node scripts/compile-sculpture.mjs && vite build",
     "start": "tsx server/index.ts --production",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -23,7 +23,9 @@
     "test:fingerprint": "node --test tests/fingerprint/*.test.mjs",
     "fingerprint:compile": "node scripts/compile-fingerprint.mjs",
     "dev:preview": "tsx scripts/preview.ts",
-    "test:http": "node scripts/verify-web.mjs"
+    "test:http": "node scripts/verify-web.mjs",
+    "sculpture:compile": "node scripts/compile-sculpture.mjs",
+    "test:sculpture": "node scripts/verify-sculpture.mjs"
   },
   "dependencies": {
     "@aave-dao/aave-address-book": "4.71.3",

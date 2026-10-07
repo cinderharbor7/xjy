@@ -187,60 +187,22 @@ export function fingerprintSVG(coin, sentiment) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 520"><rect width="480" height="520" fill="#f1f4f8"/><g fill="none" stroke-width="2">${paths}</g><text x="32" y="473" font-family="sans-serif" font-size="24" fill="#202b3b">${coin.id} / Currency Fingerprint</text><text x="32" y="500" font-family="sans-serif" font-size="12" fill="#526177">${coin.mode === "demo" ? "Illustrative data" : "Market snapshot"} / Contour edition v1</text></svg>`;
 }
 
-export async function mountSculpture(host, coin, sentiment) {
-  const [{ createSculpture }, THREE] = await Promise.all([
-    import("shader-park-core"),
-    import("three"),
-  ]);
-  const p = visualParameters(coin, sentiment);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-  const scene = new THREE.Scene(),
-    camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-  camera.position.z = 4.6;
-  const source = `let t = input(0.0); let warp = input(0.3); let mood = input(0.5); let seed = input(2.0); let s = getSpace(); let n = sin(s.x*4.0+seed+t*.3)*cos(s.y*3.0+t*.2)*sin(s.z*4.0+seed); metal(0.35); shine(0.7); color(0.45+sin(s.y*3.0+mood*3.0)*0.25,0.55+cos(s.x*2.0+seed)*0.25,0.7+sin(s.z*3.0)*0.2); rotateY(t*.12); sphere(0.82+n*warp*.38);`;
-  let elapsed = 0,
-    last = performance.now(),
-    mx = 0,
-    my = 0;
-  const sculpture = createSculpture(
-    source,
-    () => ({ t: elapsed, warp: p.roughness, mood: p.mood, seed: p.seed }),
-    { radius: 1.5 },
-  );
-  scene.add(sculpture);
-  host.replaceChildren(renderer.domElement);
-  const size = () => {
-    const r = host.getBoundingClientRect();
-    renderer.setSize(r.width, r.height);
-    camera.aspect = r.width / r.height;
-    camera.updateProjectionMatrix();
-  };
-  size();
-  const ro = new ResizeObserver(size);
-  ro.observe(host);
-  const move = (e) => {
-    const r = host.getBoundingClientRect();
-    mx = (e.clientX - r.left) / r.width - 0.5;
-    my = (e.clientY - r.top) / r.height - 0.5;
-  };
-  host.addEventListener("pointermove", move);
-  renderer.setAnimationLoop(() => {
-    const now = performance.now();
-    if (!paused && !reduced()) elapsed += Math.min(now - last, 100) / 1000;
-    last = now;
-    if (document.hidden) return;
-    sculpture.rotation.y = mx * 0.4;
-    sculpture.rotation.x = my * 0.3;
-    renderer.render(scene, camera);
+export async function mountSculpture(host, coin, sentiment, onFailure) {
+  const { mountFluid } = await import("./sculpture.js");
+  return mountFluid(host, coin, sentiment, {
+    isPaused: () => paused,
+    reduced,
+    onFailure,
   });
-  return () => {
-    renderer.setAnimationLoop(null);
-    ro.disconnect();
-    host.removeEventListener("pointermove", move);
-    sculpture.geometry.dispose();
-    sculpture.material.dispose();
-    renderer.dispose();
-    renderer.domElement.remove();
+}
+export function sculptureFailureMessage(error) {
+  const messages = {
+    WEBGL_CONTEXT: "无法创建 WebGL 绘图环境，已切回纹理指纹。",
+    WEBGL_LOST: "WebGL 绘图上下文已中断，已切回纹理指纹，可稍后重试。",
+    SHADER_COMPILE: "流体着色器编译失败，已切回纹理指纹。",
   };
+  return (
+    messages[error?.code] ||
+    "流体视图加载或初始化失败，已切回纹理指纹，请刷新后重试。"
+  );
 }
