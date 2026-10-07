@@ -20,10 +20,10 @@
 
 ## 快速验证
 
-B 的交付物为**纯文档**，不修改源码。验证方式：
+B 的本轮交付包含解释文档与 `AiInvestigationAdapter`、类型出口、配置示例和测试；该 Adapter 尚未接入现有默认规则流程或网页。未配置凭据或调用失败明确报错，不退回规则冒充 AI。验证方式：
 
 1. 阅读 `method-card.md`，确认：
-   - 方法边界与冻结方案一致（单池、未校准、无 LLM）
+   - 原规则方法边界与冻结方案一致（单池、未校准、无 LLM）；新增显式 AI Adapter 是独立能力，不能将规则验收当成真实模型验收
    - 标准未知项完整（4 条）
    - 与代码实现一致（`sell-pressure.ts`、`onchain-investigation.adapter.ts`）
 2. 阅读 `ai-benchmark.md`，确认：
@@ -60,3 +60,11 @@ B 的交付物为**纯文档**，不修改源码。验证方式：
 ---
 
 本目录由 B 创建，本地集成校正证据口径。D 可引用方法和项目已验证事实；尚未实测的 AI 对照与增益不得进入成果声明。
+
+## AI 接入代码与当前限制
+
+`AiInvestigationAdapter` 实现既有 `InvestigationAdapter`，构造时显式传入 signal 和服务端 apiKey；apiUrl/model 可覆盖，timeoutMs 覆盖请求和响应体。`.env.example` 仅为配置示例，设置变量不会自动启用 AI。通过 `InvestigationService` 注入后才能调用；现有规则流程不变。
+
+模型证据必须逐字来自输入 evidenceCatalog，未知 hash/address/显式 block 引用被拒绝；解释标为未经独立核实的 AI 推断，必填限制始终保留，Confidence 不得高于既有引用覆盖规则上限。引用成员检查不等于事实、因果或语义核验；不提供自主工具调用，不连接 Executor。
+
+测试使用受控 fetch 响应，不调用真实外部模型。运行流程装配、模型服务选择、凭据配置、实际调用、中文质量和通用 AI 比较均尚未验收；不能声明真实自主 Agent 已跑通。无重试或静默规则 fallback。

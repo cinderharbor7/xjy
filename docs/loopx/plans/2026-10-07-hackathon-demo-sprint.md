@@ -23,6 +23,9 @@ slices:
   - id: P-007
     status: done
     depends: []
+  - id: P-008
+    status: done
+    depends: [P-007]
 ---
 
 # Hackathon 冻结方案执行交接
@@ -150,9 +153,22 @@ C 的父提交 `bbfde9c` 校准研究不纳入冻结候选版：它使用与现�
 
 Aave 隐藏验收：977 passed / 6 skipped、typecheck/build 和隔离 HTTP 11 路由通过；三处导航无入口，旧路径/API保留，独立审阅未发现问题。本轮未进行视觉验收、签名或主网交易。
 
+## P-008 B/C 交付整合与 AI 边界修复
+
+用户明确授权整合：A 已在 main；移植 B 的解释材料和 AI Adapter，合入 C v2 验收记录。B 的独立初始化历史不整支覆盖 main。保持现有领域 schema、默认规则分析、HTTP 和执行装配不变；本项不代表真实模型、页面接线或自主 Agent 在线验收。
+
+必要修复遵循既有失败语义与证据合同：AI 缺配置/请求或输出失败明确报错，无静默规则回退；引用来自给定证据目录，模型解释标为推断，置信度不得突破输入引用覆盖规则上限；请求超时覆盖响应体；构造证据保存校验后的副本。B 接入代码负责人、Codex 做 A/接线/集成；A 数据核验，C 安全与 Fork 验收，D 页面和比赛材料。成员认领仍由队长确认。
+
+实际本地整合验收（2026-10-07）：998 passed / 6 skipped，其中AI边界21项；typecheck/build、合约一致性、5项指纹/本地EVM、隔离HTTP 11路由及shader检查通过。独立复审前次5项均修复，无新增重要问题。没有外部模型、签名、主网交易或本轮视觉验收；默认运行流程未改。
+
+> writes: `B/C交付文件`, `AI adapter/tests必要修复`, `README.md`, `本计划`
+> anchors: `用户BC合并整合请求; AC-011/D-011/TC-010; 原失败不fallback约束; 稳定InvestigationResult; Policy无直接模型执行权限; 真实状态与未知项`
+> verify: `pnpm typecheck；pnpm test；pnpm build；pnpm test:http；pnpm test:fingerprint；pnpm contract:check；GitHub CI`
+> review: `独立 exact diff 安全审阅；事实引用/置信度/输入快照/超时/来源标签；重要问题修复后复验`
+
 ## Integration And Final Verification
 
-本计划覆盖 AC-001–010、D-001–010、TC-001–009；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。P-001–005 保留当时的边界；P-006 记录后续授权的 D 迁移与必要修复；P-007 记录公开行情逐项换真。公共领域合同、核心 Policy/Executor 与事件状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
+本计划覆盖 AC-001–011、D-001–011、TC-001–010；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。P-001–005 保留当时的边界；P-006 记录后续授权的 D 迁移与必要修复；P-007 记录公开行情逐项换真。公共领域合同、核心 Policy/Executor 与事件状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
 
 修改前基线为 2026-10-07 15:54 的 `pnpm test`：**896 passed / 2 skipped**。历史运行验收见 [交易核验记录](../../transaction-check.md) 和 [团队集成验收](../../team-integration-acceptance.md)。只有新鲜命令/实际操作才可证明最终结果；后续经授权修改代码时重新跑相应检查。
 

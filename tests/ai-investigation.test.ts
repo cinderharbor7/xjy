@@ -1,7 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
-import { InvestigationResultSchema, RiskAnalysisSchema } from "@/domain/schemas";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { InvestigationResultSchema } from "@/domain/schemas";
 import type { MarketState, OnchainSignalState, PortfolioState, RiskAnalysis } from "@/domain/types";
 import { AiInvestigationAdapter } from "@/modules/investigation/ai-investigation.adapter";
+import { TransactionCheckReportSchema } from "@/domain/schemas/transaction-check";
+import { PolicyService } from "@/modules/policy/policy.service";
 import { OnchainSellPressureInvestigationAdapter } from "@/modules/investigation/onchain-investigation.adapter";
 
 const txHash = "0x" + "ab".repeat(32);
@@ -63,139 +65,130 @@ const risk: RiskAnalysis = {
   recommendedAction: "SWAP_TO_SAFE",
 };
 
-describe("AiInvestigationAdapter", () => {
-  it("falls back to the deterministic template when no API key is provided", async () => {
-    const ai = new AiInvestigationAdapter(signal);
-    const result = await ai.investigate(portfolio, market, risk);
+const options = { apiKey: "sk-unit-test", timeoutMs: 1000 };
+const template = () => new OnchainSellPressureInvestigationAdapter(signal).investigate(portfolio, market, risk);
+async function modelResult() {
+  return { ...await template(), summary: "卖压高于前一窗口，但原因未知。", primaryCause: "无法确认交易意图。", confidence: 0.72 };
+}
+function respond(value: unknown) {
+  return vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({
+    choices: [{ message: { content: typeof value === "string" ? value : JSON.stringify(value) } }],
+  }));
+}
+afterEach(() => vi.restoreAllMocks());
 
-    const fallback = await new OnchainSellPressureInvestigationAdapter(signal).investigate(portfolio, market, risk);
-
-    expect(result.summary).toBe(fallback.summary);
-    expect(result.primaryCause).toBe(fallback.primaryCause);
-    expect(result.confidence).toBe(fallback.confidence);
-    expect(result.evidence).toEqual(fallback.evidence);
-    expect(result.uncertainties).toEqual(fallback.uncertainties);
+describe("explicit AI investigation", () => {
+  it.each([undefined, "", "  "])("rejects missing key instead of returning a rule report (%s)", (apiKey) => {
+    expect(() => new AiInvestigationAdapter(signal, { apiKey })).toThrow("AI_CONFIGURATION_REQUIRED");
   });
-
-  it("falls back to the deterministic template when the API key is empty", async () => {
-    const ai = new AiInvestigationAdapter(signal, { apiKey: "   " });
-    const result = await ai.investigate(portfolio, market, risk);
-
-    const fallback = await new OnchainSellPressureInvestigationAdapter(signal).investigate(portfolio, market, risk);
-    expect(result.summary).toBe(fallback.summary);
+  it.each([0, -1, NaN, Infinity, 2147483648])("rejects invalid timeout %s", (timeoutMs) => {
+    expect(() => new AiInvestigationAdapter(signal, { ...options, timeoutMs })).toThrow("AI_CONFIGURATION_REQUIRED");
   });
-
-  it("falls back to the deterministic template when the LLM call fails", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network error"));
-
-    const ai = new AiInvestigationAdapter(signal, { apiKey: "sk-test", timeoutMs: 100 });
-    const result = await ai.investigate(portfolio, market, risk);
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    const fallback = await new OnchainSellPressureInvestigationAdapter(signal).investigate(portfolio, market, risk);
-    expect(result.summary).toBe(fallback.summary);
-
-    fetchSpy.mockRestore();
+  it("propagates a sanitized network failure without fallback or retry", async () => {
+    const fetcher = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("SECRET provider detail"));
+    await expect(new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk)).rejects.toThrow("AI_REQUEST_FAILED");
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
-
-  it("falls back when the LLM returns invalid JSON", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ choices: [{ message: { content: "not-json" } }] }),
-    } as Response);
-
-    const ai = new AiInvestigationAdapter(signal, { apiKey: "sk-test" });
-    const result = await ai.investigate(portfolio, market, risk);
-
-    const fallback = await new OnchainSellPressureInvestigationAdapter(signal).investigate(portfolio, market, risk);
-    expect(result.summary).toBe(fallback.summary);
-
-    fetchSpy.mockRestore();
+  it("does not expose HTTP error bodies or return rules", async () => {
+    respond({});
+    vi.mocked(fetch).mockResolvedValue(new Response("sk-secret provider body", { status: 401 }));
+    await expect(new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk)).rejects.toThrow(/^AI_REQUEST_FAILED$/);
   });
-
-  it("parses and validates a valid LLM JSON response", async () => {
-    const llmResult = {
-      summary: "AI summary: elevated sell pressure observed.",
-      primaryCause: "AI cause: concentrated DEX selling.",
-      evidence: [
-        "AI evidence: gross sell $300000 vs baseline $100000 (3.00×).",
-        "AI evidence: tx 0xabab... at block 21000000 — source: MOCK fixture.",
-      ],
-      uncertainties: [
-        "AI unknown 1: gross sell does not net buys.",
-        "AI unknown 2: single pool does not represent the whole market.",
-        "AI unknown 3: schema validation is not cryptographic proof.",
-        "AI unknown 4: confidence is not a price-fall probability.",
-      ],
-      confidence: 0.72,
-    };
-
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ choices: [{ message: { content: JSON.stringify(llmResult) } }] }),
-    } as Response);
-
-    const ai = new AiInvestigationAdapter(signal, { apiKey: "sk-test" });
-    const result = await ai.investigate(portfolio, market, risk);
-
-    expect(result.summary).toBe(llmResult.summary);
-    expect(result.primaryCause).toBe(llmResult.primaryCause);
+  it("rejects malformed JSON", async () => {
+    respond("not-json");
+    await expect(new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk)).rejects.toThrow("AI_OUTPUT_INVALID");
+  });
+  it("returns labelled interpretation with catalog evidence and mandatory limitations", async () => {
+    const output = await modelResult(); output.uncertainties = [];
+    const fetcher = respond(output);
+    const result = await new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk);
+    expect(result.summary).toContain("AI 推断（未经独立核实）");
     expect(result.confidence).toBe(0.72);
-    expect(result.evidence).toHaveLength(2);
-    expect(result.uncertainties).toHaveLength(4);
-
-    // Schema must validate.
-    expect(() => InvestigationResultSchema.parse(result)).not.toThrow();
-
-    fetchSpy.mockRestore();
+    expect(result.evidence).toEqual(output.evidence);
+    expect(result.uncertainties).toEqual(expect.arrayContaining((await template()).uncertainties));
+    expect(InvestigationResultSchema.safeParse(result).success).toBe(true);
+    const request = JSON.parse(fetcher.mock.calls[0][1]!.body as string);
+    const input = JSON.parse(request.messages[1].content);
+    expect(input.evidenceCatalog).toEqual(output.evidence);
+    expect(input.risk).not.toHaveProperty("recommendedAction");
+    expect(result).not.toHaveProperty("action");
   });
-
-  it("clamps confidence to MAX 0.9 when the LLM returns a higher value", async () => {
-    const llmResult = {
-      summary: "AI summary.",
-      primaryCause: "AI cause.",
-      evidence: ["e1"],
-      uncertainties: ["u1", "u2", "u3", "u4"],
-      confidence: 0.99,
-    };
-
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ choices: [{ message: { content: JSON.stringify(llmResult) } }] }),
+  it("cannot raise confidence beyond a no-reference observation's coverage", async () => {
+    const sparse = { ...signal, evidence: [] };
+    const baseline = await new OnchainSellPressureInvestigationAdapter(sparse).investigate(portfolio, market, risk);
+    respond({ ...baseline, confidence: 0.99 });
+    const result = await new AiInvestigationAdapter(sparse, options).investigate(portfolio, market, risk);
+    expect(result.confidence).toBe(0.36);
+    const policy = new PolicyService({ minRiskScore: 80, minConfidence: 0.85,
+      minRiskExposurePct: 50, maxDeRiskPct: 30, allowedRiskAssets: ["ETH"], allowedDefensiveAssets: ["USDC"] });
+    const decision = policy.evaluate(portfolio, { ...risk, confidence: result.confidence, investigation: result });
+    expect(decision.triggered).toBe(false);
+    expect(decision.action).toBe("NONE");
+  });
+  it("rejects empty or fabricated evidence instead of manufacturing proof", async () => {
+    const output = await modelResult();
+    const fetcher = respond({ ...output, evidence: [] });
+    const adapter = new AiInvestigationAdapter(signal, options);
+    await expect(adapter.investigate(portfolio, market, risk)).rejects.toThrow("AI_OUTPUT_INVALID");
+    fetcher.mockResolvedValue(Response.json({ choices: [{ message: { content: JSON.stringify({ ...output, evidence: ["invented fact"] }) } }] }));
+    await expect(adapter.investigate(portfolio, market, risk)).rejects.toThrow("AI_OUTPUT_INVALID");
+  });
+  it("rejects a fabricated hash even in otherwise schema-valid model prose", async () => {
+    respond({ ...await modelResult(), summary: `Unknown transaction 0x${"ee".repeat(32)}` });
+    await expect(new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk)).rejects.toThrow("AI_OUTPUT_INVALID");
+  });
+  it("rejects fabricated block references in interpretation", async () => {
+    respond({ ...await modelResult(), primaryCause: "block 999999 is the cause" });
+    await expect(new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk)).rejects.toThrow("AI_OUTPUT_INVALID");
+  });
+  it("rejects execution fields in model output", async () => {
+    respond({ ...await modelResult(), action: "SWAP_TO_SAFE" });
+    await expect(new AiInvestigationAdapter(signal, options).investigate(portfolio, market, risk)).rejects.toThrow("AI_OUTPUT_INVALID");
+  });
+  it("keeps the validated signal snapshot when caller mutates its object", async () => {
+    const copy = structuredClone(signal);
+    const adapter = new AiInvestigationAdapter(copy, options);
+    copy.currentSellVolumeUsd = 1;
+    copy.evidence[0].description = "changed";
+    const fetcher = respond(await modelResult());
+    await adapter.investigate(portfolio, market, risk);
+    const input = JSON.parse(JSON.parse(fetcher.mock.calls[0][1]!.body as string).messages[1].content);
+    expect(input.signal).toEqual(signal);
+  });
+  it("copies schema-validated optional reports and preserves their unknowns", async () => {
+    const report = TransactionCheckReportSchema.parse({
+      mode: "LIVE_READ_ONLY", network: "ethereum-mainnet", checkedAt: signal.windowEnd,
+      classification: "NO_SUPPORTED_SWAP", headline: "No supported swap", summary: "Only outer facts",
+      confirmedFacts: ["Receipt succeeded"], uncertainties: ["Other pools not checked"], nextSteps: ["Check original source"],
+      observation: {
+        transaction: { hash: txHash, from: contractAddress, to: null, nativeValueEth: "0", input: "0x",
+          status: "SUCCESS", blockNumber: 21000000, blockHash, timestamp: signal.windowStart, logCount: 0 },
+        supportedSwaps: [], scope: { protocol: "UNISWAP_V3", poolAddress: contractAddress,
+          poolLabel: "Unit-test pool", asset: "WETH", quoteAsset: "USDC", fee: 500 },
+        evidence: [
+          { type: "TRANSACTION", txHash, blockNumber: 21000000, description: "Unit-test tx", source: "MOCK fixture" },
+          { type: "BLOCK", blockHash, blockNumber: 21000000, description: "Unit-test block", source: "MOCK fixture" },
+        ],
+      },
+    });
+    const adapter = new AiInvestigationAdapter(signal, { ...options, reports: [report] });
+    report.confirmedFacts[0] = "Changed after construction";
+    report.uncertainties[0] = "Changed unknown";
+    const fetcher = respond(await modelResult());
+    const result = await adapter.investigate(portfolio, market, risk);
+    const input = JSON.parse(JSON.parse(fetcher.mock.calls[0][1]!.body as string).messages[1].content);
+    expect(input.transactionChecks[0].confirmedFacts).toEqual(["Receipt succeeded"]);
+    expect(result.uncertainties).toContain("Other pools not checked");
+  });
+  it("schema-validates optional reports at construction", () => {
+    expect(() => new AiInvestigationAdapter(signal, { ...options, reports: [{}] as never })).toThrow();
+  });
+  it("times out even if headers arrive and response body hangs", async () => {
+    const fetcher = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true, json: () => new Promise(() => {}),
     } as Response);
-
-    const ai = new AiInvestigationAdapter(signal, { apiKey: "sk-test" });
-    const result = await ai.investigate(portfolio, market, risk);
-
-    expect(result.confidence).toBe(0.9);
-    fetchSpy.mockRestore();
-  });
-
-  it("produces a valid InvestigationResult shape regardless of LLM availability", async () => {
-    const ai = new AiInvestigationAdapter(signal);
-    const result = await ai.investigate(portfolio, market, risk);
-
-    expect(() => InvestigationResultSchema.parse(result)).not.toThrow();
-    expect(result.confidence).toBeGreaterThanOrEqual(0);
-    expect(result.confidence).toBeLessThanOrEqual(0.9);
-    expect(result.uncertainties.length).toBeGreaterThanOrEqual(4);
-    expect(result.evidence.length).toBeGreaterThanOrEqual(1);
-    expect(result.summary.length).toBeGreaterThan(0);
-    expect(result.primaryCause.length).toBeGreaterThan(0);
-  });
-
-  it("never carries execution authority in the investigation output", async () => {
-    const ai = new AiInvestigationAdapter(signal);
-    const result = await ai.investigate(portfolio, market, risk);
-
-    const text = JSON.stringify(result).toLowerCase();
-    expect(text).not.toContain("execute");
-    expect(text).not.toContain("swap_to_safe");
-    expect(text).not.toContain("approve");
-    expect(text).not.toContain("broadcast");
+    const adapter = new AiInvestigationAdapter(signal, { ...options, timeoutMs: 15 });
+    await expect(adapter.investigate(portfolio, market, risk)).rejects.toThrow("AI_REQUEST_FAILED");
+    expect((fetcher.mock.calls[0][1]!.signal as AbortSignal).aborted).toBe(true);
   });
 });

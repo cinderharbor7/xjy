@@ -5,7 +5,7 @@ import type {
   ExecutionResultSchema, VerificationResultSchema, RescueSessionSchema, RescueProblemSchema,
   OnchainEvidenceSchema, OnchainSignalStateSchema,
 } from "../schemas";
-import { TransactionCheckReportSchema } from "../schemas/transaction-check";
+import type { TransactionCheckReportSchema } from "../schemas/transaction-check";
 
 export type AssetBalance = z.infer<typeof AssetBalanceSchema>;
 export type PortfolioState = z.infer<typeof PortfolioStateSchema>;

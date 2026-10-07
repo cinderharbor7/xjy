@@ -18,7 +18,7 @@
 
 ### 场景
 
-A 的 RPC 读取成功，但当前窗口内没有抽样到任何 `OnchainEvidence`（例如：代码抽样逻辑返回空数组，或窗口内确实无交易）。
+A 的 RPC 读取成功，但当前窗口内没有提供任何 `OnchainEvidence`。这是独立规则层测试输入，不代表 A 实际读侧一定产生这种结果。
 
 ### 测试复现
 
@@ -37,7 +37,7 @@ const result = await new OnchainAnalysisService().analyze(
 |---|---|---|
 | `confidence` | **0.36** | 远低于 Demo Policy 阈值 0.85，不会触发保护动作 |
 | `coverage` | 0（0 / 3） | 没有引用覆盖 |
-| `sample` | 0.25（3 / 12） | txCount 仍为 3，但无引用 |
+| `sample` | 1（12 / 12） | 测试 fixture 的 txCount 为 12，但无引用 |
 | `uncertainties[2]` | "The frozen schema validates reference format..." | 明确声明 schema 不验证交易存在性 |
 | `uncertainties[3]` | "Confidence measures how well the supplied references cover the window..." | 明确声明 confidence 不是下跌概率 |
 
@@ -45,7 +45,7 @@ const result = await new OnchainAnalysisService().analyze(
 
 系统在零引用时：
 - ✅ **不崩溃**：`RiskAnalysisSchema` 仍通过，输出完整结构
-- ✅ **不虚构证据**：`evidence` 数组只包含聚合行，没有编造的 txHash/blockHash
+- ✅ **不虚构证据**：`evidence` 数组包含规则聚合与组合说明行，没有编造的 txHash/blockHash
 - ✅ **Confidence 诚实降低**：0.36 明确反映引用缺失
 - ✅ **不触发误报**：远低于 Policy 阈值，不会导致错误执行
 

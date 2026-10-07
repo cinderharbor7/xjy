@@ -32,7 +32,7 @@
 |---|---|---|---|---|---|
 | 1.1.1 | 锚点区块 26139420，时间 2026-10-07T08:49:35.000Z | 事实 | Ethereum 主网 RPC `eth_getBlockByNumber` 返回的 `number` 与 `timestamp` | 区块 hash `0x26f371...`；[`etherscan.io/block/26139420`](https://etherscan.io/block/26139420) | 已读取，未独立节点交叉验证 |
 | 1.1.2 | 当前窗口 `[08:44:35Z, 08:49:35Z)`，基线窗口 `[08:39:35Z, 08:44:35Z)` | 事实 | 代码按锚点区块时间倒推两个等长 5 分钟窗口 | 源码 `live-data.ts` 窗口计算逻辑 | 逻辑正确性已由代码审查确认 |
-| 1.1.3 | 当前 gross sell USD = 6606.23 | 事实 | V3 池 `Swap` 事件中 `amount0`（WETH 流出）按事件区块的 Chainlink USDC/USD 报价换算 | 19 条卖出事件引用，见 JSON `evidence` 数组 | 未与第二个独立节点或全部 raw Swap 日志复核总额 |
+| 1.1.3 | 当前 gross sell USD = 6606.23 | 事实 | V3 池 `Swap` 事件中 本池 token0=USDC、token1=WETH：`amount1 > 0` 表示池收到 WETH，`-amount0` 为池支付的 USDC 成交额按事件区块的 Chainlink USDC/USD 报价换算 | 19 条卖出事件引用，见 JSON `evidence` 数组 | 未与第二个独立节点或全部 raw Swap 日志复核总额 |
 | 1.1.4 | 基线 gross sell USD = 255825.18 | 事实 | 同上，前一窗口 | 同上 | 同上 |
 | 1.1.5 | anomalyRatio = 0.0258（当前 ÷ 基线） | 推断 | 6606.23 / 255825.18 的算术结果 | 由 1.1.3 和 1.1.4 计算得出；`OnchainSignalStateSchema` 校验该等式 | 数学正确，但依赖 1.1.3/1.1.4 的读取准确性 |
 | 1.1.6 | 当前卖出交易 3 笔，原始发起钱包 3 个 | 事实 | 当前窗口内卖出事件的 txHash 和 tx.from 去重计数 | JSON 中 `txCount: 3`, `uniqueWallets: 3` | 未验证 tx.from 是否与实际发起钱包一致（RPC 返回即视为事实） |
@@ -41,9 +41,9 @@
 
 | # | 输出结论 | 分类 | 事实依据 | 引用 | 校准状态 |
 |---|---|---|---|---|---|
-| 1.2.1 | Chainlink ETH/USD = 2614.62 | 事实 | `AggregatorV3Interface.latestRoundData()` 返回的 `answer` | roundId、区块、timestamp 保留在 JSON evidence | 报价更新时间为 08:24:23Z，不等于读取时间；5m 变化因此为 0 |
+| 1.2.1 | Chainlink ETH/USD = 2614.62 | 事实 | `AggregatorV3Interface.latestRoundData()` 返回的 `answer` | roundId、区块、timestamp 保留在 Portfolio/Market 的 JSON evidence | 报价更新时间为 08:24:23Z，不等于读取时间；5m 变化因此为 0 |
 | 1.2.2 | 示例钱包持有 ETH 5.7535、USDC 37.1921 | 事实 | `eth_getBalance` + `balanceOf` 读取，按上述 Chainlink 报价估值 | 钱包 `0xd8dA...` 的区块 26139420 状态 | 只覆盖原生 ETH 和 USDC，不含 WETH 或其他代币 |
-| 1.2.3 | Portfolio 合计 USD 15080.46，风险敞口 100% | 推断 | ETH 归为 RISK，USDC 归为 DEFENSIVE，按分类加总 | 源码 `PortfolioStateSchema` 校验逻辑 | 分类规则是产品设计，非链上固有属性 |
+| 1.2.3 | Portfolio 合计 USD 15080.46，风险敞口约 99.7534% | 推断 | ETH 归为 RISK，USDC 归为 DEFENSIVE，按分类加总 | 源码 `PortfolioStateSchema` 校验逻辑 | 分类规则是产品设计，非链上固有属性 |
 
 ### 1.3 B 规则输出（需明确标注为未校准）
 
