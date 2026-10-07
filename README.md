@@ -1,4 +1,30 @@
-# Autonomous On-chain Risk Guardian
+# Ethereum 异动调查原型 · Risk Guardian
+
+## 2026-10-07 · 比赛方案冻结
+
+本次作品固定为：**可复查的 Ethereum 异动调查原型，附受限保护执行实验。** 候选任务是由承担 ETH 线索核验的投研/运营人员，交付有出处的事实、解释与未知项；使用者、采用与付费仍是假设。
+
+- 量化能力：A→B 真实单次主网快照，比较相邻 5 分钟窗口的单池卖压；Risk Score、Confidence 是未校准的确定性规则。
+- 证据能力：独立 `/investigate` 核验外层交易及固定池兑换，保留精确数量、出处和不能确认项。
+- 应用实验：原 Guardian 的 Policy → Mock/Fork 减仓 → 独立 after/verification 保留；真实信号尚未接入持续交易监控。
+- Agent 状态：当前没有真实 AI/Agent 调查参与，规则报告不构成自主 Agent；这是评分缺口，不通过改名掩盖。本轮冻结不授权模型接入、修改合同、主网执行或新增功能。
+
+产品口径与验收真源：[比赛冻结方案](docs/loopx/design/2026-10-07-hackathon-freeze/需求设计文档.md)。四人交付与状态真源：[冲刺执行计划](docs/loopx/plans/2026-10-07-hackathon-demo-sprint.md)。北京时间 10 月 8 日 12:00 截止，内部提前提交目标为 10:30。方案已写好不代表队员已执行或作品已提交。
+
+以下保留历史实现与验收记录；出现展示定位冲突时以冻结方案为准，历史测试不能替代现场验收。
+
+## 2026-10-07 历史 Update · 交易核验 MVP
+
+新增独立只读入口 **[/investigate](http://localhost:3000/investigate)**：输入 Ethereum 交易哈希，查看外层转账事实、指定池内的买卖证据，以及仍无法确认的部分。场景是“看到大额 ETH 转账消息，想核对这笔交易究竟支持什么说法”。商业需求尚未经过真实用户验证。
+
+- 数据来自服务器配置的 Ethereum 主网 RPC；示例按钮查询真实交易，不用存档或 Mock 代替在线结果。
+- 当前只核验 Uniswap V3 WETH/USDC **0.05% 单池**。普通转账不会直接被解释为卖出；发现本池卖出事件也不等于证明全笔交易净卖出或市场下跌原因。
+- 中文解释由确定性规则生成；没有真实 LLM、地址身份鉴定、内部 trace、后续路径或全市场监控。USDC 数量不被当成美元估值。
+- 新入口不连接钱包、不签名、不交易，也不访问 Guardian 事件数据库。既有保护 Demo 保留，可从导航切换。
+
+在 `.env.local` 配置 `ETHEREUM_RPC_URL`，然后运行 `pnpm dev`，打开上方入口。没有 RPC 时会明确报配置错误，不会退回 Mock。运行范围、接口与验收步骤见 [transaction-check.md](docs/transaction-check.md)，新查询合同见 [OpenAPI](docs/transaction-check-api.openapi.json)。
+
+本次验收：`pnpm typecheck`、`pnpm build` 通过，`pnpm test` **896 passed / 2 skipped**；新增功能 127 项通过。真实主网转账、买入、卖出 HTTP 查询通过；浏览器通过真实转账、卖出和输入/未找到错误测试。独立审阅发现的事件引用缺口已修复并复审通过。两个跳过项仍是需显式配置的既有 Fork 测试。
 
 ## 2026-10-07 Update · 第一版集成已合并
 
@@ -15,7 +41,9 @@ A、B、C、D 的第一版交付已通过 [PR #3](https://github.com/cinderharbo
 
 本次 ETH 链数据研究界面位于 [`/risk-lab`](http://localhost:3000/risk-lab)，API 为 `GET /api/eth-risk`。它使用经过 `OnchainSignalStateSchema` 校验的确定性链数据样本，展示卖压、波动率、杠杆、泡沫状态和左尾分位数五层模型，并把模型依据、置信度、证据引用和仓位建议放在同一页面。当前响应明确标记为 `MOCK_CHAIN_FIXTURE`，没有 RPC 读取、真实交易或实时预测；研究边界和替换真实 ETH 面板的步骤见 [`docs/eth-risk-lab.md`](docs/eth-risk-lab.md)。
 
-An autonomous on-chain risk guardian that reduces exposure when abnormal risk appears.
+## 原 Guardian 产品目标与现有执行框架
+
+以下描述保留原产品目标，并非声明真实自主 Agent 或主网自动保护已经完成。当前实际能力和本次展示以顶部冻结方案及各项验收记录为准。
 
 > We don't drive your portfolio. We protect it when things go wrong.
 

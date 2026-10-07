@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-07T05:30:05.498Z",
+  "mode": "ETHEREUM_MAINNET_READ_ONLY",
+  "chainId": 1,
+  "txHash": "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a",
+  "blockNumber": "20449709",
+  "blockHash": "0x1ea7d59632f0aeb0d3a97c83c5118d97d5f3c39115b02722a7d88d9b75a1a458",
+  "timestamp": "2024-08-03T18:08:23.000Z",
+  "from": "0x98629555d323324b9415471033f2745c57b608c6",
+  "to": "0xf584f8728b874a6a5c7a8d4d387c9aae9172d621",
+  "amountEth": "20059.2",
+  "input": "0x",
+  "status": "success",
+  "receiptLogCount": 0,
+  "receiptLogs": [],
+  "source": "Ethereum JSON-RPC; provider URL intentionally omitted",
+  "explorerUrl": "https://etherscan.io/tx/0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a",
+  "limitations": [
+    "Direct outer-transaction and receipt verification only; no internal call trace or subsequent transfers queried.",
+    "On-chain transaction does not independently prove address ownership or off-chain exchange trades."
+  ]
+}

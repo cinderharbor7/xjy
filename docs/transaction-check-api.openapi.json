@@ -1,0 +1,678 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Ethereum transaction-check MVP",
+    "version": "1.0.0",
+    "description": "Local same-origin, Ethereum mainnet live readonly verification of one transaction. Fixed Uniswap V3 WETH/USDC0.05% pool; no identity, trace, full-market coverage, signing or execution."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/api/transaction-checks": {
+      "post": {
+        "operationId": "checkEthereumTransaction",
+        "summary": "核验一笔 Ethereum 主网交易",
+        "description": "Server ETHEREUM_RPC_URL only; request must be local and same-origin. No retry or Mock fallback. USDC token quantities are not USD valuations.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionCheckRequest"
+              },
+              "example": {
+                "txHash": "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Confirmed transaction report, including reverted transactions. Runtime schema enforces classification/evidence/time consistency; JSON Schema does not express all cross-field refinements.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Transaction-Check-Mode": {
+                "schema": {
+                  "type": "string",
+                  "const": "LIVE_READ_ONLY"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCheckReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请提交完整交易哈希。",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCheckProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:transaction-check:INVALID_REQUEST",
+                  "title": "交易核验未完成",
+                  "status": 400,
+                  "detail": "请提交完整交易哈希。",
+                  "instance": "/api/transaction-checks",
+                  "code": "INVALID_REQUEST"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "仅允许本机同源访问。",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCheckProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:transaction-check:ORIGIN_REJECTED",
+                  "title": "交易核验未完成",
+                  "status": 403,
+                  "detail": "仅允许本机同源访问。",
+                  "instance": "/api/transaction-checks",
+                  "code": "ORIGIN_REJECTED"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "当前 RPC 未找到交易。",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCheckProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:transaction-check:TRANSACTION_NOT_FOUND",
+                  "title": "交易核验未完成",
+                  "status": 404,
+                  "detail": "当前 RPC 未找到交易。",
+                  "instance": "/api/transaction-checks",
+                  "code": "TRANSACTION_NOT_FOUND"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "交易尚未确认。",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCheckProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:transaction-check:TRANSACTION_PENDING",
+                  "title": "交易核验未完成",
+                  "status": 409,
+                  "detail": "交易尚未确认。",
+                  "instance": "/api/transaction-checks",
+                  "code": "TRANSACTION_PENDING"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "使用 application/json。",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCheckProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:transaction-check:JSON_REQUIRED",
+                  "title": "交易核验未完成",
+                  "status": 415,
+                  "detail": "使用 application/json。",
+                  "instance": "/api/transaction-checks",
+                  "code": "JSON_REQUIRED"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "RPC 读取失败，未生成结论。",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionCheckProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:transaction-check:RPC_READ_FAILED",
+                  "title": "交易核验未完成",
+                  "status": 503,
+                  "detail": "RPC 读取失败，未生成结论。",
+                  "instance": "/api/transaction-checks",
+                  "code": "RPC_READ_FAILED"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TransactionCheckRequest": {
+        "type": "object",
+        "properties": {
+          "txHash": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{64}$"
+          }
+        },
+        "required": [
+          "txHash"
+        ],
+        "additionalProperties": false
+      },
+      "TransactionCheckReport": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "const": "LIVE_READ_ONLY"
+          },
+          "network": {
+            "type": "string",
+            "const": "ethereum-mainnet"
+          },
+          "checkedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "observation": {
+            "type": "object",
+            "properties": {
+              "transaction": {
+                "type": "object",
+                "properties": {
+                  "hash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$"
+                  },
+                  "from": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$"
+                  },
+                  "to": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]{40}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "nativeValueEth": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9]\\d{0,77})(\\.\\d{1,18})?$"
+                  },
+                  "input": {
+                    "type": "string",
+                    "pattern": "^0x(?:[0-9a-fA-F]{2})*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "SUCCESS",
+                      "REVERTED"
+                    ]
+                  },
+                  "blockNumber": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "blockHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  "logCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "hash",
+                  "from",
+                  "to",
+                  "nativeValueEth",
+                  "input",
+                  "status",
+                  "blockNumber",
+                  "blockHash",
+                  "timestamp",
+                  "logCount"
+                ],
+                "additionalProperties": false
+              },
+              "supportedSwaps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "logIndex": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "poolAddress": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{40}$"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": [
+                        "SELL_ETH",
+                        "BUY_ETH"
+                      ]
+                    },
+                    "wethAmount": {
+                      "type": "string",
+                      "pattern": "^(0|[1-9]\\d{0,77})(\\.\\d{1,18})?$"
+                    },
+                    "usdcAmount": {
+                      "type": "string",
+                      "pattern": "^(0|[1-9]\\d{0,77})(\\.\\d{1,18})?$"
+                    }
+                  },
+                  "required": [
+                    "logIndex",
+                    "poolAddress",
+                    "direction",
+                    "wethAmount",
+                    "usdcAmount"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "evidence": {
+                "minItems": 2,
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "txHash": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{64}$"
+                        },
+                        "blockHash": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{64}$"
+                        },
+                        "blockNumber": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "contractAddress": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{40}$"
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "source": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "type": {
+                          "type": "string",
+                          "const": "TRANSACTION"
+                        }
+                      },
+                      "required": [
+                        "txHash",
+                        "blockNumber",
+                        "description",
+                        "source",
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "txHash": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{64}$"
+                        },
+                        "blockHash": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{64}$"
+                        },
+                        "blockNumber": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "contractAddress": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{40}$"
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "source": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "type": {
+                          "type": "string",
+                          "const": "BLOCK"
+                        }
+                      },
+                      "required": [
+                        "blockHash",
+                        "blockNumber",
+                        "description",
+                        "source",
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "txHash": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{64}$"
+                        },
+                        "blockHash": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{64}$"
+                        },
+                        "blockNumber": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "contractAddress": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{40}$"
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "source": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "type": {
+                          "type": "string",
+                          "const": "CONTRACT_EVENT"
+                        }
+                      },
+                      "required": [
+                        "txHash",
+                        "blockNumber",
+                        "contractAddress",
+                        "description",
+                        "source",
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              },
+              "scope": {
+                "type": "object",
+                "properties": {
+                  "protocol": {
+                    "type": "string",
+                    "const": "UNISWAP_V3"
+                  },
+                  "poolAddress": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$"
+                  },
+                  "poolLabel": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "asset": {
+                    "type": "string",
+                    "const": "WETH"
+                  },
+                  "quoteAsset": {
+                    "type": "string",
+                    "const": "USDC"
+                  },
+                  "fee": {
+                    "type": "number",
+                    "const": 500
+                  }
+                },
+                "required": [
+                  "protocol",
+                  "poolAddress",
+                  "poolLabel",
+                  "asset",
+                  "quoteAsset",
+                  "fee"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "transaction",
+              "supportedSwaps",
+              "evidence",
+              "scope"
+            ],
+            "additionalProperties": false
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "SUPPORTED_POOL_SELL",
+              "SUPPORTED_POOL_BUY",
+              "SUPPORTED_POOL_MIXED",
+              "NO_SUPPORTED_SWAP",
+              "REVERTED"
+            ]
+          },
+          "headline": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confirmedFacts": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "uncertainties": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "nextSteps": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "mode",
+          "network",
+          "checkedAt",
+          "observation",
+          "classification",
+          "headline",
+          "summary",
+          "confirmedFacts",
+          "uncertainties",
+          "nextSteps"
+        ],
+        "additionalProperties": false
+      },
+      "TransactionCheckProblem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "starts_with",
+            "pattern": "^urn:xjy:transaction-check:.*"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "number",
+                "const": 400
+              },
+              {
+                "type": "number",
+                "const": 403
+              },
+              {
+                "type": "number",
+                "const": 404
+              },
+              {
+                "type": "number",
+                "const": 409
+              },
+              {
+                "type": "number",
+                "const": 415
+              },
+              {
+                "type": "number",
+                "const": 503
+              }
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instance": {
+            "type": "string",
+            "const": "/api/transaction-checks"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_REQUEST",
+              "LOCAL_ONLY",
+              "ORIGIN_REJECTED",
+              "JSON_REQUIRED",
+              "TRANSACTION_NOT_FOUND",
+              "TRANSACTION_PENDING",
+              "CONFIGURATION_ERROR",
+              "UNSUPPORTED_NETWORK",
+              "INVALID_CHAIN_DATA",
+              "REORG_DETECTED",
+              "RPC_READ_FAILED"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance",
+          "code"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}
