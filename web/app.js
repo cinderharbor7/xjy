@@ -1,5 +1,4 @@
 import { identityAssets, esc, pct, time as timestamp } from "./ui.js";
-import "./style.css";
 import {
   sampleMarket,
   coins as registeredCoins,
