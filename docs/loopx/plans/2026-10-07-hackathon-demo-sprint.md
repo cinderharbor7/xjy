@@ -3,13 +3,13 @@ source: docs/loopx/design/2026-10-07-hackathon-freeze/需求设计文档.md
 status: ready
 slices:
   - id: P-001
-    status: pending
+    status: in-review
     depends: []
   - id: P-002
-    status: pending
+    status: in-review
     depends: []
   - id: P-003
-    status: pending
+    status: in-progress
     depends: [P-001, P-002]
   - id: P-004
     status: pending
@@ -27,6 +27,18 @@ slices:
 展示两条既有真实读侧：A→B 的单次量化观察及独立交易核验；Guardian Mock/Fork 为独立应用实验。真实确定性量化已经存在，真实 AI/Agent 调查尚未交付；既有启发式分数不是预测概率，真实信号也尚未贯通持续交易监控。材料不能把三段拼成已完成的自主保护闭环。
 
 本计划只安排现有入口的检查、案例证据、方法说明、AI 对照、材料与排练，不授予源码/API/合同/事件状态修改、模型接入、主网部署、Git 发布或外部消息权限。`ready` 仅表示已批准的原型提交准备可执行，不表示商业或完整 Agent 能力通过。新增能力需用户另行明确授权与验收，随后更新冻结文件。
+
+## 执行状态更新（2026-10-07 21:50 UTC+8，D 记录）
+
+分支 `d/hackathon-demo-materials`（基于 `codex/unified-vanilla-fingerprints`，经用户明确授权建分支与提交）：
+
+- **P-001 → in-review**：D 已写出 [PPT 逐页内容](../../hackathon/presentation.md)、[演示讲稿](../../hackathon/talk-script.md)、[提交说明](../../hackathon/submission.md)。待完成：四人 30 秒口径复述、逐页核对、队长补全队名/成员/赛道/视频链接等 TBD 项。
+- **P-002 → in-review**：A 的 `docs/demo-cases.md` 与 `docs/evidence/` 实测记录（16:49–16:50 主网读取）、C 的 `docs/c-acceptance-review.md`（Mock 复核 16:42–16:57）已顺序整合进本分支。Fork 路径 C 未运行，不计通过；HTTP/浏览器复验未在本轮重跑。
+- **P-003 → in-progress**：B 的 `docs/b-deliverables/`（方法卡、结论-证据表、证据不足反例、AI 对照方案）已整合；演示讲稿主线已按"核验问题→量化→交易证据→未知项与对照"编排。**AI 对照实测（AC-006）仍未执行，不声明优势**；录屏未开始。
+- **P-004 → pending**：提交说明草稿已备好；正式提交、回执确认、视频/链接核查、提交前重跑 `pnpm typecheck/test/build` 均待队长执行。
+
+整合来源：`origin/feat/b-reviewable-explanation`（仅 `docs/b-deliverables/` 文档）、`origin/c/acceptance-review-v2`（`docs/demo-cases.md`、`docs/evidence/`、`docs/c-acceptance-review.md`）。**未带入 B 分支的源码提交**（真实 AI 调查 adapter 未获接入授权，保持未合并）；本轮只新增/整合文档，未改源码、合同、API 或 `.guardian` 状态，故未重跑测试套件，工程基线仍为 2026-10-07 15:54 的 896 passed / 2 skipped。
+
 
 ## P-001 一致的比赛场景与表达
 

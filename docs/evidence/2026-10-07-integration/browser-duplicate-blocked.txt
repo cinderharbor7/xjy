@@ -1,0 +1,181 @@
+[p1 "Autonomous On-chain Risk Guardian · Mock Demo" | space "本地集成 Demo 验收"(1): 1 managed, 0 untracked — p1* "Autonomous On-chain Risk Guardian · Mock Demo"]
+root
+  container
+    container
+      container
+        anchor "Verdant Rescue home" [ref=1, loc=css:a[aria-label="Verdant Rescue home"], url=http://127.0.0.1:3101/#top]
+          svg_root
+          text "VERDANT / RESCUE"
+          text "DEFI POSITION INTELLIGENCE"
+        container "Primary navigation"
+          button [ref=2]
+            text "Overview"
+          button [ref=3]
+            text "Rescue loop"
+          button [ref=4]
+            text "Method"
+          anchor [ref=5, loc=href:/investigate, url=http://127.0.0.1:3101/investigate]
+            text "交易核验 MVP"
+          anchor [ref=6, loc=href:/risk-lab, url=http://127.0.0.1:3101/risk-lab]
+            text "ETH Risk Lab"
+          anchor [ref=7, loc=href:/position, url=http://127.0.0.1:3101/position]
+            text "Aave read-only"
+        text "MOCK"
+        text "· SINGLE-WALLET GUARDIAN"
+      container
+        paragraph
+          text "POSITION SAFETY LAYER · RISK GUARDIAN"
+        heading
+          text "Protect the"
+          text "position,"
+          text "calmly."
+        paragraph
+          text "A measured portfolio protection workflow: inspect the asset mix, make the risk legible, then let a hard policy decide whether capital can move."
+        svg_root
+        text "One action is in scope"
+        text "The only permitted action is a policy-approved ETH → USDC swap. Local Fork trades WETH; risk changes and investigation are explicitly simulated."
+      container "Persistent Guardian controls"
+        paragraph
+          text "SINGLE-WALLET CONTROL PLANE"
+        heading
+          text "Policy & continuous monitoring"
+        paragraph
+          text "MOCK balances, market changes, investigation and execution; no chain transactions."
+        text "Paused"
+        paragraph
+          text "Protected wallet"
+          text "0x1111111111111111111111111111111111111111"
+          text "·"
+          text "MOCK"
+        button [ref=8]
+          text "Start monitoring"
+        button [ref=9]
+          text "Pause"
+        text "Server interval: 10 seconds"
+        paragraph
+          text "One swap per risk event. Recovery requires 3 fresh samples: volatility ≤ 40, 5m change ≥ −0.5%, 1h ≥ −2%. These are demo thresholds."
+        form
+          container
+            text "Risk score above"
+            spinbutton [ref=10]
+              text "80"
+          container
+            text "Confidence above (%)"
+            spinbutton [ref=11]
+              text "85"
+          container
+            text "Exposure above (%)"
+            spinbutton [ref=12]
+              text "70"
+          container
+            text "Maximum reduction (points)"
+            spinbutton [ref=13]
+              text "30"
+          container
+            checkbox [ref=14]
+            text "Sell: ETH (WETH in Fork)"
+          container
+            checkbox [ref=15]
+            text "Receive: user-approved USDC"
+          button [ref=16]
+            text "Save policy"
+          button [ref=17]
+            text "Reload saved policy"
+          text "Loaded version"
+          text "1"
+          text "· saving does not trade"
+        paragraph
+          text "Active event ·"
+          text "3f088114-80b0-4d2d-8a09-fb257c6b5519"
+          text "· recovery"
+          text "0"
+          text "/3"
+        container
+          heading
+            text "Durable event history"
+          container
+            container [ref=21]
+              text "2026-10-07T09:48:15.482Z"
+              text "·"
+              text "CONFIRMED"
+              text "·"
+              text "Event retained"
+              text "· policy v"
+              text "1"
+            container
+              paragraph
+                text "Execution CONFIRMED; verification PASSED."
+              paragraph
+                text "Execution:"
+                text "Confirmed"
+                text "· Verification:"
+                text "PASSED"
+              paragraph
+                text "Frozen policy: risk >"
+                text "80"
+                text ", confidence >"
+                text "85"
+                text "%, exposure >"
+                text "70"
+                text "%, reduce ≤"
+                text "30"
+                text "points."
+      container
+        container
+          paragraph
+            text "START A RESCUE READING"
+          heading
+            text "Observe the protected wallet."
+          paragraph
+            text "The server binds one wallet. Manual observation shares the monitor’s persistent event gate and can execute one approved swap when no active event exists."
+        form
+          text "Server-bound wallet"
+          container
+            textbox [ref=18, loc=css:input[name="wallet"]]
+              text "0x1111111111111111111111111111111111111111"
+            button [ref=19]
+              text "Run rescue loop"
+              svg_root
+          paragraph
+            text "MOCK balances, market changes, investigation and execution; no chain transactions."
+      alert
+        svg_root
+        text "This risk event already owns its execution opportunity; the server continues observations."
+      container
+        svg_root
+        paragraph
+          text "GUARDIAN OBSERVATION"
+        heading
+          text "Read the position before you touch it."
+        paragraph
+          text "The server-bound wallet follows the complete rescue loop: read, stress test, investigate, approve, execute, then read again."
+        button [ref=22]
+          text "Run the first reading"
+          svg_root
+      container
+        container
+          paragraph
+            text "METHOD NOTE"
+          heading
+            text "A compact safety stack for a noisy market."
+          paragraph
+            text "Portfolio Service reads the asset mix. Market Service supplies the ETH price. Risk and investigation make the exposure legible. Policy owns the allowlisted one-way swap, then Portfolio Service reads a..."
+        text "trigger"
+        text "= saved policy thresholds"
+        text "event"
+        text "= one swap until market recovery"
+        text "unknown"
+        text "= query known hash only"
+        text "verify"
+        text "= independent wallet re-read"
+      container
+        text "VERDANT / RESCUE · interface prototype"
+        text "MOCK"
+        text "· ETH settles as WETH in Fork · demo signals"
+    alert
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root

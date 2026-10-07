@@ -1,0 +1,367 @@
+[p1 "保护实验 · VERDANT" | space "D 新版合并验收"(2): 1 managed, 0 untracked — p1* "保护实验 · VERDANT"]
+root
+  container
+    anchor [ref=38, loc=href:/guardian#main, url=http://127.0.0.1:3101/guardian#main]
+      text "跳到主要内容"
+    container
+      anchor "VERDANT 资产观察首页" [ref=39, loc=css:a[aria-label="VERDANT 资产观察首页"], url=http://127.0.0.1:3101/]
+        svg_root
+        container
+          text "VERDANT"
+          text "资产、指纹与证据"
+      container "主导航"
+        anchor [ref=40, url=http://127.0.0.1:3101/]
+          text "资产观察"
+        anchor [ref=41, loc=href:/investigate, url=http://127.0.0.1:3101/investigate]
+          text "交易核验"
+        anchor [ref=42, loc=href:/risk-lab, url=http://127.0.0.1:3101/risk-lab]
+          text "风险研究"
+        anchor [ref=43, loc=href:/position, url=http://127.0.0.1:3101/position]
+          text "Aave 仓位"
+        anchor [ref=44, loc=href:/guardian, url=http://127.0.0.1:3101/guardian]
+          text "保护实验"
+        anchor [ref=45, loc=href:/attestations, url=http://127.0.0.1:3101/attestations]
+          text "报告存证"
+        anchor [ref=46, loc=href:/collection, url=http://127.0.0.1:3101/collection]
+          text "指纹收藏"
+      button [ref=47]
+        text "▱"
+        text "连接钱包"
+    container [ref=48]
+      container
+        container
+          paragraph
+            text "Ethereum 专属"
+          heading
+            text "保护实验"
+          paragraph
+            text "保留单钱包策略门控、事件去重与独立结果核验。行情指纹不构成交易授权。"
+        container
+          anchor [ref=49, url=http://127.0.0.1:3101/coins/ETH]
+            image "ETH 身份指纹，未绑定此处行情"
+            container
+              text "ETH"
+              text "以太坊"
+          text "身份指纹 · 各模块数据来源独立"
+      text "此功能仅支持既有 ETH → USDC 保护实验。真实行情指纹不会驱动后台交易；运行模式由服务端配置。"
+      container
+        text "MOCK"
+        text "监控暂停"
+        text "MOCK balances, market changes, investigation and execution; no chain transactions."
+      container
+        container
+          container
+            heading
+              text "观察与监控"
+            container
+              text "受保护钱包"
+              textbox [ref=50]
+                text "0x1111111111111111111111111111111111111111"
+            container
+              button [ref=51]
+                text "运行一次保护流程"
+              button [ref=52]
+                text "启动监控"
+              button [ref=53]
+                text "暂停监控"
+            paragraph
+              text "单次运行与后台监控均可能按已保存策略执行一次 MOCK 减仓。暂停不撤销已经广播的交易。"
+            paragraph
+              text "恢复阈值为演示规则：连续 3 个新鲜样本，波动代理 ≤40、5m ≥−0.5%、1h ≥−2%。"
+          container
+            heading
+              text "策略配置"
+            form
+              container
+                container
+                  text "风险分数高于"
+                  spinbutton [ref=54, loc=css:input[name="minRiskScore"]]
+                    text "80"
+                container
+                  text "置信度高于 / %"
+                  spinbutton [ref=55, loc=css:input[name="minConfidence"]]
+                    text "85"
+                container
+                  text "风险敞口高于 / %"
+                  spinbutton [ref=56, loc=css:input[name="minRiskExposurePct"]]
+                    text "70"
+                container
+                  text "最大减仓 / 百分点"
+                  spinbutton [ref=57, loc=css:input[name="maxDeRiskPct"]]
+                    text "30"
+              container
+                checkbox [ref=58, loc=css:input[name="allowETH"]]
+                text "卖出 ETH（Fork 中为 WETH）"
+              container
+                checkbox [ref=59, loc=css:input[name="allowUSDC"]]
+                text "接收 USDC"
+              button [ref=60]
+                text "保存策略"
+              button [ref=61]
+                text "重读已保存配置"
+              paragraph
+                text "已加载 v1；保存不执行交易。版本冲突时先重读。"
+        container
+          heading
+            text "持久化事件"
+          paragraph
+            text "暂无事件。查看此页不会发起保护操作。"
+      status
+        text "本次结果已返回；交易状态与效果核验分别列示。"
+      heading
+        text "本次观察与执行"
+      text "Verified after read"
+      container
+        heading
+          text "执行前组合"
+        unordered_list
+          list_item
+            text "组合估值"
+          list_item
+            text "$30,000.00"
+          list_item
+            text "风险敞口"
+          list_item
+            text "100.00%"
+        table
+          table_row
+            table_cell
+              text "币种 / 指纹"
+            table_cell
+              text "数量"
+            table_cell
+              text "价值 / USD"
+            table_cell
+              text "角色"
+          table_row
+            table_cell
+              anchor [ref=64, url=http://127.0.0.1:3101/coins/ETH]
+                image "ETH 身份指纹，未绑定此处行情"
+                text "ETH"
+                text "以太坊"
+            table_cell
+              text "10"
+            table_cell
+              text "$30,000.00"
+            table_cell
+              text "RISK"
+          table_row
+            table_cell
+              anchor [ref=65, url=http://127.0.0.1:3101/coins/USDC]
+                image "USDC 身份指纹，未绑定此处行情"
+                text "USDC"
+                text "美元稳定币"
+            table_cell
+              text "0"
+            table_cell
+              text "$0.00"
+            table_cell
+              text "DEFENSIVE"
+      container
+        heading
+          text "风险与调查"
+        unordered_list
+          list_item
+            text "Risk Score"
+          list_item
+            text "91 / 100"
+          list_item
+            text "Confidence"
+          list_item
+            text "88.00%"
+        paragraph
+          text "Mock investigation: a simulated market shock and increased volatility affect a portfolio with concentrated risk-asset exposure."
+        heading
+          text "主要原因"
+        paragraph
+          text "Mock market decline combined with concentrated risk-asset exposure."
+        heading
+          text "证据"
+        unordered_list
+          list_item
+            text "Mock portfolio risk exposure is 100% with $30,000 in risk assets."
+          list_item
+            text "Mock ETH price is $2700; changes are -3% over 5 minutes and -10% over 1 hour."
+          list_item
+            text "Mock volatility score is 82/100."
+          list_item
+            text "Demo risk score is 91/100."
+        heading
+          text "不确定性"
+        unordered_list
+          list_item
+            text "Mock data only: no blockchain balances or live market data were read."
+          list_item
+            text "No LLM was called; confidence is a fixed demo value."
+          list_item
+            text "Demo stress tests apply one common shock to risk assets and keep defensive values unchanged; defensive-asset risks are not covered."
+          list_item
+            text "Demo swaps omit fees and slippage; a user-approved defensive asset is not guaranteed to retain its value."
+      container
+        heading
+          text "压力情景"
+        paragraph
+          text "基于 Before 风险资产的进一步冲击，不是未来价格预测。"
+        image "100% 50% 0% -5% -10% -15%"
+          text "100%"
+          text "50%"
+          text "0%"
+          text "-5%"
+          text "-10%"
+          text "-15%"
+        paragraph
+          text "Before snapshot: $30,000.00"
+        table
+          table_row
+            table_cell
+              text "ETH shock"
+            table_cell
+              text "Projected value"
+            table_cell
+              text "Projected loss"
+          table_row
+            table_cell
+              text "-5%"
+            table_cell
+              text "$28,500.00"
+            table_cell
+              text "$1,500.00"
+          table_row
+            table_cell
+              text "-10%"
+            table_cell
+              text "$27,000.00"
+            table_cell
+              text "$3,000.00"
+          table_row
+            table_cell
+              text "-15%"
+            table_cell
+              text "$25,500.00"
+            table_cell
+              text "$4,500.00"
+      container
+        heading
+          text "策略门控"
+        text "获批单向减仓"
+        unordered_list
+          list_item
+            text "方向"
+          list_item
+            text "ETH → USDC"
+          list_item
+            text "降低敞口"
+          list_item
+            text "30 个百分点"
+        unordered_list
+          list_item
+            text "Risk score 91 > 80: passed."
+          list_item
+            text "Confidence 0.88 > 0.85: passed."
+          list_item
+            text "Risk exposure 100% > 70%: passed."
+          list_item
+            text "De-risk limit 30 percentage points > 0: passed."
+          list_item
+            text "A held risk asset with positive value is on the user-approved risk allowlist: passed."
+          list_item
+            text "A user-approved defensive target is available with no conflicting portfolio category: passed."
+          list_item
+            text "Approved ETH → user-approved defensive asset USDC, reducing exposure by 30 percentage points, limited by held source value and the configured cap."
+      container
+        heading
+          text "执行记录"
+        text "Success"
+        paragraph
+          text "MOCK / SWAP_TO_SAFE"
+        paragraph
+          text "0x6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b6d6f636b"
+        paragraph
+          text "Mock 执行，没有真实链上交易。"
+      container
+        heading
+          text "执行后独立读取"
+        unordered_list
+          list_item
+            text "执行后估值"
+          list_item
+            text "$27,000.00"
+          list_item
+            text "风险敞口"
+          list_item
+            text "70.00%"
+          list_item
+            text "读取时间"
+          list_item
+            text "2026/10/7 18:38:41"
+        table
+          table_row
+            table_cell
+              text "币种 / 指纹"
+            table_cell
+              text "数量"
+            table_cell
+              text "价值 / USD"
+            table_cell
+              text "角色"
+          table_row
+            table_cell
+              anchor [ref=66, url=http://127.0.0.1:3101/coins/ETH]
+                image "ETH 身份指纹，未绑定此处行情"
+                text "ETH"
+                text "以太坊"
+            table_cell
+              text "7"
+            table_cell
+              text "$18,900.00"
+            table_cell
+              text "RISK"
+          table_row
+            table_cell
+              anchor [ref=67, url=http://127.0.0.1:3101/coins/USDC]
+                image "USDC 身份指纹，未绑定此处行情"
+                text "USDC"
+                text "美元稳定币"
+            table_cell
+              text "8100"
+            table_cell
+              text "$8,100.00"
+            table_cell
+              text "DEFENSIVE"
+      container
+        heading
+          text "结果核验"
+        heading
+          text "独立结果核验 · PASSED"
+        paragraph
+          text "The independent re-read confirms the approved swap and reduced risk exposure."
+        unordered_list
+          list_item
+            text "Passed: The re-read belongs to the same wallet."
+          list_item
+            text "Passed: The re-read evidence has not moved backwards or preceded execution."
+          list_item
+            text "Passed: The swap direction remains RISK → user-approved DEFENSIVE."
+          list_item
+            text "Passed: The source balance reduction matches the execution receipt."
+          list_item
+            text "Passed: The defensive balance increase matches the execution receipt."
+          list_item
+            text "Passed: The executed source amount matches the approved percentage points at the market quote."
+          list_item
+            text "Passed: Asset identities and non-approved balances remain unchanged."
+          list_item
+            text "Passed: Risk exposure decreased from 100% to 70%."
+    container
+      anchor [ref=62, url=http://127.0.0.1:3101/]
+        text "VERDANT / 让每一次判断有据可循。"
+      button [ref=63]
+        text "读懂货币指纹"
+      text "BOT Chain Testnet"
+      text "指纹是数据表达。来源、范围与未知项保留在各模块中；研究与收藏不构成交易授权。"
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root

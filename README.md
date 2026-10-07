@@ -21,6 +21,8 @@
 
 产品口径与验收真源：[比赛冻结方案](docs/loopx/design/2026-10-07-hackathon-freeze/需求设计文档.md)。四人交付与状态真源：[冲刺执行计划](docs/loopx/plans/2026-10-07-hackathon-demo-sprint.md)。北京时间 10 月 8 日 12:00 截止，内部提前提交目标为 10:30。方案已写好不代表队员已执行或作品已提交。
 
+比赛演示材料（D 统一稿，分支 `d/hackathon-demo-materials`）：[PPT 逐页内容](docs/hackathon/presentation.md)、[演示讲稿](docs/hackathon/talk-script.md)、[提交说明](docs/hackathon/submission.md)；A 实测案例见 [demo-cases](docs/demo-cases.md)，B 方法卡见 [b-deliverables](docs/b-deliverables/README.md)，C 复核记录见 [c-acceptance-review](docs/c-acceptance-review.md)。队名/视频链接等 TBD 项与正式提交回执仍待队长完成。
+
 以下保留历史实现与验收记录；出现展示定位冲突时以冻结方案为准，历史测试不能替代现场验收。
 
 ## 2026-10-07 历史 Update · 交易核验 MVP
