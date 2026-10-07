@@ -33,7 +33,6 @@
     "zod": "4.6.5",
     "@openzeppelin/contracts": "5.0.2",
     "ethers": "^6.15.0",
-    "shader-park-core": "^0.2.8",
     "three": "0.155.0"
   },
   "devDependencies": {
@@ -46,6 +45,7 @@
     "tailwindcss": "^4.1.0",
     "vite": "^7.1.0",
     "ganache": "^7.9.2",
-    "jsdom": "^26.1.0"
+    "jsdom": "^26.1.0",
+    "shader-park-core": "^0.2.8"
   }
 }

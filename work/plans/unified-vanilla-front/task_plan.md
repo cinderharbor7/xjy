@@ -34,3 +34,9 @@ Integrate the complete currency-fingerprint project into xjy, replace all served
 - Reproduced source vs production Shader Park: source creates Mesh, minified production throws `ReferenceError: input is not defined` during runtime DSL compilation.
 - Fixed by precompiling DSL to GLSL at build time, loading one Three.js renderer in the browser; added contextual errors and resource cleanup instead of generic device blame.
 - Checks passed: 5 fluid lifecycle/material tests + existing home test; production regression creates all 8 materials with eval disabled and verifies browser compiler absent; typecheck and build. No browser or GPU visual check.
+
+## Follow-up: frontend-only cleanup
+- User authorized only frontend cleanup and push to the same feature branch. This supersedes the earlier instruction to retain the obsolete next-env.d.ts file: its local version was backed up under output/frontend-cleanup-backup and hash-verified before deletion.
+- Removed Next typegen from CI, unused JSX compiler option and write-only detailCache. Reused ui.js escaping/percentage/time helpers, preserving the distinct monetary formats.
+- Shader Park compiler moved to devDependencies with a matching lockfile. No backend API, services, contracts, wallet logic or runtime cache cleanup.
+- Frozen install, typecheck, 22 frontend tests, production build and 8-material production shader regression passed. No visual inspection.

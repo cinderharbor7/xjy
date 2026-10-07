@@ -19,7 +19,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm contract:check
-      - run: pnpm exec next typegen
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build

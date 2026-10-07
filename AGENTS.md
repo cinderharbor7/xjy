@@ -9,5 +9,5 @@
 - 未经当前任务明确授权，不修改 `.env*`、`.guardian/`、私钥、生产监控启停或其他运行进程。验证使用隔离 Mock 数据库；不要用删除状态的方法绕过去重。
 - BOT Chain Testnet 为 968 / 0x3c8，RPC https://rpc.bohr.life，浏览器 https://scan.bohr.life。报告存证与指纹 NFT 是独立合约；部署/发布/铸造均需用户钱包确认。
 - 缺失行情保持缺失；身份指纹使用中性参数。Alternative.me 是市场背景，链 TVL 与协议 TVL、原生 ETH 与 WETH 必须区分。
-- 本轮使用 `codex/unified-vanilla-fingerprints` 分支提交。保留原有 `next-env.d.ts` 未提交修改，不混入本轮提交；该历史文件已不参与新构建。
+- 当前前端整合使用 `codex/unified-vanilla-fingerprints` 分支。用户已授权清理前端遗留，旧 `next-env.d.ts` 的本地修改已备份到忽略的 `output/frontend-cleanup-backup/` 后删除；不要重新生成 Next 类型文件或 JSX 配置。
 - 前端设计技能：`C:/Users/18364/.codex/skills/anthropic-frontend-design/SKILL.md`。用户风格和验收约束优先。

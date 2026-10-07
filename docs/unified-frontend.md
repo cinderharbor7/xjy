@@ -102,7 +102,7 @@ pnpm dev:preview         # 127.0.0.1:3100，使用 output/unified-preview/state.
 
 原独立项目的 21 个源码、配置与文档文件已逐项归档到 Git 忽略的 `work/archive/currency-fingerprint-original/`，并核对 SHA-256。原目录被后台进程占用，因此仅保留运行缓存（node_modules、dist、output、.playwright-cli）和迁移说明，没有继续维护另一份源码；原 5173 预览已停止。归档不作为新的子站运行。实际产品源码、文档、合约和测试均已纳入仓库正常路径。旧 React 页面由 Git 历史保留，不再存在第二套可运行前端。
 
-`next-env.d.ts` 是迁移前已有未提交修改的历史文件，未改写、未纳入本轮提交，也不参与 TypeScript 检查。待原修改拥有者处理后可单独清理。
+`next-env.d.ts` 在迁移初期因已有未提交修改而保留。后续用户授权仅清理前端遗留，其本地版本已备份到忽略的 `output/frontend-cleanup-backup/next-env.d.ts` 并核验 SHA-256，然后从仓库删除。JSX 配置和 CI 中的 `next typegen` 同步移除；旧 `.next` 缓存未删除。
 
 ## 验证与限制
 

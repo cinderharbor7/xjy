@@ -17,9 +17,6 @@ importers:
       ethers:
         specifier: ^6.15.0
         version: 6.17.0(bufferutil@4.0.7)(utf-8-validate@6.0.3)
-      shader-park-core:
-        specifier: ^0.2.8
-        version: 0.2.8(@babel/core@7.29.7)
       three:
         specifier: 0.155.0
         version: 0.155.0
@@ -42,6 +39,9 @@ importers:
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0(bufferutil@4.0.7)(utf-8-validate@6.0.3)
+      shader-park-core:
+        specifier: ^0.2.8
+        version: 0.2.8(@babel/core@7.29.7)
       solc:
         specifier: 0.8.30
         version: 0.8.30

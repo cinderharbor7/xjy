@@ -1,4 +1,4 @@
-import { identityAssets } from "./ui.js";
+import { identityAssets, esc, pct, time as timestamp } from "./ui.js";
 import "./style.css";
 import {
   sampleMarket,
@@ -30,14 +30,6 @@ import {
 } from "./fingerprint/nft.js";
 
 const $ = (s, root = document) => root.querySelector(s);
-const esc = (value) =>
-  String(value ?? "").replace(
-    /[&<>"']/g,
-    (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        c
-      ],
-  );
 const money = (n) =>
   n == null
     ? "—"
@@ -53,9 +45,6 @@ const compact = (n) =>
       : n >= 1e4
         ? `${(n / 1e4).toFixed(1)} 万`
         : Math.round(n).toLocaleString();
-const pct = (n) => (n == null ? "—" : `${n.toFixed(2)}%`);
-const timestamp = (s) =>
-  s ? new Date(s).toLocaleString("zh-CN", { hour12: false }) : "—";
 const statusName = {
   demo: "演示数据",
   live: "公开快照",
@@ -87,7 +76,6 @@ let state = {
 let cleanup = () => {},
   sculptureCleanup = () => {},
   routeVersion = 0,
-  detailCache = null,
   currentEdition = null,
   transactionBusy = false;
 let pageCleanup = () => {};
@@ -280,7 +268,6 @@ function detailPanels(c, data) {
 }
 async function loadDetail(c, version) {
   if (state.market.mode === "demo") {
-    detailCache = null;
     detailPanels(c, null);
     return;
   }
@@ -289,7 +276,6 @@ async function loadDetail(c, version) {
     if (!response.ok) throw new Error("读取详情失败");
     const data = await response.json();
     if (version !== routeVersion) return;
-    detailCache = data;
     detailPanels(c, data);
   } catch (error) {
     if (version !== routeVersion) return;
