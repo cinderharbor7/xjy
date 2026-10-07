@@ -18,7 +18,7 @@ slices:
     status: done
     depends: []
   - id: P-006
-    status: in_progress
+    status: done
     depends: [P-005]
 ---
 
@@ -118,6 +118,8 @@ C 的父提交 `bbfde9c` 校准研究不纳入冻结候选版：它使用与现�
 使用已有隔离 worktree，保留旧 journal；新 HTTP/页面检查使用另一个明确命名的 Mock journal。真实只读查询如实记录 RPC 成功或失败。指纹默认 Demo，行情/新闻源缺失不伪造；BOT 测试网模块、模拟报告与真正 Ethereum 证据分别标明。没有进行钱包连接、签名、部署或铸造就不能记为通过。
 
 合并完成条件是整合 diff 独立审阅无未解决的 Critical/Important 问题，typecheck/test/build 及仓库新增的 HTTP、指纹与构建回归通过，浏览器实际检查首页、Guardian 与只读调查入口；README 启动步骤与新路径一致。创建并附加集成 PR，经检查后合入 main，验证远端 main 包含该集成 commit；不删除队友分支或改写远端历史。
+
+实际完成：2026-10-07 18:52，[PR #5](https://github.com/cinderharbor7/xjy/pull/5) 合并为 `2f2ed63`，GitHub CI 通过；远端 main 已核验包含集成 `9f87b8d`，本地主工作区快进同步。18:53 本地主工作区 typecheck 与 969 passed / 6 skipped 再次通过。证据见[新版验收](../../local-integration-acceptance.md#d-整合与发布前复验)。P-006 完成不代表 P-001–004、真实 Agent、公共 BOT 部署、产品需求或比赛提交完成。
 
 > writes: `D 来源分支的整合 diff`, `必要修复与相应测试`, `README.md`, `docs/unified-frontend.md`, `docs/local-integration-acceptance.md`, `本计划`, `docs/evidence/2026-10-07-integration/`
 > anchors: `用户2026-10-07明确合并请求; AC-003/004/007/008; D-008; TC-007; 公共合同稳定; A/B/C证据保留; 既有computer use验收授权; 不广播未授权交易`

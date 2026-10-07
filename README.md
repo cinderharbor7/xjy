@@ -2,11 +2,13 @@
 
 ## 2026-10-07 · 全站原生前端与币种指纹
 
+已通过 [PR #5](https://github.com/cinderharbor7/xjy/pull/5) 合入 `main`，合并提交 `2f2ed63`（北京时间 18:52）。本地主工作区已快进同步并重新安装依赖；四人后续从最新 `main` 建分支。GitHub CI 全部通过；Vitest **969 passed / 6 skipped**，另有隔离指纹/EVM **5 passed**，typecheck、build、合约、HTTP 与生产 shader 检查通过。跳过项、真实钱包与公共链部署不记为通过。
+
 网站前端现已统一为 **HTML、CSS、原生 JavaScript、Tailwind CSS**，使用瑞士式排版和 xjy 原有的暖纸色、深绿与陶土色。货币指纹已融入币种首页、详情、持仓和调查页面，不再作为单独子站。原 TypeScript 业务服务、数据合同、Guardian 权限与去重规则保留。
 
 入口：`/` 资产观察、`/coins/ETH` 币种详情、`/guardian` 保护实验、`/investigate` 交易核验、`/risk-lab` 风险研究、`/position` Aave 只读、`/attestations` 报告存证、`/collection` 指纹收藏。
 
-运行：`pnpm dev`；生产构建与运行：`pnpm build`、`pnpm start`。默认端口仍为 3000。已有服务运行时，可在构建后使用 `pnpm dev:preview` 打开 **3100 端口的隔离 Mock 预览**，不改动原 `.guardian` 状态。本轮不做视觉检查，页面效果由用户验收。
+运行：`pnpm dev`；生产构建与运行：`pnpm build`、`pnpm start`。默认端口仍为 3000。已有服务运行时，可在构建后使用 `pnpm dev:preview` 打开 **3100 端口的隔离 Mock 预览**，不改动原 `.guardian` 状态。集成阶段已实际操作新版首页、保护实验和真实交易核验；指纹 GPU、移动端排版及真实钱包交互仍待验收。
 
 完整结构、迁移映射和验证方式见 [统一前端说明](docs/unified-frontend.md)。[货币指纹 PRD](docs/currency-fingerprint/PRD.md)记录数据与 NFT 子能力。下方保留历史项目背景和验收记录；涉及旧 Next 前端、原首页地址及旧视觉结构时，以本节和统一前端说明为准。
 

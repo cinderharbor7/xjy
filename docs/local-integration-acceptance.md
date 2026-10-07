@@ -131,4 +131,4 @@ worktree：`/Users/miyakostella/.codex/worktrees/abc-local-integration/xjy`。
 
 证据：[Mock 闭环](evidence/2026-10-07-integration/d-browser-guardian.txt)、[重复拦截](evidence/2026-10-07-integration/d-browser-duplicate.txt)、[真实转账](evidence/2026-10-07-integration/d-browser-transfer.txt)、[新版真实 SELL](evidence/2026-10-07-integration/d-browser-sell.txt)、[SELL 页面截图](evidence/2026-10-07-integration/d-browser-sell.png)。指纹 GPU、移动端排版与实际钱包交互未验收。
 
-截至本节写入时集成候选已验证，发布与合并状态以实际 PR/main 为准。比赛提交、需求验证、真实 Agent 与 BOT 主网资格仍是独立未完成事项。
+发布结果：2026-10-07 18:52，[PR #5](https://github.com/cinderharbor7/xjy/pull/5) 合并为 `2f2ed63efa2baa5e7807fe7e561fcbe6935bf797`；[GitHub CI](https://github.com/cinderharbor7/xjy/actions/runs/37610004051) 全部通过。远端 main 包含集成 commit `9f87b8d`，本地主工作区已快进到该 main 并重新安装锁定依赖；18:53 typecheck 与 969 passed / 6 skipped 复验通过。没有 force push 或删除队友分支。比赛提交、需求验证、真实 Agent 与 BOT 主网资格仍是独立未完成事项。
