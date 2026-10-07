@@ -18,6 +18,7 @@ import { GuardianError, ModeSchema } from "./contracts";
 import { GuardianStore } from "./store";
 import { GuardianMonitor, type MonitorRuntime } from "./monitor";
 import { ForkReadBridge, localForkConfig } from "./fork";
+import type { ForkObservation } from "@/modules/onchain/fork-observation-reader";
 
 const DemoSignalSchema = z.strictObject({ timestamp: z.iso.datetime(), priceChange5mPct: z.number().min(-100), priceChange1hPct: z.number().min(-100), volatilityScore: z.number().min(0).max(100) });
 async function demoMarket(priceUsd: number): Promise<MarketState> {
@@ -40,9 +41,12 @@ export function createGuardian(): GuardianMonitor {
   const runtime: MonitorRuntime = {
     async create(config, state, journal) {
       let frozenPortfolio: PortfolioState | undefined, frozenMarket: MarketState | undefined;
+      let beforeObservation: ForkObservation | undefined;
       if (bridge) await bridge.preflight();
       // Keep simulated balances across observations/events; never reset the wallet each tick.
-      const previous = state.latestSession?.after;
+      // A NONE session has no after; the last independent observation still owns
+      // the simulated balances and must not recreate the funded starting wallet.
+      const previous = state.latestSession?.after ?? state.latestAnalysis?.before;
       const initial = previous ? (() => {
         const eth = previous.assets.find(a => a.symbol === "ETH")!.amount;
         const usdc = previous.assets.find(a => a.symbol === "USDC")!.amount;
@@ -52,12 +56,15 @@ export function createGuardian(): GuardianMonitor {
       })() : undefined;
       const mock = bridge ? undefined : new MockScenarioState(wallet, config, initial);
       const portfolioService = new PortfolioService({ async getPortfolio(w) {
-        const result = bridge ? await bridge.portfolio(w) : mock!.getPortfolio(w);
+        const observation = bridge ? await bridge.observation(w) : undefined;
+        beforeObservation ??= observation;
+        const result = observation ? observation.portfolio : mock!.getPortfolio(w);
         frozenPortfolio ??= structuredClone(result);
         return result; // after always calls the independent read side again
       } });
       const marketService = new MarketService({ async getMarketState() {
-        const price = bridge ? await bridge.price() : mock!.getMarketState().priceUsd;
+        if (bridge && !beforeObservation) throw new Error("Portfolio observation must precede its market quote");
+        const price = bridge ? beforeObservation!.priceUsd : mock!.getMarketState().priceUsd;
         const result = await demoMarket(price); frozenMarket = structuredClone(result); return result;
       } });
       const adapter = bridge && fork ? new ForkExecutionAdapter(config, fork, {
@@ -67,7 +74,8 @@ export function createGuardian(): GuardianMonitor {
       return new RescueOrchestrator({ portfolioService, marketService, riskService: new RiskService(),
         investigationService: new InvestigationService(new MockInvestigationAdapter()), policyService: new PolicyService(config),
         executionService: new ExecutionService({ async execute(decision) {
-          const result = await adapter.execute(decision);
+          const receipt = await adapter.execute(decision);
+          const result = bridge ? await bridge.confirmedExecution(receipt) : receipt;
           // C's error strings can contain RPC diagnostics. Persist/display only bounded phase codes.
           if (result.error) {
             const code = result.error.split(":")[0];

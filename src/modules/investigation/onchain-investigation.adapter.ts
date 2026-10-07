@@ -11,9 +11,17 @@ const MAX_CONFIDENCE = 0.9;
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
-/** How well the supplied references and sample support the finding (not a crash probability). */
+/**
+ * Heuristic reference coverage, not truth verification or a crash probability.
+ * Repeated descriptions/sources of the same type/hash/contract add no coverage.
+ */
 export function sellPressureConfidence(signal: OnchainSignalState): number {
-  const coverage = clamp01(signal.evidence.length / EVIDENCE_TARGET);
+  const references = new Set(signal.evidence.map((evidence) => [
+    evidence.type,
+    evidence.type === "BLOCK" ? evidence.blockHash.toLowerCase() : evidence.txHash.toLowerCase(),
+    evidence.contractAddress?.toLowerCase() ?? "",
+  ].join(":")));
+  const coverage = clamp01(references.size / EVIDENCE_TARGET);
   const sample = clamp01(signal.txCount / SAMPLE_TARGET);
   return Number((MAX_CONFIDENCE * (0.6 * coverage + 0.4 * sample)).toFixed(2));
 }
@@ -48,7 +56,11 @@ export class OnchainSellPressureInvestigationAdapter implements InvestigationAda
     const signal = this.signal;
     return InvestigationResultSchema.parse({
       summary: `ETH DEX gross sell volume is ${signal.anomalyRatio.toFixed(2)}× the equal-length previous window over ${signal.windowStart}–${signal.windowEnd}.`,
-      primaryCause: "Elevated ETH gross sell volume on the observed DEX window.",
+      primaryCause: signal.anomalyRatio > 1
+        ? "Elevated ETH gross sell volume on the observed DEX window."
+        : signal.anomalyRatio === 1
+          ? "ETH gross sell volume is unchanged from the preceding equal-length DEX window."
+          : "ETH gross sell volume is lower than the preceding equal-length DEX window.",
       evidence: [
         `Aggregate: $${signal.currentSellVolumeUsd} gross sells vs $${signal.baselineSellVolumeUsd} baseline (${signal.anomalyRatio.toFixed(2)}×) over ${signal.txCount} sell transactions and ${signal.uniqueWallets} unique wallets — source: A OnchainSignalState.`,
         ...signal.evidence.map(describe),

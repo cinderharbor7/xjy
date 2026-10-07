@@ -78,6 +78,34 @@ describe("persistent single-event Guardian", () => {
     await expect(second.tick(true)).rejects.toMatchObject({ code: "BUSY" }); unblock(); await one;
     expect(f.execute).toHaveBeenCalledTimes(1);
   });
+  it("does not let a late execution overwrite a newer confirmed and closed event", async () => {
+    const f = await fixture(); f.monitor.command(DEMO_WALLET, "start");
+    let finish!: (session: typeof f.session) => void;
+    f.execute.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+    const oldTick = f.monitor.tick(false);
+    await vi.waitFor(() => expect(f.execute).toHaveBeenCalledOnce());
+    const eventId = f.monitor.status().activeEvent!;
+    f.store.change((_state, save) => {
+      const event = f.store.event(eventId);
+      event.submissions.push({ kind: "SWAP", hash: f.session.execution.txHash!, timestamp: f.session.execution.timestamp });
+      event.status = "SUBMITTED_UNKNOWN"; save(event);
+    });
+    for (let i = 0; i < 13; i++) f.advance(); // Expire the old observation lease.
+    f.resolve.mockResolvedValue(f.session); f.calm();
+    for (let i = 0; i < 3; i++) { await f.monitor.tick(false); f.advance(); }
+    expect(f.store.event(eventId).status).toBe("CONFIRMED");
+    expect(f.store.event(eventId).closedAt).toBeDefined();
+    expect(f.monitor.status().activeEvent).toBeUndefined();
+    const timeout = structuredClone(f.session);
+    timeout.execution = { success: false, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC",
+      timestamp: f.session.execution.timestamp, error: "SUBMITTED_UNKNOWN: late timeout" };
+    delete timeout.after; timeout.verification = { status: "SKIPPED", reasons: ["Unknown receipt"] };
+    finish(timeout); await oldTick;
+    expect(f.store.event(eventId).status).toBe("CONFIRMED");
+    expect(f.monitor.status().latestSession?.verification.status).toBe("PASSED");
+    expect(f.monitor.status().activeEvent).toBeUndefined();
+    expect(f.execute).toHaveBeenCalledOnce();
+  });
   it("interrupted reservation without a swap hash halts and cannot be restarted by API", async () => {
     const f = await fixture(); await f.monitor.tick(true);
     f.store.change((_s, save) => { const e = f.store.event(f.store.read().activeEvent!); e.status = "RESERVED"; delete e.session; save(e); });

@@ -100,6 +100,38 @@ describe("OnchainAnalysisService (A signal -> frozen RiskAnalysis)", () => {
     const result = await new OnchainAnalysisService().analyze(portfolio, market, neutral);
     expect(result.riskScore).toBe(91);
     expect(result.recommendedAction).toBe("SWAP_TO_SAFE");
+    expect(result.investigation.primaryCause).toContain("unchanged");
+    expect(result.investigation.primaryCause).not.toContain("Elevated");
+  });
+
+  it("describes lower sell pressure without claiming an elevated cause", async () => {
+    const lower = { ...signal, currentSellVolumeUsd: 50000, anomalyRatio: 0.5 };
+    const result = await new OnchainAnalysisService().analyze(portfolio, market, lower);
+    expect(result.riskScore).toBe(91);
+    expect(result.investigation.primaryCause).toContain("lower");
+    expect(result.investigation.primaryCause).not.toContain("Elevated");
+  });
+
+  it("does not increase confidence for duplicate references with changed descriptions or source labels", () => {
+    const first = signal.evidence[0];
+    const one = { ...signal, evidence: [first] };
+    const duplicates = { ...signal, evidence: [first, { ...first, description: "Another label", source: "Another source" }, first] };
+    expect(sellPressureConfidence(one)).toBe(0.54);
+    expect(sellPressureConfidence(duplicates)).toBe(sellPressureConfidence(one));
+  });
+
+  it("deduplicates equivalent hexadecimal reference casing", () => {
+    const event = signal.evidence[2];
+    if (event.type !== "CONTRACT_EVENT") throw new Error("Expected event fixture");
+    const cased = { ...event, txHash: `0x${event.txHash.slice(2).toUpperCase()}`, contractAddress: `0x${event.contractAddress.slice(2).toUpperCase()}` };
+    expect(sellPressureConfidence({ ...signal, evidence: [event, cased] })).toBe(0.54);
+  });
+
+  it("keeps no-reference confidence below the Demo policy threshold", async () => {
+    const result = await new OnchainAnalysisService().analyze(portfolio, market, { ...signal, evidence: [] });
+    expect(result.confidence).toBe(0.36);
+    expect(result.confidence).toBe(result.investigation.confidence);
+    expect(result.confidence).toBeLessThan(0.85);
   });
 
   it("keeps a moderate portfolio below the policy threshold for a 2x signal", async () => {

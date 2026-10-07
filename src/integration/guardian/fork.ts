@@ -1,15 +1,14 @@
-import { createPublicClient, createWalletClient, decodeEventLog, encodeFunctionData, formatUnits, getAddress, http, keccak256, parseAbi, type Address, type WalletClient } from "viem";
+import { createPublicClient, createWalletClient, decodeEventLog, encodeFunctionData, formatUnits, getAddress, http, keccak256, parseAbi, type TransactionReceipt, type WalletClient } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { ExecutionResultSchema, PortfolioStateSchema, RescueSessionSchema } from "@/domain/schemas";
-import type { PortfolioState, RescueSession } from "@/domain/types";
+import { ExecutionResultSchema, RescueSessionSchema } from "@/domain/schemas";
+import type { ExecutionResult, PortfolioState, RescueSession } from "@/domain/types";
 import { verifyRescueOutcome } from "@/domain/verification";
 import { createAnvilForkConfig, type ForkChainConfig } from "@/modules/execution/fork-execution.adapter";
+import { ForkObservationReader } from "@/modules/onchain/fork-observation-reader";
 import { GuardianError, type GuardianEvent } from "./contracts";
 import { GuardianStore } from "./store";
 
 const ERC20 = parseAbi(["function balanceOf(address) view returns (uint256)", "event Transfer(address indexed from,address indexed to,uint256 value)"]);
-const FACTORY = parseAbi(["function getPair(address,address) view returns (address)"]);
-const PAIR = parseAbi(["function getReserves() view returns (uint112,uint112,uint32)", "function token0() view returns (address)"]);
 
 export function localForkConfig(): ForkChainConfig {
   const url = new URL(process.env.FORK_RPC_URL ?? "http://127.0.0.1:8545");
@@ -22,11 +21,14 @@ export function localForkConfig(): ForkChainConfig {
   return createAnvilForkConfig(url.toString(), key as `0x${string}`, account.address);
 }
 
-/** D integration bridge pending A's production read adapter; no A module internals changed. */
+/** D owns Fork identity and signing journal; A owns canonical balance/quote observations. */
 export class ForkReadBridge {
   readonly client;
+  private readonly reader: ForkObservationReader;
   constructor(readonly config: ForkChainConfig, private readonly store: GuardianStore) {
-    this.client = createPublicClient({ chain: config.chain, transport: http(config.rpcUrl, { retryCount: 0, timeout: 10_000 }) });
+    this.client = createPublicClient({ chain: config.chain, cacheTime: 0, transport: http(config.rpcUrl, { retryCount: 0, timeout: 10_000 }) });
+    this.reader = new ForkObservationReader(this.client, { chainId: config.chain.id, wallet: config.recipient,
+      factory: config.factory, weth: config.tokens.ETH, usdc: config.tokens.USDC });
   }
   async preflight() {
     const [chainId, metadata] = await Promise.all([
@@ -42,36 +44,26 @@ export class ForkReadBridge {
       state.networkIdentity = identity;
     });
   }
-  async portfolio(wallet: string): Promise<PortfolioState> {
-    if (getAddress(wallet.toLowerCase()) !== this.config.recipient) throw new Error("Wallet mismatch");
-    const { ETH, USDC } = this.config.tokens;
-    const blockNumber = await this.client.getBlockNumber({ cacheTime: 0 });
-    const pair = await this.client.readContract({ address: this.config.factory, abi: FACTORY, functionName: "getPair", args: [ETH.address, USDC.address], blockNumber });
-    const [reserves, token0, eth, usdc] = await Promise.all([
-      this.client.readContract({ address: pair, abi: PAIR, functionName: "getReserves", blockNumber }),
-      this.client.readContract({ address: pair, abi: PAIR, functionName: "token0", blockNumber }),
-      this.client.readContract({ address: ETH.address, abi: ERC20, functionName: "balanceOf", args: [this.config.recipient], blockNumber }),
-      this.client.readContract({ address: USDC.address, abi: ERC20, functionName: "balanceOf", args: [this.config.recipient], blockNumber }),
-    ]);
-    const ethFirst = token0.toLowerCase() === ETH.address.toLowerCase();
-    const ethReserve = Number(formatUnits(reserves[ethFirst ? 0 : 1], ETH.decimals));
-    const usdcReserve = Number(formatUnits(reserves[ethFirst ? 1 : 0], USDC.decimals));
-    const price = usdcReserve / ethReserve;
-    if (!Number.isFinite(price) || price <= 0) throw new Error("Invalid pool quote");
-    const amount = Number(formatUnits(eth, ETH.decimals)), safeAmount = Number(formatUnits(usdc, USDC.decimals));
-    const riskAssetUsd = amount * price, totalUsd = riskAssetUsd + safeAmount;
-    return PortfolioStateSchema.parse({ wallet: this.config.recipient, totalUsd, riskAssetUsd, defensiveAssetUsd: safeAmount,
-      riskExposurePct: totalUsd ? riskAssetUsd / totalUsd * 100 : 0, blockNumber: Number(blockNumber), timestamp: new Date().toISOString(),
-      assets: [{ symbol: "ETH", tokenAddress: ETH.address, amount, usdValue: riskAssetUsd, category: "RISK" }, { symbol: "USDC", tokenAddress: USDC.address, amount: safeAmount, usdValue: safeAmount, category: "DEFENSIVE" }],
-    });
+  async observation(wallet: string) {
+    await this.preflight();
+    return this.reader.read(wallet);
   }
-  async price(): Promise<number> {
-    // A zero WETH balance must not make market price unavailable.
-    const { ETH, USDC } = this.config.tokens;
-    const pair = await this.client.readContract({ address: this.config.factory, abi: FACTORY, functionName: "getPair", args: [ETH.address, USDC.address] });
-    const [r, first] = await Promise.all([this.client.readContract({ address: pair, abi: PAIR, functionName: "getReserves" }), this.client.readContract({ address: pair, abi: PAIR, functionName: "token0" })]);
-    const ethFirst = first.toLowerCase() === ETH.address.toLowerCase();
-    return Number(formatUnits(r[ethFirst ? 1 : 0], USDC.decimals)) / Number(formatUnits(r[ethFirst ? 0 : 1], ETH.decimals));
+  async portfolio(wallet: string): Promise<PortfolioState> {
+    return (await this.observation(wallet)).portfolio;
+  }
+  /** A mined Fork execution is timed by its canonical receipt block, not the signing clock. */
+  private async receiptTimestamp(receipt: TransactionReceipt, hash: string): Promise<string> {
+    if (receipt.status !== "success" || receipt.transactionHash.toLowerCase() !== hash.toLowerCase()) throw new Error("Receipt does not confirm this swap");
+    const block = await this.client.getBlock({ blockNumber: receipt.blockNumber });
+    if (block.number !== receipt.blockNumber || block.hash?.toLowerCase() !== receipt.blockHash.toLowerCase()
+      || block.timestamp < 0n || block.timestamp > 253_402_300_799n) throw new Error("Receipt block is not canonical or has invalid time");
+    return new Date(Number(block.timestamp) * 1000).toISOString();
+  }
+  async confirmedExecution(execution: ExecutionResult): Promise<ExecutionResult> {
+    if (!execution.success) return execution;
+    if (!execution.txHash) throw new Error("Confirmed swap requires a transaction hash");
+    const receipt = await this.client.getTransactionReceipt({ hash: execution.txHash as `0x${string}` });
+    return ExecutionResultSchema.parse({ ...execution, timestamp: await this.receiptTimestamp(receipt, execution.txHash) });
   }
   journaledWallet(journal: (kind: "APPROVE" | "SWAP", hash: string) => void): WalletClient {
     const account = privateKeyToAccount(this.config.guardianPrivateKey);
@@ -115,8 +107,9 @@ export class ForkReadBridge {
     }
     if (source <= 0n || target <= 0n) return "UNVERIFIABLE";
     const execution = ExecutionResultSchema.parse({ success: true, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC",
-      sourceAmount: Number(formatUnits(source, this.config.tokens.ETH.decimals)), targetAmount: Number(formatUnits(target, this.config.tokens.USDC.decimals)), txHash: submitted.hash, timestamp: submitted.timestamp });
+      sourceAmount: Number(formatUnits(source, this.config.tokens.ETH.decimals)), targetAmount: Number(formatUnits(target, this.config.tokens.USDC.decimals)), txHash: submitted.hash, timestamp: await this.receiptTimestamp(receipt, submitted.hash) });
     const after = await this.portfolio(this.config.recipient);
+    if (after.blockNumber === undefined || after.blockNumber < Number(receipt.blockNumber)) throw new Error("The after observation predates the receipt block");
     return RescueSessionSchema.parse({ ...event.analysis, execution, after, verification: verifyRescueOutcome(event.analysis.before, after, event.analysis.policyDecision, execution, event.analysis.market) });
   }
 }

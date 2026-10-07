@@ -161,6 +161,7 @@ export class ForkExecutionAdapter implements ExecutionAdapter {
   private readonly publicClient: PublicClient;
   private readonly walletClient: WalletClient;
   private readonly guardian: Address;
+  private readonly signingAccount: ReturnType<typeof privateKeyToAccount>;
   private readonly submissionLog: ForkSubmission[] = [];
 
   constructor(
@@ -174,6 +175,7 @@ export class ForkExecutionAdapter implements ExecutionAdapter {
     this.config = validatePolicyConfig(trustedConfig, { executableAssets: Object.keys(chainConfig.tokens) });
 
     const account = privateKeyToAccount(chainConfig.guardianPrivateKey);
+    this.signingAccount = account;
     this.guardian = account.address;
     if (!sameAddress(account.address, chainConfig.recipient)) {
       throw new ForkExecutionFailure(
@@ -258,7 +260,7 @@ export class ForkExecutionAdapter implements ExecutionAdapter {
       if (allowance < rawAmount) {
         const approveHash = await this.walletClient.writeContract({
           address: sourceToken.address, abi: ERC20_ABI, functionName: "approve",
-          args: [this.chainConfig.router, rawAmount], account: this.guardian, chain: this.chainConfig.chain,
+          args: [this.chainConfig.router, rawAmount], account: this.signingAccount, chain: this.chainConfig.chain,
         });
         const approveReceipt = await this.publicClient.waitForTransactionReceipt({ hash: approveHash });
         if (approveReceipt.status !== "success") {
@@ -282,7 +284,7 @@ export class ForkExecutionAdapter implements ExecutionAdapter {
       submittedHash = await this.walletClient.writeContract({
         address: this.chainConfig.router, abi: ROUTER_ABI, functionName: "swapExactTokensForTokens",
         args: [rawAmount, minOut, [sourceToken.address, targetToken.address], this.chainConfig.recipient, deadline],
-        account: this.guardian, chain: this.chainConfig.chain,
+        account: this.signingAccount, chain: this.chainConfig.chain,
       });
       const entry = this.recordSubmission(submittedHash, approved, timestamp);
 
