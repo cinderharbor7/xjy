@@ -25,11 +25,11 @@ it("integrates workbench links and per-coin fingerprints with working search and
     "/guardian",
     "/investigate",
     "/risk-lab",
-    "/position",
     "/attestations",
     "/collection",
   ])
     expect(document.querySelector(`header a[href="${route}"]`)).not.toBeNull();
+  expect(document.querySelector('a[href="/position"]')).toBeNull();
   const search = document.querySelector<HTMLInputElement>("#search")!;
   search.value = "SOL";
   search.dispatchEvent(new Event("input", { bubbles: true }));
@@ -49,5 +49,9 @@ it("integrates workbench links and per-coin fingerprints with working search and
   document.querySelector<HTMLButtonElement>('[data-action="reset"]')!.click();
   expect(document.querySelectorAll(".coin-card")).toHaveLength(8);
   expect(fetch).not.toHaveBeenCalled();
+  history.pushState(null, "", "/coins/ETH");
+  window.dispatchEvent(new PopStateEvent("popstate"));
+  expect(document.querySelector('.coin-workbench a[href="/position"]')).toBeNull();
+  expect(document.querySelector('.coin-workbench a[href="/investigate"]')).not.toBeNull();
   vi.unstubAllGlobals();
 });

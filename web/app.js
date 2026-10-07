@@ -741,7 +741,7 @@ function homeTools() {
 }
 function coinTools(c) {
   return c.id === "ETH"
-    ? '<section class="coin-workbench"><div><h2>围绕 ETH 继续研究</h2><p>市场指纹、主网只读核验、研究样本和保护实验分别保留其数据口径。</p></div><nav aria-label="ETH 工作台"><a href="/investigate">核验交易</a><a href="/risk-lab">风险研究</a><a href="/position">Aave 仓位</a><a href="/guardian">保护实验</a><a href="/attestations">报告存证</a></nav></section>'
+    ? '<section class="coin-workbench"><div><h2>围绕 ETH 继续研究</h2><p>市场指纹、主网只读核验、研究样本和保护实验分别保留其数据口径。</p></div><nav aria-label="ETH 工作台"><a href="/investigate">核验交易</a><a href="/risk-lab">风险研究</a><a href="/guardian">保护实验</a><a href="/attestations">报告存证</a></nav></section>'
     : '<div class="notice">该币种提供数据指纹与收藏；交易核验、风险研究和保护实验目前为 ETH 专属，尚未扩展到 ' +
         esc(c.id) +
         "。</div>";
