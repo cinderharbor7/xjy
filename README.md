@@ -1,5 +1,15 @@
 # Ethereum 异动调查原型 · Risk Guardian
 
+## 2026-10-07 · 全站原生前端与币种指纹
+
+网站前端现已统一为 **HTML、CSS、原生 JavaScript、Tailwind CSS**，使用瑞士式排版和 xjy 原有的暖纸色、深绿与陶土色。货币指纹已融入币种首页、详情、持仓和调查页面，不再作为单独子站。原 TypeScript 业务服务、数据合同、Guardian 权限与去重规则保留。
+
+入口：`/` 资产观察、`/coins/ETH` 币种详情、`/guardian` 保护实验、`/investigate` 交易核验、`/risk-lab` 风险研究、`/position` Aave 只读、`/attestations` 报告存证、`/collection` 指纹收藏。
+
+运行：`pnpm dev`；生产构建与运行：`pnpm build`、`pnpm start`。默认端口仍为 3000。已有服务运行时，可在构建后使用 `pnpm dev:preview` 打开 **3100 端口的隔离 Mock 预览**，不改动原 `.guardian` 状态。本轮不做视觉检查，页面效果由用户验收。
+
+完整结构、迁移映射和验证方式见 [统一前端说明](docs/unified-frontend.md)。[货币指纹 PRD](docs/currency-fingerprint/PRD.md)记录数据与 NFT 子能力。下方保留历史项目背景和验收记录；涉及旧 Next 前端、原首页地址及旧视觉结构时，以本节和统一前端说明为准。
+
 ## 2026-10-07 · 比赛方案冻结
 
 本次作品固定为：**可复查的 Ethereum 异动调查原型，附受限保护执行实验。** 候选任务是由承担 ETH 线索核验的投研/运营人员，交付有出处的事实、解释与未知项；使用者、采用与付费仍是假设。

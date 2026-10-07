@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { TransactionCheckProblemSchema, TransactionCheckReportSchema, TransactionCheckRequestSchema, type TransactionCheckProblem } from "@/domain/schemas/transaction-check";
 import { checkTransaction } from "@/integration/transaction-check";
 import { assertLocalRequest } from "@/integration/guardian/http";
@@ -24,7 +23,7 @@ const problems: Record<TransactionCheckProblem["code"], { status: TransactionChe
 
 function problem(code: TransactionCheckProblem["code"]) {
   const safe = problems[code];
-  return NextResponse.json(TransactionCheckProblemSchema.parse({
+  return Response.json(TransactionCheckProblemSchema.parse({
     type: `urn:xjy:transaction-check:${code}`, title: "交易核验未完成", code,
     status: safe.status, detail: safe.detail, instance: "/api/transaction-checks",
   }), { status: safe.status, headers: { "Cache-Control": "no-store", "Content-Type": "application/problem+json" } });
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
     if (!parsed.success) return problem("INVALID_REQUEST");
     const report = TransactionCheckReportSchema.safeParse(await checkTransaction(parsed.data.txHash));
     if (!report.success) return problem("INVALID_CHAIN_DATA");
-    return NextResponse.json(report.data, { headers: { "Cache-Control": "no-store", "X-Transaction-Check-Mode": "LIVE_READ_ONLY" } });
+    return Response.json(report.data, { headers: { "Cache-Control": "no-store", "X-Transaction-Check-Mode": "LIVE_READ_ONLY" } });
   } catch (error) {
     if (error instanceof TransactionCheckError) return problem(error.code);
     if (isGuardianError(error) && ["LOCAL_ONLY", "ORIGIN_REJECTED", "JSON_REQUIRED"].includes(error.code)) {
