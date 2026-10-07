@@ -1,0 +1,1446 @@
+{
+ "generatedFrom": {
+  "primaryDataset": "Coinbase Exchange public candles API",
+  "instrument": "ETH-USD",
+  "coverage": {
+   "from": "2016-05-18",
+   "to": "2026-10-07",
+   "bars": 3793
+  },
+  "fetchedAt": "2026-10-07T06:51:32Z",
+  "crossVenueReturnCorrelation": 0.3242,
+  "crossVenueMaxReturnGapPoints": 39.68
+ },
+ "spec": {
+  "labelHorizon": 10,
+  "labelThreshold": -0.15,
+  "minHistory": 250,
+  "ridge": 1,
+  "volShort": 7,
+  "volLong": 30,
+  "highWindow": 90,
+  "trendWindow": 200,
+  "volumeWindow": 90,
+  "tradeCostPct": 0.3,
+  "recoveryDays": 3,
+  "recoveryMargin": 10
+ },
+ "events": 99,
+ "crashEvents": [
+  {
+   "triggerDate": "2016-05-18",
+   "troughDate": "2016-05-27",
+   "dropPct": -16.69
+  },
+  {
+   "triggerDate": "2016-06-08",
+   "troughDate": "2016-06-18",
+   "dropPct": -20.49
+  },
+  {
+   "triggerDate": "2016-06-24",
+   "troughDate": "2016-07-04",
+   "dropPct": -21.1
+  },
+  {
+   "triggerDate": "2016-07-22",
+   "troughDate": "2016-08-01",
+   "dropPct": -26.16
+  },
+  {
+   "triggerDate": "2016-11-19",
+   "troughDate": "2016-11-29",
+   "dropPct": -15.91
+  },
+  {
+   "triggerDate": "2016-11-30",
+   "troughDate": "2016-12-05",
+   "dropPct": -21.6
+  },
+  {
+   "triggerDate": "2016-12-13",
+   "troughDate": "2016-12-23",
+   "dropPct": -15.22
+  },
+  {
+   "triggerDate": "2017-03-03",
+   "troughDate": "2017-03-08",
+   "dropPct": -15.24
+  },
+  {
+   "triggerDate": "2017-03-16",
+   "troughDate": "2017-03-18",
+   "dropPct": -26.81
+  },
+  {
+   "triggerDate": "2017-03-24",
+   "troughDate": "2017-04-03",
+   "dropPct": -16.4
+  },
+  {
+   "triggerDate": "2017-05-24",
+   "troughDate": "2017-05-27",
+   "dropPct": -18.44
+  },
+  {
+   "triggerDate": "2017-06-12",
+   "troughDate": "2017-06-22",
+   "dropPct": -19.47
+  },
+  {
+   "triggerDate": "2017-06-23",
+   "troughDate": "2017-06-26",
+   "dropPct": -22.63
+  },
+  {
+   "triggerDate": "2017-06-27",
+   "troughDate": "2017-07-07",
+   "dropPct": -16
+  },
+  {
+   "triggerDate": "2017-07-08",
+   "troughDate": "2017-07-16",
+   "dropPct": -36.88
+  },
+  {
+   "triggerDate": "2017-07-18",
+   "troughDate": "2017-07-28",
+   "dropPct": -15.99
+  },
+  {
+   "triggerDate": "2017-08-29",
+   "troughDate": "2017-09-08",
+   "dropPct": -17.32
+  },
+  {
+   "triggerDate": "2017-09-09",
+   "troughDate": "2017-09-14",
+   "dropPct": -26.6
+  },
+  {
+   "triggerDate": "2017-10-14",
+   "troughDate": "2017-10-23",
+   "dropPct": -15.53
+  },
+  {
+   "triggerDate": "2017-12-19",
+   "troughDate": "2017-12-22",
+   "dropPct": -17.49
+  },
+  {
+   "triggerDate": "2018-01-09",
+   "troughDate": "2018-01-18",
+   "dropPct": -20.48
+  },
+  {
+   "triggerDate": "2018-01-25",
+   "troughDate": "2018-02-04",
+   "dropPct": -20.58
+  },
+  {
+   "triggerDate": "2018-02-17",
+   "troughDate": "2018-02-22",
+   "dropPct": -17.33
+  },
+  {
+   "triggerDate": "2018-02-26",
+   "troughDate": "2018-03-08",
+   "dropPct": -19.41
+  },
+  {
+   "triggerDate": "2018-03-09",
+   "troughDate": "2018-03-18",
+   "dropPct": -26.15
+  },
+  {
+   "triggerDate": "2018-03-19",
+   "troughDate": "2018-03-29",
+   "dropPct": -31.01
+  },
+  {
+   "triggerDate": "2018-05-05",
+   "troughDate": "2018-05-11",
+   "dropPct": -16.5
+  },
+  {
+   "triggerDate": "2018-05-13",
+   "troughDate": "2018-05-23",
+   "dropPct": -20.85
+  },
+  {
+   "triggerDate": "2018-05-24",
+   "troughDate": "2018-05-28",
+   "dropPct": -15.15
+  },
+  {
+   "triggerDate": "2018-06-02",
+   "troughDate": "2018-06-12",
+   "dropPct": -16.31
+  },
+  {
+   "triggerDate": "2018-06-18",
+   "troughDate": "2018-06-28",
+   "dropPct": -18.84
+  },
+  {
+   "triggerDate": "2018-07-28",
+   "troughDate": "2018-08-07",
+   "dropPct": -19.23
+  },
+  {
+   "triggerDate": "2018-08-08",
+   "troughDate": "2018-08-14",
+   "dropPct": -21.45
+  },
+  {
+   "triggerDate": "2018-08-26",
+   "troughDate": "2018-09-05",
+   "dropPct": -17.02
+  },
+  {
+   "triggerDate": "2018-09-06",
+   "troughDate": "2018-09-12",
+   "dropPct": -20.19
+  },
+  {
+   "triggerDate": "2018-10-01",
+   "troughDate": "2018-10-11",
+   "dropPct": -18.26
+  },
+  {
+   "triggerDate": "2018-11-04",
+   "troughDate": "2018-11-14",
+   "dropPct": -15.36
+  },
+  {
+   "triggerDate": "2018-11-15",
+   "troughDate": "2018-11-24",
+   "dropPct": -38.42
+  },
+  {
+   "triggerDate": "2018-11-26",
+   "troughDate": "2018-12-06",
+   "dropPct": -16.7
+  },
+  {
+   "triggerDate": "2018-12-24",
+   "troughDate": "2018-12-27",
+   "dropPct": -17.59
+  },
+  {
+   "triggerDate": "2019-01-02",
+   "troughDate": "2019-01-12",
+   "dropPct": -18.83
+  },
+  {
+   "triggerDate": "2019-01-19",
+   "troughDate": "2019-01-29",
+   "dropPct": -15.55
+  },
+  {
+   "triggerDate": "2019-02-23",
+   "troughDate": "2019-03-04",
+   "dropPct": -20.51
+  },
+  {
+   "triggerDate": "2019-06-26",
+   "troughDate": "2019-07-04",
+   "dropPct": -15.55
+  },
+  {
+   "triggerDate": "2019-07-05",
+   "troughDate": "2019-07-14",
+   "dropPct": -21.61
+  },
+  {
+   "triggerDate": "2019-08-04",
+   "troughDate": "2019-08-14",
+   "dropPct": -16.39
+  },
+  {
+   "triggerDate": "2019-08-19",
+   "troughDate": "2019-08-29",
+   "dropPct": -16.56
+  },
+  {
+   "triggerDate": "2019-09-16",
+   "troughDate": "2019-09-26",
+   "dropPct": -16.06
+  },
+  {
+   "triggerDate": "2019-11-12",
+   "troughDate": "2019-11-22",
+   "dropPct": -19.79
+  },
+  {
+   "triggerDate": "2019-12-07",
+   "troughDate": "2019-12-17",
+   "dropPct": -17.36
+  },
+  {
+   "triggerDate": "2020-02-17",
+   "troughDate": "2020-02-26",
+   "dropPct": -16.61
+  },
+  {
+   "triggerDate": "2020-03-02",
+   "troughDate": "2020-03-12",
+   "dropPct": -52.48
+  },
+  {
+   "triggerDate": "2020-03-13",
+   "troughDate": "2020-03-16",
+   "dropPct": -17.81
+  },
+  {
+   "triggerDate": "2020-08-28",
+   "troughDate": "2020-09-05",
+   "dropPct": -15.23
+  },
+  {
+   "triggerDate": "2020-09-14",
+   "troughDate": "2020-09-23",
+   "dropPct": -15.02
+  },
+  {
+   "triggerDate": "2021-01-09",
+   "troughDate": "2021-01-12",
+   "dropPct": -18.08
+  },
+  {
+   "triggerDate": "2021-01-19",
+   "troughDate": "2021-01-21",
+   "dropPct": -18.82
+  },
+  {
+   "triggerDate": "2021-02-15",
+   "troughDate": "2021-02-25",
+   "dropPct": -16.69
+  },
+  {
+   "triggerDate": "2021-05-08",
+   "troughDate": "2021-05-17",
+   "dropPct": -16.18
+  },
+  {
+   "triggerDate": "2021-05-18",
+   "troughDate": "2021-05-23",
+   "dropPct": -37.81
+  },
+  {
+   "triggerDate": "2021-05-25",
+   "troughDate": "2021-05-29",
+   "dropPct": -15.76
+  },
+  {
+   "triggerDate": "2021-06-03",
+   "troughDate": "2021-06-11",
+   "dropPct": -17.55
+  },
+  {
+   "triggerDate": "2021-06-12",
+   "troughDate": "2021-06-22",
+   "dropPct": -20.66
+  },
+  {
+   "triggerDate": "2021-07-04",
+   "troughDate": "2021-07-13",
+   "dropPct": -16.46
+  },
+  {
+   "triggerDate": "2021-09-01",
+   "troughDate": "2021-09-10",
+   "dropPct": -16.18
+  },
+  {
+   "triggerDate": "2021-09-11",
+   "troughDate": "2021-09-21",
+   "dropPct": -15.34
+  },
+  {
+   "triggerDate": "2021-11-08",
+   "troughDate": "2021-11-18",
+   "dropPct": -16.92
+  },
+  {
+   "triggerDate": "2021-11-30",
+   "troughDate": "2021-12-10",
+   "dropPct": -15.84
+  },
+  {
+   "triggerDate": "2021-12-27",
+   "troughDate": "2022-01-06",
+   "dropPct": -15.66
+  },
+  {
+   "triggerDate": "2022-01-11",
+   "troughDate": "2022-01-21",
+   "dropPct": -20.73
+  },
+  {
+   "triggerDate": "2022-02-15",
+   "troughDate": "2022-02-21",
+   "dropPct": -19.37
+  },
+  {
+   "triggerDate": "2022-03-01",
+   "troughDate": "2022-03-07",
+   "dropPct": -16.33
+  },
+  {
+   "triggerDate": "2022-04-03",
+   "troughDate": "2022-04-11",
+   "dropPct": -15.42
+  },
+  {
+   "triggerDate": "2022-04-29",
+   "troughDate": "2022-05-09",
+   "dropPct": -20.89
+  },
+  {
+   "triggerDate": "2022-05-10",
+   "troughDate": "2022-05-18",
+   "dropPct": -18.31
+  },
+  {
+   "triggerDate": "2022-05-22",
+   "troughDate": "2022-05-27",
+   "dropPct": -15.49
+  },
+  {
+   "triggerDate": "2022-06-01",
+   "troughDate": "2022-06-11",
+   "dropPct": -15.69
+  },
+  {
+   "triggerDate": "2022-06-12",
+   "troughDate": "2022-06-18",
+   "dropPct": -30.67
+  },
+  {
+   "triggerDate": "2022-07-07",
+   "troughDate": "2022-07-12",
+   "dropPct": -16.15
+  },
+  {
+   "triggerDate": "2022-08-10",
+   "troughDate": "2022-08-20",
+   "dropPct": -15.01
+  },
+  {
+   "triggerDate": "2022-08-25",
+   "troughDate": "2022-08-28",
+   "dropPct": -15.85
+  },
+  {
+   "triggerDate": "2022-09-08",
+   "troughDate": "2022-09-18",
+   "dropPct": -18.4
+  },
+  {
+   "triggerDate": "2022-10-29",
+   "troughDate": "2022-11-08",
+   "dropPct": -17.64
+  },
+  {
+   "triggerDate": "2024-03-09",
+   "troughDate": "2024-03-19",
+   "dropPct": -19.33
+  },
+  {
+   "triggerDate": "2024-04-08",
+   "troughDate": "2024-04-17",
+   "dropPct": -19.21
+  },
+  {
+   "triggerDate": "2024-07-25",
+   "troughDate": "2024-08-04",
+   "dropPct": -15.31
+  },
+  {
+   "triggerDate": "2024-12-12",
+   "troughDate": "2024-12-22",
+   "dropPct": -15.56
+  },
+  {
+   "triggerDate": "2025-01-25",
+   "troughDate": "2025-02-04",
+   "dropPct": -17.67
+  },
+  {
+   "triggerDate": "2025-02-17",
+   "troughDate": "2025-02-27",
+   "dropPct": -15.99
+  },
+  {
+   "triggerDate": "2025-02-28",
+   "troughDate": "2025-03-10",
+   "dropPct": -16.64
+  },
+  {
+   "triggerDate": "2025-03-27",
+   "troughDate": "2025-04-06",
+   "dropPct": -21.14
+  },
+  {
+   "triggerDate": "2025-06-11",
+   "troughDate": "2025-06-21",
+   "dropPct": -17.14
+  },
+  {
+   "triggerDate": "2025-09-17",
+   "troughDate": "2025-09-25",
+   "dropPct": -15.6
+  },
+  {
+   "triggerDate": "2025-10-02",
+   "troughDate": "2025-10-11",
+   "dropPct": -16.42
+  },
+  {
+   "triggerDate": "2025-10-25",
+   "troughDate": "2025-11-04",
+   "dropPct": -16.9
+  },
+  {
+   "triggerDate": "2025-11-09",
+   "troughDate": "2025-11-19",
+   "dropPct": -15.62
+  },
+  {
+   "triggerDate": "2026-01-15",
+   "troughDate": "2026-01-25",
+   "dropPct": -15.18
+  },
+  {
+   "triggerDate": "2026-01-26",
+   "troughDate": "2026-02-05",
+   "dropPct": -37.71
+  },
+  {
+   "triggerDate": "2026-05-25",
+   "troughDate": "2026-06-04",
+   "dropPct": -16.22
+  }
+ ],
+ "walkForward": [
+  {
+   "testYear": 2019,
+   "trainSamples": 757,
+   "trainCrashRatePct": 26.552,
+   "inSampleAuc": 0.656,
+   "converged": true
+  },
+  {
+   "testYear": 2020,
+   "trainSamples": 1122,
+   "trainCrashRatePct": 22.371,
+   "inSampleAuc": 0.6255,
+   "converged": true
+  },
+  {
+   "testYear": 2021,
+   "trainSamples": 1488,
+   "trainCrashRatePct": 18.817,
+   "inSampleAuc": 0.6417,
+   "converged": true
+  },
+  {
+   "testYear": 2022,
+   "trainSamples": 1853,
+   "trainCrashRatePct": 18.834,
+   "inSampleAuc": 0.6229,
+   "converged": true
+  },
+  {
+   "testYear": 2023,
+   "trainSamples": 2218,
+   "trainCrashRatePct": 19.297,
+   "inSampleAuc": 0.5922,
+   "converged": true
+  },
+  {
+   "testYear": 2024,
+   "trainSamples": 2583,
+   "trainCrashRatePct": 16.57,
+   "inSampleAuc": 0.6389,
+   "converged": true
+  },
+  {
+   "testYear": 2025,
+   "trainSamples": 2949,
+   "trainCrashRatePct": 15.361,
+   "inSampleAuc": 0.635,
+   "converged": true
+  },
+  {
+   "testYear": 2026,
+   "trainSamples": 3314,
+   "trainCrashRatePct": 15.238,
+   "inSampleAuc": 0.6251,
+   "converged": true
+  }
+ ],
+ "pooledOutOfSampleAuc": 0.524,
+ "scoredDays": 2578,
+ "baseRatePct": 11.676,
+ "scoreBuckets": [
+  {
+   "range": "0-20",
+   "days": 656,
+   "crashRatePct": 11.28,
+   "liftVsBase": 0.966
+  },
+  {
+   "range": "20-40",
+   "days": 742,
+   "crashRatePct": 11.59,
+   "liftVsBase": 0.993
+  },
+  {
+   "range": "40-60",
+   "days": 595,
+   "crashRatePct": 10.924,
+   "liftVsBase": 0.936
+  },
+  {
+   "range": "60-70",
+   "days": 224,
+   "crashRatePct": 6.25,
+   "liftVsBase": 0.535
+  },
+  {
+   "range": "70-80",
+   "days": 206,
+   "crashRatePct": 15.049,
+   "liftVsBase": 1.289
+  },
+  {
+   "range": "80-90",
+   "days": 128,
+   "crashRatePct": 24.219,
+   "liftVsBase": 2.074
+  },
+  {
+   "range": "90-100",
+   "days": 27,
+   "crashRatePct": 0,
+   "liftVsBase": 0
+  }
+ ],
+ "backtestWindow": {
+  "from": "2019-09-07",
+  "to": "2026-10-07",
+  "days": 2587
+ },
+ "buyHold": {
+  "totalReturnPct": 1370.249,
+  "maxDrawdownPct": -79.35
+ },
+ "grid": [
+  {
+   "label": "60/10",
+   "totalReturnPct": 1242.849,
+   "maxDrawdownPct": -77.384,
+   "returnOverMaxDrawdown": 16.061,
+   "averageExposurePct": 96.598,
+   "triggers": 40,
+   "hitRatePct": 5,
+   "medianDaysToTrough": 9.5,
+   "medianRemainingDropPct": -5.799,
+   "costDragPct": 2.4
+  },
+  {
+   "label": "60/20",
+   "totalReturnPct": 1106.909,
+   "maxDrawdownPct": -75.762,
+   "returnOverMaxDrawdown": 14.61,
+   "averageExposurePct": 93.197,
+   "triggers": 40,
+   "hitRatePct": 5,
+   "medianDaysToTrough": 9.5,
+   "medianRemainingDropPct": -5.799,
+   "costDragPct": 4.8
+  },
+  {
+   "label": "60/30",
+   "totalReturnPct": 967.397,
+   "maxDrawdownPct": -75.222,
+   "returnOverMaxDrawdown": 12.861,
+   "averageExposurePct": 89.795,
+   "triggers": 40,
+   "hitRatePct": 5,
+   "medianDaysToTrough": 9.5,
+   "medianRemainingDropPct": -5.799,
+   "costDragPct": 7.2
+  },
+  {
+   "label": "60/50",
+   "totalReturnPct": 695.408,
+   "maxDrawdownPct": -74.737,
+   "returnOverMaxDrawdown": 9.305,
+   "averageExposurePct": 82.992,
+   "triggers": 40,
+   "hitRatePct": 5,
+   "medianDaysToTrough": 9.5,
+   "medianRemainingDropPct": -5.799,
+   "costDragPct": 12
+  },
+  {
+   "label": "60/100",
+   "totalReturnPct": 186.667,
+   "maxDrawdownPct": -83.604,
+   "returnOverMaxDrawdown": 2.233,
+   "averageExposurePct": 65.984,
+   "triggers": 40,
+   "hitRatePct": 5,
+   "medianDaysToTrough": 9.5,
+   "medianRemainingDropPct": -5.799,
+   "costDragPct": 24
+  },
+  {
+   "label": "70/10",
+   "totalReturnPct": 1254.283,
+   "maxDrawdownPct": -77.922,
+   "returnOverMaxDrawdown": 16.097,
+   "averageExposurePct": 97.82,
+   "triggers": 30,
+   "hitRatePct": 6.667,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -7.955,
+   "costDragPct": 1.8
+  },
+  {
+   "label": "70/20",
+   "totalReturnPct": 1132.882,
+   "maxDrawdownPct": -77.407,
+   "returnOverMaxDrawdown": 14.635,
+   "averageExposurePct": 95.64,
+   "triggers": 30,
+   "hitRatePct": 6.667,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -7.955,
+   "costDragPct": 3.6
+  },
+  {
+   "label": "70/30",
+   "totalReturnPct": 1009.225,
+   "maxDrawdownPct": -77.672,
+   "returnOverMaxDrawdown": 12.993,
+   "averageExposurePct": 93.46,
+   "triggers": 30,
+   "hitRatePct": 6.667,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -7.955,
+   "costDragPct": 5.4
+  },
+  {
+   "label": "70/50",
+   "totalReturnPct": 766.609,
+   "maxDrawdownPct": -79.018,
+   "returnOverMaxDrawdown": 9.702,
+   "averageExposurePct": 89.099,
+   "triggers": 30,
+   "hitRatePct": 6.667,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -7.955,
+   "costDragPct": 9
+  },
+  {
+   "label": "70/100",
+   "totalReturnPct": 279.354,
+   "maxDrawdownPct": -83.752,
+   "returnOverMaxDrawdown": 3.335,
+   "averageExposurePct": 78.199,
+   "triggers": 30,
+   "hitRatePct": 6.667,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -7.955,
+   "costDragPct": 18
+  },
+  {
+   "label": "75/10",
+   "totalReturnPct": 1191.94,
+   "maxDrawdownPct": -78.508,
+   "returnOverMaxDrawdown": 15.182,
+   "averageExposurePct": 98.33,
+   "triggers": 28,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -5.798,
+   "costDragPct": 1.68
+  },
+  {
+   "label": "75/20",
+   "totalReturnPct": 1024.913,
+   "maxDrawdownPct": -78.502,
+   "returnOverMaxDrawdown": 13.056,
+   "averageExposurePct": 96.66,
+   "triggers": 28,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -5.798,
+   "costDragPct": 3.36
+  },
+  {
+   "label": "75/30",
+   "totalReturnPct": 870.538,
+   "maxDrawdownPct": -79.257,
+   "returnOverMaxDrawdown": 10.984,
+   "averageExposurePct": 94.99,
+   "triggers": 28,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -5.798,
+   "costDragPct": 5.04
+  },
+  {
+   "label": "75/50",
+   "totalReturnPct": 602.748,
+   "maxDrawdownPct": -80.883,
+   "returnOverMaxDrawdown": 7.452,
+   "averageExposurePct": 91.651,
+   "triggers": 28,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -5.798,
+   "costDragPct": 8.4
+  },
+  {
+   "label": "75/100",
+   "totalReturnPct": 166.291,
+   "maxDrawdownPct": -87.263,
+   "returnOverMaxDrawdown": 1.906,
+   "averageExposurePct": 83.301,
+   "triggers": 28,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 9,
+   "medianRemainingDropPct": -5.798,
+   "costDragPct": 16.8
+  },
+  {
+   "label": "80/10",
+   "totalReturnPct": 1306.314,
+   "maxDrawdownPct": -78.059,
+   "returnOverMaxDrawdown": 16.735,
+   "averageExposurePct": 98.825,
+   "triggers": 20,
+   "hitRatePct": 10,
+   "medianDaysToTrough": 11,
+   "medianRemainingDropPct": -4.457,
+   "costDragPct": 1.2
+  },
+  {
+   "label": "80/20",
+   "totalReturnPct": 1235.481,
+   "maxDrawdownPct": -77.161,
+   "returnOverMaxDrawdown": 16.012,
+   "averageExposurePct": 97.65,
+   "triggers": 20,
+   "hitRatePct": 10,
+   "medianDaysToTrough": 11,
+   "medianRemainingDropPct": -4.457,
+   "costDragPct": 2.4
+  },
+  {
+   "label": "80/30",
+   "totalReturnPct": 1159.101,
+   "maxDrawdownPct": -77.255,
+   "returnOverMaxDrawdown": 15.003,
+   "averageExposurePct": 96.475,
+   "triggers": 20,
+   "hitRatePct": 10,
+   "medianDaysToTrough": 11,
+   "medianRemainingDropPct": -4.457,
+   "costDragPct": 3.6
+  },
+  {
+   "label": "80/50",
+   "totalReturnPct": 995.238,
+   "maxDrawdownPct": -77.61,
+   "returnOverMaxDrawdown": 12.824,
+   "averageExposurePct": 94.124,
+   "triggers": 20,
+   "hitRatePct": 10,
+   "medianDaysToTrough": 11,
+   "medianRemainingDropPct": -4.457,
+   "costDragPct": 6
+  },
+  {
+   "label": "80/100",
+   "totalReturnPct": 580.879,
+   "maxDrawdownPct": -79.616,
+   "returnOverMaxDrawdown": 7.296,
+   "averageExposurePct": 88.249,
+   "triggers": 20,
+   "hitRatePct": 10,
+   "medianDaysToTrough": 11,
+   "medianRemainingDropPct": -4.457,
+   "costDragPct": 12
+  },
+  {
+   "label": "85/10",
+   "totalReturnPct": 1371.19,
+   "maxDrawdownPct": -78.006,
+   "returnOverMaxDrawdown": 17.578,
+   "averageExposurePct": 99.281,
+   "triggers": 12,
+   "hitRatePct": 33.333,
+   "medianDaysToTrough": 8,
+   "medianRemainingDropPct": -9.572,
+   "costDragPct": 0.72
+  },
+  {
+   "label": "85/20",
+   "totalReturnPct": 1364.182,
+   "maxDrawdownPct": -76.598,
+   "returnOverMaxDrawdown": 17.81,
+   "averageExposurePct": 98.562,
+   "triggers": 12,
+   "hitRatePct": 33.333,
+   "medianDaysToTrough": 8,
+   "medianRemainingDropPct": -9.572,
+   "costDragPct": 1.44
+  },
+  {
+   "label": "85/30",
+   "totalReturnPct": 1349.36,
+   "maxDrawdownPct": -75.808,
+   "returnOverMaxDrawdown": 17.8,
+   "averageExposurePct": 97.843,
+   "triggers": 12,
+   "hitRatePct": 33.333,
+   "medianDaysToTrough": 8,
+   "medianRemainingDropPct": -9.572,
+   "costDragPct": 2.16
+  },
+  {
+   "label": "85/50",
+   "totalReturnPct": 1297.397,
+   "maxDrawdownPct": -75.13,
+   "returnOverMaxDrawdown": 17.269,
+   "averageExposurePct": 96.405,
+   "triggers": 12,
+   "hitRatePct": 33.333,
+   "medianDaysToTrough": 8,
+   "medianRemainingDropPct": -9.572,
+   "costDragPct": 3.6
+  },
+  {
+   "label": "85/100",
+   "totalReturnPct": 1060.674,
+   "maxDrawdownPct": -74.272,
+   "returnOverMaxDrawdown": 14.281,
+   "averageExposurePct": 92.81,
+   "triggers": 12,
+   "hitRatePct": 33.333,
+   "medianDaysToTrough": 8,
+   "medianRemainingDropPct": -9.572,
+   "costDragPct": 7.2
+  },
+  {
+   "label": "90/10",
+   "totalReturnPct": 1374.47,
+   "maxDrawdownPct": -77.984,
+   "returnOverMaxDrawdown": 17.625,
+   "averageExposurePct": 99.679,
+   "triggers": 7,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 7,
+   "medianRemainingDropPct": -3.06,
+   "costDragPct": 0.42
+  },
+  {
+   "label": "90/20",
+   "totalReturnPct": 1375.475,
+   "maxDrawdownPct": -76.551,
+   "returnOverMaxDrawdown": 17.968,
+   "averageExposurePct": 99.358,
+   "triggers": 7,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 7,
+   "medianRemainingDropPct": -3.06,
+   "costDragPct": 0.84
+  },
+  {
+   "label": "90/30",
+   "totalReturnPct": 1373.278,
+   "maxDrawdownPct": -75.725,
+   "returnOverMaxDrawdown": 18.135,
+   "averageExposurePct": 99.037,
+   "triggers": 7,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 7,
+   "medianRemainingDropPct": -3.06,
+   "costDragPct": 1.26
+  },
+  {
+   "label": "90/50",
+   "totalReturnPct": 1359.414,
+   "maxDrawdownPct": -74.944,
+   "returnOverMaxDrawdown": 18.139,
+   "averageExposurePct": 98.396,
+   "triggers": 7,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 7,
+   "medianRemainingDropPct": -3.06,
+   "costDragPct": 2.1
+  },
+  {
+   "label": "90/100",
+   "totalReturnPct": 1272.976,
+   "maxDrawdownPct": -73.651,
+   "returnOverMaxDrawdown": 17.284,
+   "averageExposurePct": 96.792,
+   "triggers": 7,
+   "hitRatePct": 0,
+   "medianDaysToTrough": 7,
+   "medianRemainingDropPct": -3.06,
+   "costDragPct": 4.2
+  }
+ ],
+ "controls": [
+  {
+   "exposurePct": 100,
+   "totalReturnPct": 1370.249,
+   "maxDrawdownPct": -79.35
+  },
+  {
+   "exposurePct": 70,
+   "totalReturnPct": 977.086,
+   "maxDrawdownPct": -65.266
+  },
+  {
+   "exposurePct": 50,
+   "totalReturnPct": 589.045,
+   "maxDrawdownPct": -51.973
+  },
+  {
+   "exposurePct": 30,
+   "totalReturnPct": 265.658,
+   "maxDrawdownPct": -34.757
+  }
+ ],
+ "sameExposureControl": {
+  "exposurePct": 93,
+  "totalReturnPct": 1322.099,
+  "maxDrawdownPct": -76.6
+ },
+ "selected": {
+  "currentThresholds": {
+   "minRiskScore": 80,
+   "maxDeRiskPct": 30
+  },
+  "current": {
+   "totalReturnPct": 1159.101,
+   "maxDrawdownPct": -77.255,
+   "triggers": 20,
+   "hitRatePct": 10
+  },
+  "bestByDrawdown": "90/100",
+  "bestByCalmar": "90/50"
+ },
+ "graded": {
+  "question": "does a graded (continuous) exposure response beat the shipped on/off switch?",
+  "control": "a passive hold at each schedule's own average exposure",
+  "rebalanceBandPctForGraded": 5,
+  "baselineReproducesShippedRule": true,
+  "meanEdgeVsMatchedControlPct": -269.763,
+  "bestByCalmar": {
+   "label": "bands 70/80/90 -> 10/25/40",
+   "returnOverMaxDrawdown": 15.722
+  },
+  "bestVsMatchedControl": {
+   "label": "bands 70/80/90 -> 10/25/40",
+   "deltaReturnPct": -149.423
+  },
+  "variants": [
+   {
+    "label": "fixed 80/-30 (shipped)",
+    "spec": {
+     "kind": "step",
+     "label": "fixed 80/-30 (shipped)",
+     "threshold": 80,
+     "cutPct": 30
+    },
+    "recoveryLevel": 70,
+    "totalReturnPct": 1159.101,
+    "maxDrawdownPct": -77.255,
+    "returnOverMaxDrawdown": 15.003,
+    "averageExposurePct": 96.475,
+    "downSwitches": 20,
+    "upSwitches": 20,
+    "switches": 40,
+    "switchesPerYear": 5.644,
+    "costDragPct": 3.6,
+    "hitRatePct": 10,
+    "minExposurePct": 70,
+    "daysBelowSeventyPct": 0,
+    "matchedStaticReturnPct": 1346.837,
+    "deltaReturnVsMatchedPct": -187.735,
+    "deltaCalmarVsMatched": -2.305
+   },
+   {
+    "label": "linear 60..95 -50",
+    "spec": {
+     "kind": "linear",
+     "label": "linear 60..95 -50",
+     "lo": 60,
+     "hi": 95,
+     "maxCutPct": 50
+    },
+    "recoveryLevel": 60,
+    "totalReturnPct": 983.544,
+    "maxDrawdownPct": -77.562,
+    "returnOverMaxDrawdown": 12.681,
+    "averageExposurePct": 92.588,
+    "downSwitches": 93,
+    "upSwitches": 44,
+    "switches": 137,
+    "switchesPerYear": 19.329,
+    "costDragPct": 6.114,
+    "hitRatePct": 8.602,
+    "minExposurePct": 50.905,
+    "daysBelowSeventyPct": 322,
+    "matchedStaticReturnPct": 1322.099,
+    "deltaReturnVsMatchedPct": -338.555,
+    "deltaCalmarVsMatched": -4.579
+   },
+   {
+    "label": "linear 70..90 -40",
+    "spec": {
+     "kind": "linear",
+     "label": "linear 70..90 -40",
+     "lo": 70,
+     "hi": 90,
+     "maxCutPct": 40
+    },
+    "recoveryLevel": 70,
+    "totalReturnPct": 1157.001,
+    "maxDrawdownPct": -76.631,
+    "returnOverMaxDrawdown": 15.098,
+    "averageExposurePct": 95.439,
+    "downSwitches": 67,
+    "upSwitches": 37,
+    "switches": 104,
+    "switchesPerYear": 14.673,
+    "costDragPct": 4.715,
+    "hitRatePct": 7.463,
+    "minExposurePct": 60,
+    "daysBelowSeventyPct": 208,
+    "matchedStaticReturnPct": 1339.254,
+    "deltaReturnVsMatchedPct": -182.254,
+    "deltaCalmarVsMatched": -2.201
+   },
+   {
+    "label": "bands 70/80/90 -> 10/25/40",
+    "spec": {
+     "kind": "bands",
+     "label": "bands 70/80/90 -> 10/25/40",
+     "bands": [
+      {
+       "from": 70,
+       "cutPct": 10
+      },
+      {
+       "from": 80,
+       "cutPct": 25
+      },
+      {
+       "from": 90,
+       "cutPct": 40
+      }
+     ]
+    },
+    "recoveryLevel": 70,
+    "totalReturnPct": 1197.414,
+    "maxDrawdownPct": -76.164,
+    "returnOverMaxDrawdown": 15.722,
+    "averageExposurePct": 95.628,
+    "downSwitches": 64,
+    "upSwitches": 43,
+    "switches": 107,
+    "switchesPerYear": 15.097,
+    "costDragPct": 4.83,
+    "hitRatePct": 4.688,
+    "minExposurePct": 60,
+    "daysBelowSeventyPct": 129,
+    "matchedStaticReturnPct": 1346.837,
+    "deltaReturnVsMatchedPct": -149.423,
+    "deltaCalmarVsMatched": -1.587
+   },
+   {
+    "label": "convex 60..95 -50 (^2)",
+    "spec": {
+     "kind": "power",
+     "label": "convex 60..95 -50 (^2)",
+     "lo": 60,
+     "hi": 95,
+     "maxCutPct": 50,
+     "exponent": 2
+    },
+    "recoveryLevel": 60,
+    "totalReturnPct": 990.743,
+    "maxDrawdownPct": -78.199,
+    "returnOverMaxDrawdown": 12.67,
+    "averageExposurePct": 94.815,
+    "downSwitches": 63,
+    "upSwitches": 29,
+    "switches": 92,
+    "switchesPerYear": 12.98,
+    "costDragPct": 3.834,
+    "hitRatePct": 9.524,
+    "minExposurePct": 50,
+    "daysBelowSeventyPct": 191,
+    "matchedStaticReturnPct": 1339.254,
+    "deltaReturnVsMatchedPct": -348.512,
+    "deltaCalmarVsMatched": -4.63
+   },
+   {
+    "label": "tail bands 80/92 -> 30/50",
+    "spec": {
+     "kind": "bands",
+     "label": "tail bands 80/92 -> 30/50",
+     "bands": [
+      {
+       "from": 80,
+       "cutPct": 30
+      },
+      {
+       "from": 92,
+       "cutPct": 50
+      }
+     ]
+    },
+    "recoveryLevel": 70,
+    "totalReturnPct": 1016.766,
+    "maxDrawdownPct": -78.96,
+    "returnOverMaxDrawdown": 12.877,
+    "averageExposurePct": 95.775,
+    "downSwitches": 25,
+    "upSwitches": 20,
+    "switches": 45,
+    "switchesPerYear": 6.349,
+    "costDragPct": 4.2,
+    "hitRatePct": 4,
+    "minExposurePct": 50,
+    "daysBelowSeventyPct": 89,
+    "matchedStaticReturnPct": 1346.837,
+    "deltaReturnVsMatchedPct": -330.071,
+    "deltaCalmarVsMatched": -4.431
+   }
+  ]
+ },
+ "crossMarket": {
+  "series": "国证2000 (CNI2000)",
+  "outOfSampleAuc": 0.8018,
+  "backtestFrom": "2017-01-10",
+  "strategy": {
+   "totalReturnPct": -3.528,
+   "maxDrawdownPct": -49.914,
+   "triggers": 9
+  },
+  "buyHold": {
+   "totalReturnPct": 4.912,
+   "maxDrawdownPct": -49.914
+  },
+  "feb2024Window": {
+   "from": "2024-01-02",
+   "to": "2024-03-15",
+   "cniScorePath": [
+    {
+     "date": "2024-01-02",
+     "score": 14.9
+    },
+    {
+     "date": "2024-01-03",
+     "score": 8
+    },
+    {
+     "date": "2024-01-04",
+     "score": 10.1
+    },
+    {
+     "date": "2024-01-05",
+     "score": 13.7
+    },
+    {
+     "date": "2024-01-08",
+     "score": 37.1
+    },
+    {
+     "date": "2024-01-09",
+     "score": 30.1
+    },
+    {
+     "date": "2024-01-10",
+     "score": 20.6
+    },
+    {
+     "date": "2024-01-11",
+     "score": 39.2
+    },
+    {
+     "date": "2024-01-12",
+     "score": 38.2
+    },
+    {
+     "date": "2024-01-15",
+     "score": 37.8
+    },
+    {
+     "date": "2024-01-16",
+     "score": 28.6
+    },
+    {
+     "date": "2024-01-17",
+     "score": 37.9
+    },
+    {
+     "date": "2024-01-18",
+     "score": 29.1
+    },
+    {
+     "date": "2024-01-19",
+     "score": 38.2
+    },
+    {
+     "date": "2024-01-22",
+     "score": 65.4
+    },
+    {
+     "date": "2024-01-23",
+     "score": 68.8
+    },
+    {
+     "date": "2024-01-24",
+     "score": 67.8
+    },
+    {
+     "date": "2024-01-25",
+     "score": 67.1
+    },
+    {
+     "date": "2024-01-26",
+     "score": 64.4
+    },
+    {
+     "date": "2024-01-29",
+     "score": 68.9
+    },
+    {
+     "date": "2024-01-30",
+     "score": 72.2
+    },
+    {
+     "date": "2024-01-31",
+     "score": 69
+    },
+    {
+     "date": "2024-02-01",
+     "score": 71.7
+    },
+    {
+     "date": "2024-02-02",
+     "score": 71.5
+    },
+    {
+     "date": "2024-02-05",
+     "score": 78.8
+    },
+    {
+     "date": "2024-02-06",
+     "score": 73.1
+    },
+    {
+     "date": "2024-02-07",
+     "score": 72.2
+    },
+    {
+     "date": "2024-02-08",
+     "score": 69.3
+    },
+    {
+     "date": "2024-02-19",
+     "score": 48.7
+    },
+    {
+     "date": "2024-02-20",
+     "score": 47.1
+    },
+    {
+     "date": "2024-02-21",
+     "score": 40
+    },
+    {
+     "date": "2024-02-22",
+     "score": 75.4
+    },
+    {
+     "date": "2024-02-23",
+     "score": 74.4
+    },
+    {
+     "date": "2024-02-26",
+     "score": 74.2
+    },
+    {
+     "date": "2024-02-27",
+     "score": 4.7
+    },
+    {
+     "date": "2024-02-28",
+     "score": 74.1
+    },
+    {
+     "date": "2024-02-29",
+     "score": 71.9
+    },
+    {
+     "date": "2024-03-01",
+     "score": 72.4
+    },
+    {
+     "date": "2024-03-04",
+     "score": 73.3
+    },
+    {
+     "date": "2024-03-05",
+     "score": 75.8
+    },
+    {
+     "date": "2024-03-06",
+     "score": 76.5
+    },
+    {
+     "date": "2024-03-07",
+     "score": 85.2
+    },
+    {
+     "date": "2024-03-08",
+     "score": 78.2
+    },
+    {
+     "date": "2024-03-11",
+     "score": 66.8
+    },
+    {
+     "date": "2024-03-12",
+     "score": 63
+    },
+    {
+     "date": "2024-03-13",
+     "score": 63.8
+    },
+    {
+     "date": "2024-03-14",
+     "score": 49.2
+    },
+    {
+     "date": "2024-03-15",
+     "score": 54.8
+    }
+   ]
+  }
+ }
+}

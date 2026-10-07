@@ -7,3 +7,10 @@ coverage/
 !.env.example
 .DS_Store
 .guardian/
+
+# Raw market history is fetched, never committed: ~1.1 MB of third-party data
+# with a licence we do not own. Rebuild it with:
+#   node scripts/fetch-market-data.mjs            (add --proxy http://127.0.0.1:7897 if needed)
+# The frozen evidence — data/policy-calibration-results.json — IS committed.
+data/*.json
+!data/policy-calibration-results.json
