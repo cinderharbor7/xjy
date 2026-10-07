@@ -16,9 +16,9 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 
 比赛 MVP 只有 `NONE` 和 `SWAP_TO_SAFE` 两种动作：允许 `RISK → DEFENSIVE`；禁止 `DEFENSIVE → RISK`。Demo 使用 ETH → USDC，USDC 在这里是 **user-approved defensive asset**，不表示绝对安全或无风险。
 
-## 当前实现状态（D 集成分支）
+## 当前实现状态（团队集成分支）
 
-本分支 `d/guardian-monitor-integration` 从 main `bc1d504` 开始，整合 C 的 `30d5bbb`，完成配置 API/表单、固定钱包绑定、服务端监控、SQLite 持久化和 Fork 装配。**分支实现不代表已合入 main；真实链上异常识别与真实 Agent 调查仍未接入。**
+本分支 `codex/integrate-guardian` 从 main `bc1d504` 开始，整合 A、B、C、D 的交付，保留配置 API/表单、固定钱包绑定、服务端监控、SQLite 持久化和 Fork 装配。**分支实现不代表已合入 main；真实链上异常识别与真实 Agent 调查仍未接入。**
 
 | 内容 | 当前状态 |
 | --- | --- |
@@ -31,6 +31,8 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 | Fork 余额与现价 | D 临时集成读取桥：真实本机 Fork WETH/USDC 余额与 V2 池现价，等待 A 模块交付替换 |
 | Fork 执行 | 本机 Anvil、同一 signer/recipient、WETH→USDC；独立新读取验证效果 |
 | 风险变化和调查 | 明确演示输入；仍使用 Mock investigation / confidence，不声称实时异常调查 |
+| A 主网只读数据 | 原生 ETH + USDC、Chainlink 当前/历史行情、Uniswap V3 单池卖压；独立只读入口，不与 Fork WETH 余额混用 |
+| B 卖压分析 | 冻结信号输入、规则评分和有来源的调查输出；不直接授权执行 |
 | 链上信号合同 / Risk Lab | `OnchainSignalState` / `OnchainEvidence` 保持冻结；研究页样本独立于交易流程 |
 
 完整运行步骤、HTTP 合同、错误码、状态机、A/B/C 交接和验收方式见 [D 监控与 Fork 集成](docs/guardian-monitor.md)。原始需求与 C 分工说明保留于 [D2C-handoff.md](D2C-handoff.md)。
@@ -61,6 +63,21 @@ pnpm build
 ```
 
 构建后可用 `pnpm start` 运行生产服务。`.env*` 已被 Git 忽略，仅 `.env.example` 可提交；不提交真实私钥或 API Key。
+
+## A 真实只读数据验收
+
+`.env.local` 设置 `ETHEREUM_RPC_URL` 后运行：
+
+```bash
+pnpm data:read --wallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --only portfolio
+pnpm data:read --only market
+pnpm data:read --only signal
+pnpm --silent data:read --wallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --json
+```
+
+输出标记 **LIVE_READ_ONLY**。钱包总值仅覆盖原生 ETH 与 USDC；行情是 Chainlink oracle，`volatilityScore` 是已批准的 1h 价格变化代理；卖压仅覆盖 Uniswap V3 WETH/USDC 0.05% 单池。基线为零、RPC/报价/区块异常明确失败，不回退 Mock。命令只读取一次，不启动持续监控。
+
+B/D 的稳定服务入口是 `createEthereumDataServices()`，分别返回 `PortfolioState`、`MarketState`、`OnchainSignalState`；出处由 `OnchainEvidence` 表示。安装、完整口径、接口用法与验收标准见 [ethereum-data.md](docs/ethereum-data.md)。首页和 `POST /api/rescue` 继续使用 Mock。
 
 ## 架构纠偏前后
 
