@@ -14,28 +14,28 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 
 ## 当前完成状态与开工准备
 
-截至 2026-10-07，**已完成的是 Guardian 工程骨架和单次运行的 Mock 闭环，尚未完成真实链上异常调查、持续监控或真实自动换币**。上述产品目标不代表这些能力已在当前仓库实现。
+截至 2026-10-07，**已完成 Guardian 工程骨架、单次运行的 Mock 闭环，以及 A 的独立真实只读数据模块；尚未完成真实链上异常调查、持续监控或真实自动换币**。上述产品目标不代表这些能力已在当前仓库实现。
 
 | 内容 | 当前状态 |
 | --- | --- |
 | Portfolio / Market / Risk / Investigation / Policy / Execution / RescueSession 核心契约 | Mock 阶段已冻结，Zod 与 TypeScript 类型已实现 |
 | Agent 无执行权、Policy 硬门控、白名单、单向转换、额度和独立重读验证 | 已实现并有测试 |
 | 首页和 `POST /api/rescue` | 已实现，点击一次运行一次固定 Mock 场景 |
-| Ethereum 钱包 ETH 余额、实时价格及链上资金异常读取 | 主 Guardian 尚未接入；已有真实 Aave 读取仅为独立扩展 |
-| 链上信号与结构化证据 | `OnchainSignalState` / `OnchainEvidence` 已冻结并实现 Zod/infer 与测试；尚未接入运行流程，现有调查 evidence 仍为 `string[]`、confidence 固定为 0.88 |
+| A：真实资产、行情与卖压读取 | 本分支新增原生 ETH + USDC、Chainlink 当前/历史报价、Uniswap V3 单池卖压及只读 CLI；主 Guardian 尚未注入，Aave 仍为独立扩展 |
+| 链上信号与结构化证据 | `OnchainSignalState` / `OnchainEvidence` 已冻结并实现 Zod/infer 与测试；A 的真实卖压 Adapter 已产出这两个合同；尚未接入调查运行流程，现有调查 evidence 仍为 `string[]`、confidence 固定为 0.88 |
 | 持续监控与异常触发调查 | 尚未实现；当前每次请求都运行调查，并创建新的 Mock 场景 |
 | 同钱包跨轮重复/并发执行保护 | 尚未实现；Mock 状态内拒绝重复转换不等于持续监控下的保护 |
-| 四人下一阶段开发 | 职责已划分，本仓库尚未开始本轮真实能力接入；具体任务单待细化 |
+| 四人下一阶段开发 | A 的只读入口与范围已实现；B/C/D 继续按各自目录接入分析、受限执行和 Dashboard/监控 |
 | 团队共同代码基线 | 团队以 `main` 中的 Guardian Mock 骨架和冻结链上合同为共同基线，从同一提交创建各自工作分支 |
 
 现有冻结范围见 [Guardian Mock 设计](docs/loopx/design/2026-10-06-risk-guardian/需求设计文档.md) 与 [A→B 链上合同设计](docs/loopx/design/2026-10-06-onchain-contracts/需求设计文档.md)。两份记录中的“无未决问题”分别指 Mock 架构纠偏和这两个数据合同，不代表真实采集与持续监控已实现。
 
 A/B 已可按冻结合同分别开发采集与分析。后续实现任务仍需明确：
 
-- 第一版信号已确定为 `DEX_SELL_PRESSURE`；在采集任务中配置 DEX/池范围、窗口长度、交易识别和 USD 估值来源，在分析任务中确定异常阈值。
+- A 的采集已采用主网 Uniswap V3 WETH/USDC 0.05% 单池、相邻 5 分钟窗口和事件区块 Chainlink USDC/USD 估值；B 在分析任务中确定异常阈值。
 - 在监控任务中确定调度和重复执行规则；链上信号保持独立，不放进 Portfolio。
 - 确认 36 小时交付范围，明确哪些能力接真实数据、哪些保留 Mock。
-- 为 ABCD 写明输入、输出、文件范围、交付节点和验收标准；开工时从 `main` 的同一提交创建各自的工作分支。
+- A 的输入、输出、文件范围、只读命令和验收标准见 [ethereum-data.md](docs/ethereum-data.md)；其余具体任务仍由各负责人落实，从共同基线开分支并由 D 顺序整合。
 
 **36 小时候选范围，尚未最终确认：** 一个 Ethereum 钱包、ETH 余额与价格读取、一种明确的链上资金异常、Agent 调查与可核验证据、Policy 门控、Mock 换币和效果展示。真实主网自动交易属于另一个需要明确授权与验收的里程碑。该范围是下一阶段建议，不是当前实现或完成时间保证。
 
@@ -59,6 +59,21 @@ pnpm build
 ```
 
 构建后可用 `pnpm start` 运行生产服务。`.env*` 已被 Git 忽略，仅 `.env.example` 可提交；不提交真实私钥或 API Key。
+
+## A 真实只读数据验收
+
+`.env.local` 设置 `ETHEREUM_RPC_URL` 后运行：
+
+```bash
+pnpm data:read --wallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --only portfolio
+pnpm data:read --only market
+pnpm data:read --only signal
+pnpm --silent data:read --wallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --json
+```
+
+输出标记 **LIVE_READ_ONLY**。钱包总值仅覆盖原生 ETH 与 USDC；行情是 Chainlink oracle，`volatilityScore` 是已批准的 1h 价格变化代理；卖压仅覆盖 Uniswap V3 WETH/USDC 0.05% 单池。基线为零、RPC/报价/区块异常明确失败，不回退 Mock。命令只读取一次，不启动持续监控。
+
+B/D 的稳定服务入口是 `createEthereumDataServices()`，分别返回 `PortfolioState`、`MarketState`、`OnchainSignalState`；出处由 `OnchainEvidence` 表示。安装、完整口径、接口用法与验收标准见 [ethereum-data.md](docs/ethereum-data.md)。首页和 `POST /api/rescue` 继续使用 Mock。
 
 ## 架构纠偏前后
 
@@ -84,7 +99,7 @@ Risk Engine → Investigation Agent → RiskAnalysis
   → verification → Dashboard
 ```
 
-外部世界目前由 Mock Adapter 模拟。Orchestrator 管流程，服务通过 Zod 数据合同通信。Risk Engine 做确定性计算；Agent 解释事件、原因、证据与不确定性，没有 Executor 引用。Policy 使用服务端用户预设阈值和资产名单，Agent 建议或文字不构成批准。Executor 只接结构化 `PolicyDecision`，并独立检查可信名单、方向和限额。
+首页核心流程的外部世界由 Mock Adapter 模拟。A 的真实只读 Adapter 在独立入口验收，尚未注入该流程。Orchestrator 管流程，服务通过 Zod 数据合同通信。Risk Engine 做确定性计算；Agent 解释事件、原因、证据与不确定性，没有 Executor 引用。Policy 使用服务端用户预设阈值和资产名单，Agent 建议或文字不构成批准。Executor 只接结构化 `PolicyDecision`，并独立检查可信名单、方向和限额。
 
 核心不再要求 collateral、debt、healthFactor 或 Aave：`PositionState` 换为 `PortfolioState`，HF 压力测试换为组合价值压力测试，HF/债务触发条件换为风险分数、可信度、风险敞口与白名单，`repay()` 换为 `execute(decision)`。保留服务/Adapter 分层、Risk、Investigation、Policy、Execution、RescueOrchestrator、API 和现有页面/CSS体系。
 
@@ -129,6 +144,7 @@ src/
   modules/
     portfolio/            # 钱包组合服务与 Adapter
     market/               # 独立行情服务与 Adapter
+    onchain/              # A 的只读 Ethereum 快照、卖压服务与 CLI
     risk/                 # 确定性风险和压力测试
     investigation/        # 调查接口、服务、Mock Agent
     policy/               # 用户预设硬规则、资产白名单
@@ -147,12 +163,12 @@ tests/
 
 | 开发者 | 主要目录 | 下一步职责 |
 | --- | --- | --- |
-| A | `src/modules/portfolio/`、`src/modules/market/` | 钱包 ETH 余额、ETH 行情及链上资金数据；按冻结的 `OnchainSignalState` 输出，采集实现目录在 A/D 集成任务中确定，不与 Portfolio 混用 |
+| A | `src/modules/portfolio/`、`src/modules/market/`、`src/modules/onchain/` | 已提供原生 ETH + USDC、Chainlink 行情和单池卖压；保持 Portfolio / Market / Signal 三合同独立，后续维护采集与出处 |
 | B | `src/modules/risk/`、`src/modules/investigation/` | 消费冻结的链上信号与证据，开发异常识别、风险计算、压力测试和调查；只输出分析，不获得交易权限 |
 | C | `src/modules/policy/`、`src/modules/execution/` | 用户预设规则、白名单、额度与受限执行；配合监控规则防止重复动作，当前执行仍为 Mock |
 | D | `src/app/`、`src/integration/`、`src/modules/rescue/` | Dashboard、API、监控入口、异常触发与流程集成，负责执行后的独立重读和效果展示 |
 
-此表描述下一阶段的职责边界，不表示四名开发者已经开工，也不替代具体任务单。A/B 的数据交接边界已冻结，可各自从样例开发；真实 Adapter 的接入与监控任务需按上一节明确范围。
+A 的只读数据交付分支为 `feat/a-live-data`（原开发分支 `feat/ethereum-live-data`）；此表不表示 B/C/D 已开工。B 可从真实 getters 或样例消费冻结合同，D 负责把读取服务接入 API/页面及监控，C 保持执行硬门控。
 
 `src/domain/` 是共同稳定边界，`src/mocks/` 与公共配置由集成负责人协调，顺序整合变更。Adapter 实现由各负责人维护，D 在 composition root 注入；业务层不知道具体 Mock 类型。可选 Aave 扩展单独维护，不能作为新 Portfolio 或短周期 Market 的替代源。
 
@@ -177,7 +193,7 @@ A 输出 `OnchainSignalState`，包含 ETH 卖压类型、UTC 观察窗口、当
 - `txCount` 按 ETH 卖出交易的 txHash 去重，`uniqueWallets` 按这些交易的原始 `tx.from` 去重，不使用 router/池地址。
 - `TRANSACTION` 必填 txHash；`BLOCK` 必填 blockHash；`CONTRACT_EVENT` 必填 txHash 与 contractAddress。三类均要求 blockNumber、description、source。
 
-完整字段、校验规则、证据抽样口径和可解析 JSON 示例见 [链上合同](docs/contracts.md)。格式校验不证明链上事实，A 负责真实来源，B 负责证据对结论的支持程度。本次没有修改现有 Investigation 签名、`string[]` 证据、RescueSession 或 API；接入运行流程属于后续集成任务。
+完整字段、校验规则、证据抽样口径和可解析 JSON 示例见 [链上合同](docs/contracts.md)。格式校验不证明链上事实，A 负责真实来源，B 负责证据对结论的支持程度。A 的读取实现也没有修改现有 Investigation 签名、`string[]` 证据、RescueSession 或 API；接入运行流程属于后续集成任务。
 
 ```http
 POST /api/rescue
@@ -196,7 +212,7 @@ URL 保留，但响应**整体替换**旧借贷合同，不维护旧 `PositionSt
 
 该聚合数据不是整个钱包组合；7200 区块窗口不是精确 24 小时，也不是新核心的 5m / 1h 行情。扩展使用本地 `AavePositionState` 合同，不向主 Risk / Policy / Executor 传递数据。新核心不导入扩展，扩展也不导入新核心 Domain。
 
-仅使用扩展时才需要 `.env.local` 服务端配置：
+A 的只读 CLI 或 Aave 扩展使用 `.env.local` 服务端 RPC 配置：
 
 ```dotenv
 MOCK_MODE=true
@@ -208,15 +224,16 @@ RPC 必须支持最近 7200 区块历史 `eth_call` 与 EIP-1898 `blockHash` / `
 
 ## 当前 Mock 与实际能力
 
-**核心外部能力均为 Mock：** 钱包资产余额、行情冲击和历史变化、Agent 解释与 confidence、ETH → USDC 执行、执行后余额及假 txHash。没有真实 DEX、钱包签名、LLM、交易广播、数据库或多链。
+**首页核心流程的外部能力均为 Mock：** 钱包资产余额、行情冲击和历史变化、Agent 解释与 confidence、ETH → USDC 执行、执行后余额及假 txHash。没有钱包签名、LLM、DEX 换币、交易广播、数据库或多链。A 的独立只读入口已读取真实 DEX 日志，不执行交易。
 
-**实际运行的工程能力：** Zod/TypeScript 合同、确定性评分和压力测试、Policy 硬门控、Executor 名单/方向/限额检查、流程编排、独立重读、效果验证、API/UI 与测试。**独立扩展中的实际链上能力：** Aave 只读查询；它不代表主 Guardian 已能执行真实防御交易。
+**实际运行的工程能力：** Zod/TypeScript 合同、确定性评分和压力测试、Policy 硬门控、Executor 名单/方向/限额检查、流程编排、独立重读、效果验证、API/UI 与测试。**实际链上读取能力：** A 的 ETH/USDC 余额、Chainlink oracle 当前/历史价和单池卖压，另有独立 Aave 查询；这些能力不代表主 Guardian 已能执行真实防御交易。
 
 OpenAPI 文档验证范围为 JSON 解析、内部引用及示例对 Zod 合同的检查；仓库没有专门 OpenAPI 规范校验器，未声称完成完整 OpenAPI 规范验证。
 
 ## 验收标准
 
 - [ ] `pnpm typecheck`、`pnpm test`、`pnpm build` 全部通过。
+- [ ] A 的真实只读 portfolio / market / signal 命令与严格 JSON 通过 [数据验收标准](docs/ethereum-data.md)，余额/报价/交易可核验，故障明确失败。
 - [ ] 两个链上合同可从公共入口导入；测试验证三类证据必填引用、零基线拒绝、ratio 一致性、UTC 窗口、计数关系及未知字段拒绝。
 - [ ] 无真实 Key/RPC 时启动核心页面，明确显示 MOCK MODE。
 - [ ] Run Demo 展示 10 ETH / $30,000 / 100% → 模拟 $3,000 → $2,700 → Risk 91 / Confidence 88% → Policy Triggered → Mock 3 ETH → 8,100 USDC → 独立重读 7 ETH / 8,100 USDC / 70% → PASSED。

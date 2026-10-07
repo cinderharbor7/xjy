@@ -1,2 +1,4 @@
+allowBuilds:
+  esbuild@0.28.2: true
 minimumReleaseAgeExclude:
   - '@aave-dao/aave-address-book@4.71.3'
