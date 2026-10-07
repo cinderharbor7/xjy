@@ -1,5 +1,11 @@
 # Autonomous On-chain Risk Guardian
 
+## BOT Chain 风险调查报告存证
+
+新增 [`/attestations`](http://localhost:3000/attestations)：导出已有 Guardian 调查/证据/策略/执行结果或 ETH Risk Lab 快照，以规范化 JSON 的 Keccak-256 哈希存证到 BOT Chain 测试网（968）。支持 MetaMask 部署合约、发布、进度/回执查询、JSON 下载和内容防篡改核验。不保存 BOT 钱包私钥，也不改变 Ethereum 分析或本地 Fork 执行网络。
+
+真实/Mock/Fork 来源标签随报告保存。研究快照没有策略执行时明确记为 null，存证不代表报告结论真实。首次 BOT 部署与发布需要用户在 MetaMask 确认；[部署与使用步骤](docs/bot-report-attestation.md)包含网络参数、环境变量和验证边界。
+
 ## ETH Crash Risk Lab demo
 
 本次 ETH 链数据研究界面位于 [`/risk-lab`](http://localhost:3000/risk-lab)，API 为 `GET /api/eth-risk`。它使用经过 `OnchainSignalStateSchema` 校验的确定性链数据样本，展示卖压、波动率、杠杆、泡沫状态和左尾分位数五层模型，并把模型依据、置信度、证据引用和仓位建议放在同一页面。当前响应明确标记为 `MOCK_CHAIN_FIXTURE`，没有 RPC 读取、真实交易或实时预测；研究边界和替换真实 ETH 面板的步骤见 [`docs/eth-risk-lab.md`](docs/eth-risk-lab.md)。

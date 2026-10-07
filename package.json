@@ -13,7 +13,10 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "contract:compile": "node scripts/compile-attestation.mjs",
+    "contract:check": "node scripts/compile-attestation.mjs --check",
+    "contract:test": "node scripts/test-attestation-evm.mjs"
   },
   "dependencies": {
     "@aave-dao/aave-address-book": "4.71.3",
@@ -27,6 +30,7 @@
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "solc": "0.8.30",
     "typescript": "5.9.3",
     "vitest": "5.0.3"
   }
