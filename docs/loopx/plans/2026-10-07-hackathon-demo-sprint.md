@@ -120,13 +120,13 @@ C 的父提交 `bbfde9c` 校准研究不纳入冻结候选版：它使用与现�
 合并完成条件是整合 diff 独立审阅无未解决的 Critical/Important 问题，typecheck/test/build 及仓库新增的 HTTP、指纹与构建回归通过，浏览器实际检查首页、Guardian 与只读调查入口；README 启动步骤与新路径一致。创建并附加集成 PR，经检查后合入 main，验证远端 main 包含该集成 commit；不删除队友分支或改写远端历史。
 
 > writes: `D 来源分支的整合 diff`, `必要修复与相应测试`, `README.md`, `docs/unified-frontend.md`, `docs/local-integration-acceptance.md`, `本计划`, `docs/evidence/2026-10-07-integration/`
-> anchors: `用户2026-10-07明确合并请求; 公共合同稳定; A/B/C证据保留; 既有computer use验收授权; 不广播未授权交易`
+> anchors: `用户2026-10-07明确合并请求; AC-003/004/007/008; D-008; TC-007; 公共合同稳定; A/B/C证据保留; 既有computer use验收授权; 不广播未授权交易`
 > verify: `pnpm install --frozen-lockfile；pnpm typecheck；pnpm test；pnpm build；pnpm test:fingerprint；pnpm contract:check；pnpm test:http；pnpm test:sculpture；实际浏览器入口/报告/Mock闭环；git diff --check；GitHub PR/main状态`
 > review: `整合exact diff；HTTP同源/钱包/事件状态；前端证据与未知项；钱包确认和公开配置；运行及文档迁移；无未授权部署或秘密提交`
 
 ## Integration And Final Verification
 
-本计划覆盖 AC-001–008、D-001–007、TC-001–006；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。没有新增软件行为，公共合同、API、执行权限和持久状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
+本计划覆盖 AC-001–008、D-001–008、TC-001–007；各 slice 的 anchors 指向冻结方案中的需求、设计合同和验收。P-001–005 保留当时的边界；P-006 记录后续授权的 D 迁移与必要修复。公共领域合同、核心 Policy/Executor 与事件状态保持原样。共享文件先由负责人完成，再顺序复核；不能让多人同时覆盖同一材料。
 
 修改前基线为 2026-10-07 15:54 的 `pnpm test`：**896 passed / 2 skipped**。历史运行验收见 [交易核验记录](../../transaction-check.md) 和 [团队集成验收](../../team-integration-acceptance.md)。只有新鲜命令/实际操作才可证明最终结果；后续经授权修改代码时重新跑相应检查。
 

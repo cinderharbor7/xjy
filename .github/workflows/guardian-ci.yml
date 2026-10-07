@@ -18,8 +18,11 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec next typegen
+      - run: pnpm contract:check
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm test:fingerprint
       - run: pnpm build
+      - run: pnpm test:http
+      - run: pnpm test:sculpture
       # Local Fork acceptance is explicit opt-in; CI has no signing key or mainnet RPC.

@@ -1,12 +1,9 @@
-import { createRequire } from "node:module";
-import { createElement, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import { ExecutionBadge, StressChart, VerificationBadge, VerificationDetails } from "@/app/rescue-display";
+import { ExecutionBadge, StressChart, VerificationBadge, VerificationDetails } from "../web/pages/rescue-display.js";
 import type { ExecutionResult, VerificationResult } from "@/domain/types";
 
-const { renderToStaticMarkup: render } = createRequire(import.meta.url)("react-dom/server") as {
-  renderToStaticMarkup(node: ReactNode): string;
-};
+const render = (html: string) => html;
+const createElement = (component: (props: any) => string, props: any) => component(props);
 
 describe("rescue result presentation", () => {
   it("does not describe a successful transaction with failed verification as protected", () => {

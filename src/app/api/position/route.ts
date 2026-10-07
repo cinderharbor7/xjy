@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { PositionProblemSchema, PositionQuerySchema, PositionSnapshotSchema } from "@/extensions/aave/schemas";
 import type { PositionProblem } from "@/extensions/aave/types";
 import { getAavePositionSnapshot } from "@/extensions/aave/integration";
@@ -8,7 +7,7 @@ export const runtime = "nodejs";
 
 function problem(status: PositionProblem["status"], code: PositionProblem["code"], title: string, detail: string) {
   const body = PositionProblemSchema.parse({ type: `urn:xjy:position:${code}`, title, status, detail, instance: "/api/position", code });
-  return NextResponse.json(body, { status, headers: { "Content-Type": "application/problem+json", "Cache-Control": "no-store" } });
+  return Response.json(body, { status, headers: { "Content-Type": "application/problem+json", "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
@@ -24,7 +23,7 @@ export async function POST(request: Request) {
   }
   try {
     const snapshot = PositionSnapshotSchema.parse(await getAavePositionSnapshot(parsed.data.wallet));
-    return NextResponse.json(snapshot, { headers: { "X-Position-Mode": "LIVE", "Cache-Control": "no-store" } });
+    return Response.json(snapshot, { headers: { "X-Position-Mode": "LIVE", "Cache-Control": "no-store" } });
   } catch (cause) {
     if (cause instanceof PositionReadError) {
       if (cause.code === "CONFIGURATION_ERROR") return problem(503, cause.code, "Position reader is not configured", cause.message);

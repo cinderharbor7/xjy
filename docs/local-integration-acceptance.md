@@ -1,6 +1,6 @@
 # A/B/C 本地整合验收
 
-2026-10-07，Asia/Shanghai。本轮用户授权先在本地整合，结果保留为未提交的候选版；没有 push、修改 main 或更新主工作区。
+2026-10-07，Asia/Shanghai。前半部分是 17:27–17:55 本地候选验收，当时没有 push、修改 main 或更新主工作区。用户随后明确授权“合并”，D 的新鲜整合记录见本文最后一节，不将两轮状态混用。
 
 ## 范围与来源
 
@@ -93,3 +93,42 @@ worktree：`/Users/miyakostella/.codex/worktrees/abc-local-integration/xjy`。
 可本地整合的候选包是 **A 真实证据＋B 方法说明/待验证对照＋C 验收文档**，保留当前运行流程。整条 C 校准分支尚不适合直接并入冻结版。
 
 本地检查不等于 main 已更新、PR 已创建或比赛已提交。下一步 D 可引用这套材料检查演示，B 补真实对照原始记录；线上 RPC、Fork/Agent 缺口与最终提交分别按实际验收处理。唯一执行状态真源仍为[冲刺计划](loopx/plans/2026-10-07-hackathon-demo-sprint.md)。
+
+## D 整合与发布前复验
+
+18:25–18:46，用户明确要求“合并”。D 来源固定为 `a3f227238011cc0a56b8a40bc87caf0583a8da02`，与已审阅 A/B/C 材料合并并保留提交历史；C `bbfde9c` 研究代码仍未纳入。前端迁移为 `web/` 原生 JS/Vite 与 `server/` 同源服务，保护实验移到 `/guardian`。公共 domain schema、核心 Policy/Executor 和 Guardian 事件状态没有改动。
+
+整合中修复并新增测试：环境优先级保持进程 > `.env.local` > `.env`；报告绑定请求、输入变化清除旧结果；NFT/存证广播前保存占用、未知回执仅查原 hash、存储失败禁止重播；确认 NFT 的元数据与时间从已核验链上 URI 读取。独立审阅提出的问题已顺序修复并复验。
+
+| 新鲜检查 | 结果 |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | exit 0 |
+| D 合入未修复基线 | 932 passed / 6 skipped |
+| `pnpm typecheck` | exit 0 |
+| `pnpm test` | 18:39、18:48 两次均 969 passed / 6 skipped；46 文件通过、2 文件跳过 |
+| 最后源码修改后的 `pnpm build` | 18:42，生产构建 exit 0 |
+| `pnpm contract:check` | 固定报告合约产物与源码/编译器一致 |
+| `pnpm test:fingerprint` | 5 passed；仅隔离本地 EVM 和计算验证 |
+| 最后构建后的 `pnpm test:http` | 11 路径、资源、同源限制、策略版本、不触发跳过、Mock 成功和重复事件拦截通过 |
+| 最后构建后的 `pnpm test:sculpture` | 预编译源匹配，8 个生产材质创建成功；不是 GPU 视觉验收 |
+
+六项条件测试跳过未计为通过。本轮没有连接钱包、签名、公开测试网部署/铸造、BOT 主网部署、真实 LLM 或 Anvil/Fork 自动执行。BOT 模块配置为测试网 968，不是赛事提供的主网 677 有效部署证明。
+
+发布前独立复核未发现秘密泄漏、危险默认值或未解决的问题。CI 已补上指纹 `.test.mjs`、生产 HTTP 与 sculpture 检查，避免仅 Vitest 绿色掩盖新增模块回归。
+
+### D 新版 browser 操作
+
+生产服务运行在 `http://127.0.0.1:3101`，新 journal `.guardian/d-unified-merge.sqlite`，此前 journal 与主工作区配置未动。Guardian 明确 MOCK、固定测试钱包、监控暂停；真实只读查询使用 `https://eth.drpc.org`，无存档/Mock 补齐。
+
+| 操作 | 实际观察 |
+| --- | --- |
+| 首页 | 图鉴与导航可加载，行情标为演示数据 |
+| `/guardian` 点击“运行一次保护流程” | Risk 91 / Confidence 88%；Policy 批准 30 个百分点；Mock 3 ETH → 8100 USDC；独立 after 敞口 70%，8 项验证 PASSED |
+| 再次运行 | 执行机会已占用，没有第二次兑换 |
+| `/investigate` 真实转账，18:39:29 | 20059.2 ETH，区块 20449709，0 日志；明确不是已确认卖出 |
+| 改为 `bad` | 旧报告立即清除，提交显示完整交易哈希校验错误 |
+| 最后构建后真实 SELL，18:46:18 | logIndex 12；0.198 WETH / 517.590594 USDC；保留钱包净方向、美元价值与因果未知项 |
+
+证据：[Mock 闭环](evidence/2026-10-07-integration/d-browser-guardian.txt)、[重复拦截](evidence/2026-10-07-integration/d-browser-duplicate.txt)、[真实转账](evidence/2026-10-07-integration/d-browser-transfer.txt)、[新版真实 SELL](evidence/2026-10-07-integration/d-browser-sell.txt)、[SELL 页面截图](evidence/2026-10-07-integration/d-browser-sell.png)。指纹 GPU、移动端排版与实际钱包交互未验收。
+
+截至本节写入时集成候选已验证，发布与合并状态以实际 PR/main 为准。比赛提交、需求验证、真实 Agent 与 BOT 主网资格仍是独立未完成事项。

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f7f1e7" />
+    <meta
+      name="description"
+      content="VERDANT：从币种指纹观察市场，沿着数据核验交易、理解风险并记录证据。"
+    />
+    <title>资产观察 · VERDANT</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="VERDANT 资产观察首页"
+        ><svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path
+            d="M8 26C3 8 28 0 34 16M12 30C4 9 31 4 30 21M17 33C4 17 24 5 26 19c1 6-7 6-7 0M22 35C10 29 9 18 16 13M29 31c-4 0-8-3-10-7M34 26c-2 1-4 1-6 0"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          /></svg
+        ><span>VERDANT<small>资产、指纹与证据</small></span></a
+      >
+      <nav aria-label="主导航">
+        <a href="/" data-nav="/">资产观察</a
+        ><a href="/investigate" data-nav="/investigate">交易核验</a
+        ><a href="/risk-lab" data-nav="/risk-lab">风险研究</a
+        ><a href="/position" data-nav="/position">Aave 仓位</a
+        ><a href="/guardian" data-nav="/guardian">保护实验</a
+        ><a href="/attestations" data-nav="/attestations">报告存证</a
+        ><a href="/collection" data-nav="/collection">指纹收藏</a>
+      </nav>
+      <button class="wallet-button" data-action="wallet">
+        <span aria-hidden="true">▱</span><span id="wallet-label">连接钱包</span>
+      </button>
+    </header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="site-footer">
+      <a class="footer-name" href="/">VERDANT / 让每一次判断有据可循。</a>
+      <div>
+        <button data-action="guide">读懂货币指纹</button
+        ><span>BOT Chain Testnet</span>
+      </div>
+      <small
+        >指纹是数据表达。来源、范围与未知项保留在各模块中；研究与收藏不构成交易授权。</small
+      >
+    </footer>
+    <dialog id="modal"><div id="modal-body"></div></dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

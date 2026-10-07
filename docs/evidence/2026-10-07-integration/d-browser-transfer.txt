@@ -1,0 +1,216 @@
+[p1 "交易核验 · VERDANT" | space "D 新版合并验收"(2): 1 managed, 0 untracked — p1* "交易核验 · VERDANT"]
+root
+  container
+    anchor [ref=68, loc=href:/investigate#main, url=http://127.0.0.1:3101/investigate#main]
+      text "跳到主要内容"
+    container
+      anchor "VERDANT 资产观察首页" [ref=69, loc=css:a[aria-label="VERDANT 资产观察首页"], url=http://127.0.0.1:3101/]
+        svg_root
+        container
+          text "VERDANT"
+          text "资产、指纹与证据"
+      container "主导航"
+        anchor [ref=70, url=http://127.0.0.1:3101/]
+          text "资产观察"
+        anchor [ref=71, url=http://127.0.0.1:3101/investigate]
+          text "交易核验"
+        anchor [ref=72, url=http://127.0.0.1:3101/risk-lab]
+          text "风险研究"
+        anchor [ref=73, url=http://127.0.0.1:3101/position]
+          text "Aave 仓位"
+        anchor [ref=74, loc=href:/guardian, url=http://127.0.0.1:3101/guardian]
+          text "保护实验"
+        anchor [ref=75, url=http://127.0.0.1:3101/attestations]
+          text "报告存证"
+        anchor [ref=76, loc=href:/collection, url=http://127.0.0.1:3101/collection]
+          text "指纹收藏"
+      button [ref=77]
+        text "▱"
+        text "连接钱包"
+    container [ref=78]
+      container
+        container
+          paragraph
+            text "Ethereum 专属"
+          heading
+            text "交易核验"
+          paragraph
+            text "核对一笔 Ethereum 交易的外层事实与指定池兑换，保留能够确认和不能确认的边界。"
+        container
+          anchor [ref=79, url=http://127.0.0.1:3101/coins/ETH]
+            image "ETH 身份指纹，未绑定此处行情"
+            container
+              text "ETH"
+              text "以太坊"
+          text "身份指纹 · 各模块数据来源独立"
+      container
+        anchor [ref=80, url=http://127.0.0.1:3101/coins/ETH]
+          text "ETH 数据与指纹"
+        anchor [ref=81, url=http://127.0.0.1:3101/investigate]
+          text "交易核验"
+        anchor [ref=82, url=http://127.0.0.1:3101/risk-lab]
+          text "风险研究"
+        anchor [ref=83, url=http://127.0.0.1:3101/position]
+          text "Aave 仓位"
+        anchor [ref=84, url=http://127.0.0.1:3101/attestations]
+          text "报告存证"
+      form
+        text "Ethereum 交易哈希"
+        container
+          textbox [ref=85, loc=css:input[name="value"]]
+            text "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a"
+          button [ref=86]
+            text "核验这笔交易"
+          button [ref=87]
+            text "填入示例"
+        paragraph
+          text "仅从配置的主网 RPC 读取；未配置或读取失败时不回退 Mock。目前仅解析 Uniswap V3 WETH/USDC 0.05% 池，不推断身份或后续去向。"
+      container
+        container
+          text "LIVE_READ_ONLY"
+          heading
+            text "已核验交易，当前范围没有可确认的兑换证据"
+          paragraph
+            text "外层 ETH 金额描述的是这笔交易附带的原生 ETH；它不等于卖出。回执中未发现足以分类的本池非零 Swap 事件，也不能据此断言其他地方没有卖出。"
+          text "核查时间 2026/10/7 18:39:29"
+        container
+          heading
+            text "已确认的事实"
+          unordered_list
+            list_item
+              text "区块 20449709，时间 2024-08-03T18:08:23.000Z；回执状态 成功。"
+            list_item
+              text "外层发送地址 0x98629555d323324b9415471033f2745c57b608c6；接收地址 0xf584f8728b874a6a5c7a8d4d387c9aae9172d621。"
+            list_item
+              text "外层交易附带原生 ETH：20059.2 ETH；输入数据为空。"
+            list_item
+              text "回执共有 0 条日志；其中 0 条符合已核验单池的非零兑换方向。"
+        container
+          heading
+            text "仍无法确认"
+          unordered_list
+            list_item
+              text "事实读取来自单个配置 RPC，浏览器链接供独立核查；未做多节点或密码学验证。"
+            list_item
+              text "兑换核验只覆盖 Ethereum 主网 Uniswap V3 WETH/USDC 0.05% 单池，不覆盖其他池、DEX 或链。"
+            list_item
+              text "未读取内部调用 trace、后续资金路径或交易所成交；不能确定整笔交易的净买卖方向。"
+            list_item
+              text "发送地址是链上地址，未核验所属机构或个人，也无法确认转账动机。"
+            list_item
+              text "链上交易与行情先后发生不证明因果；本报告不判断是否导致 ETH 下跌，也不提供买卖建议。"
+            list_item
+              text "USDC 数量按代币 decimals 计算，未读取历史美元报价；不能当作等额美元价值。"
+        container
+          heading
+            text "外层交易记录"
+          paragraph
+            text "外层 ETH 金额不等于钱包净流出，也不等于卖出数量。"
+          unordered_list
+            list_item
+              text "状态"
+            list_item
+              text "SUCCESS"
+            list_item
+              text "原生 ETH 金额"
+            list_item
+              text "20059.2 ETH"
+            list_item
+              text "交易"
+            list_item
+              anchor [ref=90, url=https://etherscan.io/tx/0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a]
+                text "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a"
+                text "↗"
+            list_item
+              text "From"
+            list_item
+              anchor [ref=91, loc=href:https://etherscan.io/address/0x98629555d323324b9415471033f2745c57b608c6, url=https://etherscan.io/address/0x98629555d323324b9415471033f2745c57b608c6]
+                text "0x98629555d323324b9415471033f2745c57b608c6"
+                text "↗"
+            list_item
+              text "To"
+            list_item
+              anchor [ref=92, loc=href:https://etherscan.io/address/0xf584f8728b874a6a5c7a8d4d387c9aae9172d621, url=https://etherscan.io/address/0xf584f8728b874a6a5c7a8d4d387c9aae9172d621]
+                text "0xf584f8728b874a6a5c7a8d4d387c9aae9172d621"
+                text "↗"
+            list_item
+              text "区块"
+            list_item
+              anchor [ref=93, loc=href:https://etherscan.io/block/20449709, url=https://etherscan.io/block/20449709]
+                text "20449709"
+                text "↗"
+            list_item
+              text "区块哈希"
+            list_item
+              text "0x1ea7d59632f0aeb0d3a97c83c5118d97d5f3c39115b02722a7d88d9b75a1a458"
+            list_item
+              text "区块时间"
+            list_item
+              text "2024/8/4 02:08:23"
+            list_item
+              text "日志数"
+            list_item
+              text "0"
+          container [ref=94]
+            text "交易输入数据"
+          text ""0x""
+        container
+          heading
+            text "指定池兑换证据"
+          paragraph
+            text "Uniswap V3 WETH/USDC 0.05%（Ethereum 主网单池）"
+          paragraph
+            anchor [ref=95, loc=href:https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640, url=https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640]
+              text "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+              text "↗"
+          anchor [ref=96, loc=href:/coins/WETH, url=http://127.0.0.1:3101/coins/WETH]
+            image "WETH 身份指纹，未绑定此处行情"
+            text "WETH"
+            text "包装以太币"
+          anchor [ref=97, loc=href:/coins/USDC, url=http://127.0.0.1:3101/coins/USDC]
+            image "USDC 身份指纹，未绑定此处行情"
+            text "USDC"
+            text "美元稳定币"
+          paragraph
+            text "WETH 是包装 ETH；USDC 列为代币数量，不换算成美元。事件不合并为钱包净买卖方向。"
+          paragraph
+            text "未找到该池的兑换证据，不代表在其他池或场所没有卖出。"
+        container
+          heading
+            text "证据出处"
+          unordered_list
+            list_item
+              text "核验外层交易的发送、接收、原生 ETH 金额、输入数据与回执状态。"
+            list_item
+              text "核验交易所在区块、时间与交易索引；查询结束时再次检查主链区块哈希。"
+          anchor [ref=98, url=https://etherscan.io/tx/0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a]
+            text "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a"
+            text "↗"
+          paragraph
+            text "https://etherscan.io/tx/0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a"
+          anchor [ref=99, url=https://etherscan.io/block/0x1ea7d59632f0aeb0d3a97c83c5118d97d5f3c39115b02722a7d88d9b75a1a458]
+            text "0x1ea7d59632f0aeb0d3a97c83c5118d97d5f3c39115b02722a7d88d9b75a1a458"
+            text "↗"
+          paragraph
+            text "https://etherscan.io/block/20449709"
+        container
+          heading
+            text "下一步"
+          unordered_list
+            list_item
+              text "打开交易和区块出处，核对原始交易、回执状态及日志。"
+            list_item
+              text "如果消息声称某机构卖出，请另行核验地址标签、完整资金路径与实际成交证据。"
+    container
+      anchor [ref=88, url=http://127.0.0.1:3101/]
+        text "VERDANT / 让每一次判断有据可循。"
+      button [ref=89]
+        text "读懂货币指纹"
+      text "BOT Chain Testnet"
+      text "指纹是数据表达。来源、范围与未知项保留在各模块中；研究与收藏不构成交易授权。"
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root

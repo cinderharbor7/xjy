@@ -1,0 +1,95 @@
+{
+  "contractName": "RiskReportRegistry",
+  "compiler": "0.8.30+commit.73712a01.Emscripten.clang",
+  "evmVersion": "paris",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "AlreadyPublished",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "EmptyReportHash",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "publisher",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "ReportPublished",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "REGISTRY_ID",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "publisher",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "attestations",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "publish",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b506101eb8061001f6000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80636ad3f74c146100465780638b2e6dcf1461007f578063f2cb7bad14610094575b600080fd5b61006d7fdf79ff0c1a4e3c851ef9b74a638b0fa214418cb6dbd57d4c569cb68c77d312ea81565b60405190815260200160405180910390f35b61009261008d366004610164565b6100bc565b005b61006d6100a236600461017d565b600060208181529281526040808220909352908152205481565b806100da57604051632de2024560e21b815260040160405180910390fd5b336000908152602081815260408083208484529091529020541561011157604051639ac89bcd60e01b815260040160405180910390fd5b336000818152602081815260408083208584528252918290204290819055915191825283917fbd258e1d6b4b67bb66e9243665a29fcceb93ecad220935ea88bfad222bb8b2ae910160405180910390a350565b60006020828403121561017657600080fd5b5035919050565b6000806040838503121561019057600080fd5b82356001600160a01b03811681146101a757600080fd5b94602093909301359350505056fea26469706673582212202e197b5e0732c3621dc1cf402a21b61f3cb3c0fbe01ce59dc5486cb64337069164736f6c634300081e0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80636ad3f74c146100465780638b2e6dcf1461007f578063f2cb7bad14610094575b600080fd5b61006d7fdf79ff0c1a4e3c851ef9b74a638b0fa214418cb6dbd57d4c569cb68c77d312ea81565b60405190815260200160405180910390f35b61009261008d366004610164565b6100bc565b005b61006d6100a236600461017d565b600060208181529281526040808220909352908152205481565b806100da57604051632de2024560e21b815260040160405180910390fd5b336000908152602081815260408083208484529091529020541561011157604051639ac89bcd60e01b815260040160405180910390fd5b336000818152602081815260408083208584528252918290204290819055915191825283917fbd258e1d6b4b67bb66e9243665a29fcceb93ecad220935ea88bfad222bb8b2ae910160405180910390a350565b60006020828403121561017657600080fd5b5035919050565b6000806040838503121561019057600080fd5b82356001600160a01b03811681146101a757600080fd5b94602093909301359350505056fea26469706673582212202e197b5e0732c3621dc1cf402a21b61f3cb3c0fbe01ce59dc5486cb64337069164736f6c634300081e0033",
+  "runtimeCodeHash": "0xd9554722186abc3d437c74e5a593fad5822f27db57d2ce2900def09af7bd79c8"
+}
