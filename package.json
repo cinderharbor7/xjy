@@ -8,29 +8,44 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
-    "start": "next start --hostname 127.0.0.1",
+    "dev": "tsx server/index.ts",
+    "build": "node scripts/compile-sculpture.mjs && vite build",
+    "start": "tsx server/index.ts --production",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "data:read": "tsx src/modules/onchain/read-cli.ts",
-    "data:analyze": "tsx scripts/analyze-onchain.ts"
+    "data:analyze": "tsx scripts/analyze-onchain.ts",
+    "contract:compile": "node scripts/compile-attestation.mjs",
+    "contract:check": "node scripts/compile-attestation.mjs --check",
+    "contract:test": "node scripts/test-attestation-evm.mjs",
+    "test:ui": "vitest run tests/frontend",
+    "test:fingerprint": "node --test tests/fingerprint/*.test.mjs",
+    "fingerprint:compile": "node scripts/compile-fingerprint.mjs",
+    "dev:preview": "tsx scripts/preview.ts",
+    "test:http": "node scripts/verify-web.mjs",
+    "sculpture:compile": "node scripts/compile-sculpture.mjs",
+    "test:sculpture": "node scripts/verify-sculpture.mjs"
   },
   "dependencies": {
     "@aave-dao/aave-address-book": "4.71.3",
-    "next": "16.3.8",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
     "viem": "2.57.3",
-    "zod": "4.6.5"
+    "zod": "4.6.5",
+    "@openzeppelin/contracts": "5.0.2",
+    "ethers": "^6.15.0",
+    "three": "0.155.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "solc": "0.8.30",
     "tsx": "4.23.15",
     "typescript": "5.9.3",
-    "vitest": "5.0.3"
+    "vitest": "5.0.3",
+    "@tailwindcss/vite": "^4.1.0",
+    "tailwindcss": "^4.1.0",
+    "vite": "^7.1.0",
+    "ganache": "^7.9.2",
+    "jsdom": "^26.1.0",
+    "shader-park-core": "^0.2.8"
   }
 }

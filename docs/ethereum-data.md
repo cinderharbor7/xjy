@@ -1,5 +1,7 @@
 # A：真实 Ethereum 数据交接
 
+2026-10-07 比赛当前交付见 [A → B / D 真实数据与案例](demo-cases.md)：新鲜窗口、三笔重新核验的交易及原始输出。下文保留早期 A 实现记录；B/C/装配现状以[比赛冻结方案](loopx/design/2026-10-07-hackathon-freeze/需求设计文档.md)和当前代码为准。
+
 本轮仅交付只读数据。交付分支为 `feat/a-live-data`，原开发分支 `feat/ethereum-live-data` 基于 `main` 提交 `1ab57ee`；不修改冻结 Domain、首页、现有 API、Mock、Risk、Investigation、Policy 或 Executor。B/D 可以消费三个独立合同，不需要依赖 A 的 RPC 内部字段。
 
 ## 读取入口

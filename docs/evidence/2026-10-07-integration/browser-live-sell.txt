@@ -1,0 +1,224 @@
+[p1 "ETH 交易核验 · 只读 MVP" | space "本地集成 Demo 验收"(1): 1 managed, 0 untracked — p1* "ETH 交易核验 · 只读 MVP"]
+root
+  container
+    container
+      container
+        anchor [ref=43, loc=href:/, url=http://127.0.0.1:3101/]
+          text "← 返回 Guardian Demo"
+        text "LIVE READ ONLY · Ethereum 主网"
+      container
+        paragraph
+          text "ETH 交易核验 · MVP"
+        heading
+          text "大额转账，"
+          text "就等于有人在卖吗？"
+        paragraph
+          text "把消息中的交易哈希贴进来，查看链上实际记录了什么、哪些结论有证据、哪些还不能确定。"
+        paragraph
+          text "当前覆盖：Ethereum 主网外层交易 + Uniswap V3 WETH/USDC 0.05% 单池。输入不会触发签名、转账或交易。"
+      container "先核查一笔交易"
+        heading
+          text "先核查一笔交易"
+        form
+          text "Ethereum 交易哈希（Tx Hash）"
+          container
+            textbox [ref=44, loc=css:input[name="txHash"]]
+              text "0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9"
+            button [ref=45]
+              text "核验交易"
+          paragraph
+            text "在区块浏览器的交易详情或链上异动消息中复制完整 Tx Hash。"
+          button [ref=46]
+            text "填入真实大额转账示例（20,059.2 ETH）"
+          paragraph
+            text "示例只填入历史交易哈希；点击「核验交易」仍会从真实 RPC 读取，不使用 Mock 结果。"
+      status
+        text "核验完成。下方是本次交易报告。"
+      container "交易核验报告"
+        container
+          paragraph
+            text "核验结论 · 仅依据已读取的链上记录"
+          heading
+            text "本池日志确认存在 WETH 换 USDC 的兑换"
+          paragraph
+            text "交易包含 WETH 流入、USDC 流出本池的 Swap 事件。这支持本池内卖出方向，不证明发送方在整笔交易净卖出，更不能据此解释 ETH 下跌。"
+          paragraph
+            text "查询时间："
+            text "2026-10-07T09:54:49.409Z"
+            text "· 实时只读查询"
+        container
+          heading
+            text "已确认的事实"
+          unordered_list
+            list_item
+              text "区块 26138703，时间 2026-10-07T06:25:23.000Z；回执状态 成功。"
+            list_item
+              text "外层发送地址 0x1c65598d9affd13f13adde7c17a39808ab63e136；接收地址 0x4313c378cc91ea583c91387b9216e2c03096b27f。"
+            list_item
+              text "外层交易附带原生 ETH：0.2 ETH；输入数据不为空。"
+            list_item
+              text "回执共有 18 条日志；其中 1 条符合已核验单池的非零兑换方向。"
+            list_item
+              text "日志 12：WETH → USDC，0.198 WETH / 517.590594 USDC。"
+        container
+          heading
+            text "现在还不能确认什么"
+          unordered_list
+            list_item
+              text "事实读取来自单个配置 RPC，浏览器链接供独立核查；未做多节点或密码学验证。"
+            list_item
+              text "兑换核验只覆盖 Ethereum 主网 Uniswap V3 WETH/USDC 0.05% 单池，不覆盖其他池、DEX 或链。"
+            list_item
+              text "未读取内部调用 trace、后续资金路径或交易所成交；不能确定整笔交易的净买卖方向。"
+            list_item
+              text "发送地址是链上地址，未核验所属机构或个人，也无法确认转账动机。"
+            list_item
+              text "链上交易与行情先后发生不证明因果；本报告不判断是否导致 ETH 下跌，也不提供买卖建议。"
+            list_item
+              text "USDC 数量按代币 decimals 计算，未读取历史美元报价；不能当作等额美元价值。"
+        container
+          heading
+            text "这笔交易的外层记录"
+          paragraph
+            text "外层 ETH 金额指这笔交易携带的原生 ETH，不等于钱包最终净流出，也不等于卖出的金额。"
+          unordered_list
+            list_item
+              text "交易状态"
+            list_item
+              text "执行成功"
+            list_item
+              text "外层 ETH 金额"
+            list_item
+              text "0.2"
+              text "ETH"
+            list_item
+              text "交易哈希"
+            list_item
+              anchor [ref=55, url=https://etherscan.io/tx/0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9]
+                text "0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9"
+                text "↗"
+                text "（在新窗口打开 Etherscan）"
+            list_item
+              text "发起地址（from）"
+            list_item
+              anchor [ref=56, loc=href:https://etherscan.io/address/0x1c65598d9affd13f13adde7c17a39808ab63e136, url=https://etherscan.io/address/0x1c65598d9affd13f13adde7c17a39808ab63e136]
+                text "0x1c65598d9affd13f13adde7c17a39808ab63e136"
+                text "↗"
+                text "（在新窗口打开 Etherscan）"
+            list_item
+              text "接收地址（to）"
+            list_item
+              anchor [ref=57, loc=href:https://etherscan.io/address/0x4313c378cc91ea583c91387b9216e2c03096b27f, url=https://etherscan.io/address/0x4313c378cc91ea583c91387b9216e2c03096b27f]
+                text "0x4313c378cc91ea583c91387b9216e2c03096b27f"
+                text "↗"
+                text "（在新窗口打开 Etherscan）"
+            list_item
+              text "所在区块"
+            list_item
+              anchor [ref=58, loc=href:https://etherscan.io/block/26138703, url=https://etherscan.io/block/26138703]
+                text "26138703"
+                text "↗"
+                text "（在新窗口打开 Etherscan）"
+            list_item
+              text "区块哈希"
+            list_item
+              text "0x66f58d81781883ae43d1f4b383da64fe7f35a977dd5b2a2b5e6271d3be97281b"
+            list_item
+              text "区块时间（UTC）"
+            list_item
+              text "2026-10-07T06:25:23.000Z"
+            list_item
+              text "回执中的日志数量"
+            list_item
+              text "18"
+            list_item
+              text "输入数据（input）"
+            list_item
+              container [ref=59]
+                text "1156 字节 · 展开查看"
+              text "0xeffbec1300000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002c68af0bb1400..."
+        container
+          heading
+            text "指定池里的兑换证据"
+          paragraph
+            text "本次只检查"
+            text "Uniswap V3 WETH/USDC 0.05%（Ethereum 主网单池）"
+            text "。WETH 是包装后的 ETH；下方 USDC 是代币数量，没有换算成美元价值。"
+          paragraph
+            text "池地址："
+            anchor [ref=60, url=https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640]
+              text "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+              text "↗"
+              text "（在新窗口打开 Etherscan）"
+          table
+            text "同一笔交易内的已识别兑换事件；不合并为钱包净买卖方向"
+            table_row
+              table_cell
+                text "日志序号"
+              table_cell
+                text "池内兑换方向"
+              table_cell
+                text "WETH 数量"
+              table_cell
+                text "USDC 数量"
+            table_row
+              table_cell
+                text "12"
+              table_cell
+                text "卖出 WETH → 收到 USDC"
+              table_cell
+                text "0.198"
+              table_cell
+                text "517.590594"
+        container
+          heading
+            text "可以自己核查的出处"
+          unordered_list
+            list_item
+              anchor [ref=61, url=https://etherscan.io/tx/0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9]
+                text "交易与回执"
+                text "↗"
+                text "（在新窗口打开 Etherscan）"
+              paragraph
+                text "核验外层交易的发送、接收、原生 ETH 金额、输入数据与回执状态。"
+              text "核查链接："
+              text "https://etherscan.io/tx/0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9"
+            list_item
+              anchor [ref=62, url=https://etherscan.io/block/0x66f58d81781883ae43d1f4b383da64fe7f35a977dd5b2a2b5e6271d3be97281b]
+                text "区块记录"
+                text "↗"
+                text "（在新窗口打开 Etherscan）"
+              paragraph
+                text "核验交易所在区块、时间与交易索引；查询结束时再次检查主链区块哈希。"
+              text "核查链接："
+              text "https://etherscan.io/block/26138703"
+            list_item
+              anchor [ref=63, url=https://etherscan.io/tx/0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9]
+                text "交易中的合约事件"
+                text "↗"
+                text "（在新窗口打开 Etherscan）"
+              paragraph
+                text "本池 Swap 日志 12：WETH 流入池、USDC 流出池；WETH=0.198，USDC=517.590594。"
+              text "核查链接："
+              text "https://etherscan.io/tx/0x310948594828e864aff5f1bc133968b80889379ec66091e734a6758bf8abc9e9#eventlog"
+              paragraph
+                anchor [ref=64, url=https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640]
+                  text "查看事件所属合约"
+                  text "↗"
+                  text "（在新窗口打开 Etherscan）"
+        container
+          heading
+            text "下一步怎么判断"
+          unordered_list
+            list_item
+              text "打开交易和区块出处，核对原始交易、回执状态及日志。"
+            list_item
+              text "如果消息声称某机构卖出，请另行核验地址标签、完整资金路径与实际成交证据。"
+      text "只读核验 · 不提供买卖指令 · 报告只覆盖本次查询的交易与指定池"
+    alert
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root
+  svg_root

@@ -60,7 +60,7 @@ Object.assign(env, { GUARDIAN_WALLET: signer.address, FORK_PRIVATE_KEY: signingK
   GUARDIAN_DB_PATH: resolve(output, "state.sqlite"), GUARDIAN_ORIGIN: origin, GUARDIAN_SIGNAL_FILE: signalFile });
 const startApp = async () => {
   await assertFreePort(3107);
-  const child = launch(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "3107"], env, `next-${Date.now()}.log`);
+  const child = launch(process.execPath, ["--import", "tsx", "server/index.ts", "--production", "--port", "3107"], env, `server-${Date.now()}.log`);
   await until(async () => {
     assertRunning(child); const r = await api("monitor"); assertRunning(child);
     return r.status === 200 && r.body.wallet === signer.address && r.body.mode === "FORK";

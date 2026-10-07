@@ -1,5 +1,17 @@
 # Ethereum 异动调查原型 · Risk Guardian
 
+## 2026-10-07 · 全站原生前端与币种指纹
+
+网站前端现已统一为 **HTML、CSS、原生 JavaScript、Tailwind CSS**，使用瑞士式排版和 xjy 原有的暖纸色、深绿与陶土色。货币指纹已融入币种首页、详情、持仓和调查页面，不再作为单独子站。原 TypeScript 业务服务、数据合同、Guardian 权限与去重规则保留。
+
+入口：`/` 资产观察、`/coins/ETH` 币种详情、`/guardian` 保护实验、`/investigate` 交易核验、`/risk-lab` 风险研究、`/position` Aave 只读、`/attestations` 报告存证、`/collection` 指纹收藏。
+
+运行：`pnpm dev`；生产构建与运行：`pnpm build`、`pnpm start`。默认端口仍为 3000。已有服务运行时，可在构建后使用 `pnpm dev:preview` 打开 **3100 端口的隔离 Mock 预览**，不改动原 `.guardian` 状态。本轮不做视觉检查，页面效果由用户验收。
+
+完整结构、迁移映射和验证方式见 [统一前端说明](docs/unified-frontend.md)。[货币指纹 PRD](docs/currency-fingerprint/PRD.md)记录数据与 NFT 子能力。下方保留历史项目背景和验收记录；涉及旧 Next 前端、原首页地址及旧视觉结构时，以本节和统一前端说明为准。
+
+本次整合纳入 A 的真实案例、B 的方法卡与待验证对照、C 的验收记录，见 [本地整合验收](docs/local-integration-acceptance.md)。BOT 存证与指纹 NFT 代码已纳入，但公开测试网部署/铸造和主网部署尚未验收；当前配置为测试网 968，不能作为赛题要求的主网 677 有效部署材料。核心调查仍无真实自主 Agent。
+
 ## 2026-10-07 · 比赛方案冻结
 
 本次作品固定为：**可复查的 Ethereum 异动调查原型，附受限保护执行实验。** 候选任务是由承担 ETH 线索核验的投研/运营人员，交付有出处的事实、解释与未知项；使用者、采用与付费仍是假设。
@@ -36,6 +48,12 @@ A、B、C、D 的第一版交付已通过 [PR #3](https://github.com/cinderharbo
 - 真实读取与本机执行：A→B 主网单次只读分析通过；本机 Anvil Fork 的 HTTP → Policy → swap → 独立 after → 验证通过；Aave 独立只读页面也完成浏览器查询验收。
 
 **当前尚未接通真实链上信号驱动的持续调查和交易监控。** 首页监控仍使用 Demo 风险变化和 Mock investigation；真实主网分析目前是单次只读入口。BOT 存证分支未纳入本次集成，也没有完成主网部署验收。详细范围与证据见 [团队集成验收](docs/team-integration-acceptance.md)。
+
+## BOT Chain 风险调查报告存证
+
+新增 [`/attestations`](http://localhost:3000/attestations)：导出已有 Guardian 调查/证据/策略/执行结果或 ETH Risk Lab 快照，以规范化 JSON 的 Keccak-256 哈希存证到 BOT Chain 测试网（968）。支持 MetaMask 部署合约、发布、进度/回执查询、JSON 下载和内容防篡改核验。不保存 BOT 钱包私钥，也不改变 Ethereum 分析或本地 Fork 执行网络。
+
+真实/Mock/Fork 来源标签随报告保存。研究快照没有策略执行时明确记为 null，存证不代表报告结论真实。首次 BOT 部署与发布需要用户在 MetaMask 确认；[部署与使用步骤](docs/bot-report-attestation.md)包含网络参数、环境变量和验证边界。
 
 ## ETH Crash Risk Lab demo
 
@@ -89,7 +107,7 @@ pnpm install
 pnpm dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)，默认绑定示例钱包且处于暂停状态。在页面保存策略并启动监控，或点击 Run rescue loop 手动运行一次。手动与自动入口共享事件去重，重复点击不再重置模拟钱包。
+打开 [资产首页](http://localhost:3000) 浏览指纹；进入 [交易核验](http://localhost:3000/investigate) 查询真实交易，或进入 [Guardian 保护实验](http://localhost:3000/guardian) 保存策略和点击「运行一次保护流程」。Guardian 默认绑定示例钱包且初次处于暂停状态；手动与自动入口共享事件去重，重复点击不再重置模拟钱包，已有状态启动时继续按持久化配置恢复。
 
 默认 `GUARDIAN_MODE=MOCK`，无需 RPC、Key 或钱包连接。只有显式 `GUARDIAN_MODE=FORK`、匹配的固定钱包/本机私钥、loopback RPC 和有效 Anvil Fork 元数据才可进入 Fork 模式；`MOCK_MODE=false` 本身不能开启交易。见 [.env.example](.env.example)。运行记录保存在 Git 忽略的 `.guardian/`，不得通过删除状态绕过去重。默认 dev/start 命令绑定 127.0.0.1，仅在本机运行，不暴露到公网或反向代理。
 
@@ -116,7 +134,7 @@ pnpm --silent data:read --wallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --js
 
 输出标记 **LIVE_READ_ONLY**。钱包总值仅覆盖原生 ETH 与 USDC；行情是 Chainlink oracle，`volatilityScore` 是已批准的 1h 价格变化代理；卖压仅覆盖 Uniswap V3 WETH/USDC 0.05% 单池。基线为零、RPC/报价/区块异常明确失败，不回退 Mock。命令只读取一次，不启动持续监控。
 
-B/D 的稳定服务入口是 `createEthereumDataServices()`，分别返回 `PortfolioState`、`MarketState`、`OnchainSignalState`；出处由 `OnchainEvidence` 表示。安装、完整口径、接口用法与验收标准见 [ethereum-data.md](docs/ethereum-data.md)。需要一次共同快照时使用 `readEthereumData(client, { section: "all", wallet })`。首页与 `POST /api/rescue` 的实际模式由 `GUARDIAN_MODE` 显式决定。
+B/D 的稳定服务入口是 `createEthereumDataServices()`，分别返回 `PortfolioState`、`MarketState`、`OnchainSignalState`；出处由 `OnchainEvidence` 表示。安装、完整口径、接口用法与验收标准见 [ethereum-data.md](docs/ethereum-data.md)。需要一次共同快照时使用 `readEthereumData(client, { section: "all", wallet })`。Guardian 保护实验与 `POST /api/rescue` 的实际模式由 `GUARDIAN_MODE` 显式决定；指纹行情不作为执行输入。
 
 ## A→B 真实只读分析
 

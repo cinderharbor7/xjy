@@ -1,0 +1,66 @@
+{
+  "mode": "LIVE_READ_ONLY",
+  "network": "ethereum-mainnet",
+  "checkedAt": "2026-10-07T08:50:43.319Z",
+  "observation": {
+    "transaction": {
+      "hash": "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a",
+      "from": "0x98629555d323324b9415471033f2745c57b608c6",
+      "to": "0xf584f8728b874a6a5c7a8d4d387c9aae9172d621",
+      "nativeValueEth": "20059.2",
+      "input": "0x",
+      "status": "SUCCESS",
+      "blockNumber": 20449709,
+      "blockHash": "0x1ea7d59632f0aeb0d3a97c83c5118d97d5f3c39115b02722a7d88d9b75a1a458",
+      "timestamp": "2024-08-03T18:08:23.000Z",
+      "logCount": 0
+    },
+    "supportedSwaps": [],
+    "evidence": [
+      {
+        "txHash": "0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a",
+        "blockHash": "0x1ea7d59632f0aeb0d3a97c83c5118d97d5f3c39115b02722a7d88d9b75a1a458",
+        "blockNumber": 20449709,
+        "description": "核验外层交易的发送、接收、原生 ETH 金额、输入数据与回执状态。",
+        "source": "https://etherscan.io/tx/0x19b45706e3877b8cb19133dbdc6f8013a5a4a033495e7b070c84977620348e8a",
+        "type": "TRANSACTION"
+      },
+      {
+        "blockHash": "0x1ea7d59632f0aeb0d3a97c83c5118d97d5f3c39115b02722a7d88d9b75a1a458",
+        "blockNumber": 20449709,
+        "description": "核验交易所在区块、时间与交易索引；查询结束时再次检查主链区块哈希。",
+        "source": "https://etherscan.io/block/20449709",
+        "type": "BLOCK"
+      }
+    ],
+    "scope": {
+      "protocol": "UNISWAP_V3",
+      "poolAddress": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+      "poolLabel": "Uniswap V3 WETH/USDC 0.05%（Ethereum 主网单池）",
+      "asset": "WETH",
+      "quoteAsset": "USDC",
+      "fee": 500
+    }
+  },
+  "classification": "NO_SUPPORTED_SWAP",
+  "headline": "已核验交易，当前范围没有可确认的兑换证据",
+  "summary": "外层 ETH 金额描述的是这笔交易附带的原生 ETH；它不等于卖出。回执中未发现足以分类的本池非零 Swap 事件，也不能据此断言其他地方没有卖出。",
+  "confirmedFacts": [
+    "区块 20449709，时间 2024-08-03T18:08:23.000Z；回执状态 成功。",
+    "外层发送地址 0x98629555d323324b9415471033f2745c57b608c6；接收地址 0xf584f8728b874a6a5c7a8d4d387c9aae9172d621。",
+    "外层交易附带原生 ETH：20059.2 ETH；输入数据为空。",
+    "回执共有 0 条日志；其中 0 条符合已核验单池的非零兑换方向。"
+  ],
+  "uncertainties": [
+    "事实读取来自单个配置 RPC，浏览器链接供独立核查；未做多节点或密码学验证。",
+    "兑换核验只覆盖 Ethereum 主网 Uniswap V3 WETH/USDC 0.05% 单池，不覆盖其他池、DEX 或链。",
+    "未读取内部调用 trace、后续资金路径或交易所成交；不能确定整笔交易的净买卖方向。",
+    "发送地址是链上地址，未核验所属机构或个人，也无法确认转账动机。",
+    "链上交易与行情先后发生不证明因果；本报告不判断是否导致 ETH 下跌，也不提供买卖建议。",
+    "USDC 数量按代币 decimals 计算，未读取历史美元报价；不能当作等额美元价值。"
+  ],
+  "nextSteps": [
+    "打开交易和区块出处，核对原始交易、回执状态及日志。",
+    "如果消息声称某机构卖出，请另行核验地址标签、完整资金路径与实际成交证据。"
+  ]
+}
