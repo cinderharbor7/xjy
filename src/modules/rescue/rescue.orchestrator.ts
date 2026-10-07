@@ -25,6 +25,11 @@ export class RescueOrchestrator {
   constructor(private readonly services: RescueServices) {}
 
   async runRescueSession(wallet: string): Promise<RescueSession> {
+    return this.executeAnalysis(await this.analyze(wallet));
+  }
+
+  /** Read-only phase; monitoring can inspect recovery without authorizing another swap. */
+  async analyze(wallet: string): Promise<Pick<RescueSession, "before" | "market" | "riskAnalysis" | "policyDecision">> {
     const requestedWallet = WalletSchema.parse(wallet);
     const before = PortfolioStateSchema.parse(await this.services.portfolioService.getPortfolio(requestedWallet));
     if (before.wallet !== requestedWallet) throw new Error("Portfolio does not belong to the requested wallet.");
@@ -37,6 +42,14 @@ export class RescueOrchestrator {
       ...preliminaryRisk, investigation, confidence: investigation.confidence,
     });
     const policyDecision = PolicyDecisionSchema.parse(this.services.policyService.evaluate(before, riskAnalysis));
+
+    return { before, market, riskAnalysis, policyDecision };
+  }
+
+  /** Integration reserves the durable event before entering the execution phase. */
+  async executeAnalysis(analysis: Pick<RescueSession, "before" | "market" | "riskAnalysis" | "policyDecision">): Promise<RescueSession> {
+    const { before, market, riskAnalysis, policyDecision } = analysis;
+    const requestedWallet = before.wallet;
 
     const execution = policyDecision.triggered
       ? ExecutionResultSchema.parse(await this.services.executionService.execute(PolicyDecisionSchema.parse(policyDecision)))

@@ -5,6 +5,19 @@
   --shadow: 0 24px 50px rgba(63, 53, 40, .12); color-scheme: light;
   font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif; color: var(--ink); background: var(--sand);
 }
+.guardian-controls { margin-bottom: 20px; }
+.policy-form { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; }
+.policy-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.policy-fields input { display: block; width: 100%; margin-top: 7px; }
+.monitor-actions, .allowlist-fields { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
+.monitor-actions > span, .wallet-binding { color: var(--ink-soft); font-size: 12px; overflow-wrap: anywhere; }
+.allowlist-fields label { display: flex; align-items: center; gap: 8px; }
+.allowlist-fields input { flex: none; accent-color: var(--clay-dark); }
+.secondary-button { padding: 11px 15px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: transparent; }
+.event-history details { padding: 14px 0; border-top: 1px solid var(--line); font-size: 12px; overflow-wrap: anywhere; }
+.event-history summary { cursor: pointer; }
+.event-history p { margin: 10px 0 0; color: var(--ink-soft); }
+@media (max-width: 690px) { .policy-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; background: var(--sand); }
