@@ -9,11 +9,12 @@ import { DEMO_POLICY_CONFIG } from "@/mocks/scenarios";
 import { GuardianStore } from "@/integration/guardian/store";
 import { ForkReadBridge, localForkConfig } from "@/integration/guardian/fork";
 
-const rpc = vi.hoisted(() => ({ send: vi.fn(), prepare: vi.fn(), metadata: vi.fn(), chainId: vi.fn() }));
+const rpc = vi.hoisted(() => ({ send: vi.fn(), prepare: vi.fn(), metadata: vi.fn(), chainId: vi.fn(), receipt: vi.fn(), block: vi.fn() }));
 vi.mock("viem", async importOriginal => {
   const actual = await importOriginal<typeof import("viem")>();
   return { ...actual,
-    createPublicClient: () => ({ sendRawTransaction: rpc.send, getChainId: rpc.chainId, request: rpc.metadata }),
+    createPublicClient: () => ({ sendRawTransaction: rpc.send, getChainId: rpc.chainId, request: rpc.metadata,
+      getTransactionReceipt: rpc.receipt, getBlock: rpc.block }),
     createWalletClient: () => ({ prepareTransactionRequest: rpc.prepare }),
   };
 });
@@ -57,5 +58,18 @@ describe("Fork pre-broadcast persistence boundary", () => {
     expect(localForkConfig().recipient).toBe(f.address);
     vi.stubEnv("FORK_RPC_URL", "https://eth.drpc.org"); expect(localForkConfig).toThrow(/loopback/);
     vi.stubEnv("FORK_RPC_URL", "http://127.0.0.1:8545"); vi.stubEnv("GUARDIAN_WALLET", `0x${"11".repeat(20)}`); expect(localForkConfig).toThrow(/signing wallet/);
+  });
+  it("times a confirmed execution from its canonical receipt block", async () => {
+    const f = fixture(); const hash = `0x${"ab".repeat(32)}`, blockHash = `0x${"cd".repeat(32)}`;
+    rpc.receipt.mockResolvedValue({ status: "success", transactionHash: hash, blockNumber: 123n, blockHash });
+    rpc.block.mockResolvedValue({ number: 123n, hash: blockHash, timestamp: 1_791_340_800n });
+    const execution = await f.bridge.confirmedExecution({ success: true, action: "SWAP_TO_SAFE", sourceAsset: "ETH", targetAsset: "USDC",
+      sourceAmount: 3, targetAmount: 8100, txHash: hash, timestamp: "2026-10-07T03:00:00.987Z" });
+    expect(execution.timestamp).toBe("2026-10-07T02:40:00.000Z");
+    expect(rpc.block).toHaveBeenLastCalledWith({ blockNumber: 123n });
+    rpc.block.mockResolvedValue({ number: 123n, hash: `0x${"ef".repeat(32)}`, timestamp: 1_791_340_800n });
+    await expect(f.bridge.confirmedExecution(execution)).rejects.toThrow(/canonical/);
+    rpc.receipt.mockResolvedValue({ status: "success", transactionHash: `0x${"ef".repeat(32)}`, blockNumber: 123n, blockHash });
+    await expect(f.bridge.confirmedExecution(execution)).rejects.toThrow(/this swap/);
   });
 });

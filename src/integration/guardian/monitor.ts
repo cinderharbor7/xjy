@@ -84,12 +84,12 @@ export class GuardianMonitor {
         if (active.status === "RESERVED" || active.status === "SUBMITTED_UNKNOWN") {
           const swap = active.submissions.find(s => s.kind === "SWAP");
           if (!swap) {
-            this.halt(active, "REVIEW", "Interrupted execution: no durable swap hash. Check the known approval and wallet nonce; do not resend.");
+            this.halt(active, "REVIEW", "Interrupted execution: no durable swap hash. Check the known approval and wallet nonce; do not resend.", token);
           } else {
             const result = await this.runtime.resolve(active);
-            if (result === "PENDING") this.updateEvent(active.id, e => { e.status = "SUBMITTED_UNKNOWN"; e.note = "Querying the recorded swap hash; no resubmission."; });
-            else if (typeof result === "string") this.halt(active, result === "REVERTED" ? "FAILED" : "REVIEW", "Receipt reverted or could not be verified. Manual review required.");
-            else this.complete(active.id, result);
+            if (result === "PENDING") this.updateEvent(active.id, e => { e.status = "SUBMITTED_UNKNOWN"; e.note = "Querying the recorded swap hash; no resubmission."; }, token);
+            else if (typeof result === "string") this.halt(active, result === "REVERTED" ? "FAILED" : "REVIEW", "Receipt reverted or could not be verified. Manual review required.", token);
+            else this.complete(active.id, result, token);
           }
         }
       }
@@ -145,15 +145,18 @@ export class GuardianMonitor {
         return;
       }
       const session = await orchestrator.executeAnalysis(analysis);
-      if (reserved) this.complete(reserved, session);
+      if (reserved) this.complete(reserved, session, token);
       else this.store.change(state => { this.owned(state, token); state.latestSession = session; });
       return session;
     } catch (error) {
-      if (reserved) {
+      // A late result no longer owns this journal. A newer observation may have
+      // already resolved and closed its event; never roll that result backwards.
+      const currentLease = this.store.read().lease;
+      if (reserved && currentLease?.token === token && currentLease.expires > this.now()) {
         const event = this.store.event(reserved);
         if (event.status !== "CONFIRMED") {
-          if (event.submissions.some(s => s.kind === "SWAP")) this.updateEvent(reserved, e => { e.status = "SUBMITTED_UNKNOWN"; e.note = "Execution interrupted. Resolve the known swap hash; do not resend."; });
-          else this.halt(event, "REVIEW", "Execution interrupted before a known swap receipt. Automatic execution is halted.");
+          if (event.submissions.some(s => s.kind === "SWAP")) this.updateEvent(reserved, e => { e.status = "SUBMITTED_UNKNOWN"; e.note = "Execution interrupted. Resolve the known swap hash; do not resend."; }, token);
+          else this.halt(event, "REVIEW", "Execution interrupted before a known swap receipt. Automatic execution is halted.", token);
         }
       }
       const safe = isGuardianError(error) ? error : new GuardianError(503, "OBSERVATION_FAILED", "Observation or execution could not be completed. No automatic transaction retry.");
@@ -166,14 +169,15 @@ export class GuardianMonitor {
   private owned(state: GuardianState, token: string) {
     if (state.lease?.token !== token || state.lease.expires <= this.now()) throw new GuardianError(409, "LEASE_LOST", "The observation lease expired; execution is blocked.");
   }
-  private updateEvent(id: string, fn: (event: GuardianEvent) => void) {
-    this.store.change((_s, save) => { const e = this.store.event(id); fn(e); save(e); });
+  private updateEvent(id: string, fn: (event: GuardianEvent) => void, token: string) {
+    this.store.change((state, save) => { this.owned(state, token); const e = this.store.event(id); fn(e); save(e); });
   }
-  private halt(event: GuardianEvent, status: "FAILED" | "REVIEW", note: string) {
-    this.store.change((state, save) => { state.halted = true; state.enabled = false; state.recoveryCount = 0; event.status = status; event.note = note; save(event); });
+  private halt(event: GuardianEvent, status: "FAILED" | "REVIEW", note: string, token: string) {
+    this.store.change((state, save) => { this.owned(state, token); state.halted = true; state.enabled = false; state.recoveryCount = 0; event.status = status; event.note = note; save(event); });
   }
-  private complete(id: string, session: RescueSession) {
+  private complete(id: string, session: RescueSession, token: string) {
     this.store.change((state, save) => {
+      this.owned(state, token);
       const event = this.store.event(id);
       event.session = session; state.latestSession = session;
       const unknown = !session.execution.success && event.submissions.some(s => s.kind === "SWAP") && !session.execution.error?.startsWith("SWAP_REVERTED");
