@@ -221,3 +221,11 @@ it("clears an earlier report when the example button replaces the query", async 
   expect(error().hidden).toBe(true);
   expect(fetcher).toHaveBeenCalledTimes(1);
 });
+
+
+it("hides Aave from research navigation while retaining the other research links", async () => {
+  dispose = await mount(root(), "investigate");
+  expect(root().querySelector('a[href="/position"]')).toBeNull();
+  expect(root().querySelector('a[href="/coins/ETH"]')).not.toBeNull();
+  expect(root().querySelector('a[href="/risk-lab"]')).not.toBeNull();
+});
