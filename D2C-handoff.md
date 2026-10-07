@@ -147,7 +147,7 @@ const orchestrator = new RescueOrchestrator({
 
 D 需要完成模式选择、请求钱包绑定、配置加载、服务端监控循环、事件去重及执行记录恢复，并将 A 的 Fork 读取服务接入编排器。执行后的 Portfolio 必须来自新读取，不能由 executor 根据回执拼造。
 
-前端应显示生效配置和实际模式，将“交易成功”与 `verification.status` 分开呈现。现有 MOCK 文案及依据 `execution.success` 显示“已验证”的逻辑需要调整；本地 Fork hash 也不能直接当成主网交易链接。
+前端应显示生效配置和实际模式，将“交易成功”与 `verification.status` 分开呈现。D 已修正首页的验证状态展示，成功、失败、跳过和重读依据分别显示；接入 Fork 时仍需调整 MOCK 文案及配置展示，本地 Fork hash 也不能直接当成主网交易链接。
 
 ## 6. C 的交付与验收清单
 

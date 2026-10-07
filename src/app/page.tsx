@@ -1,64 +1,44 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import type { FormEvent, ReactNode } from "react";
 import { RescueProblemSchema, RescueSessionSchema } from "@/domain/schemas";
-import type { PortfolioState, RescueSession } from "@/domain/types";
+import type { RescueSession } from "@/domain/types";
+import { ExecutionBadge, StressChart, VerificationBadge, VerificationDetails } from "./rescue-display";
 
-const usd = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
-const amount = new Intl.NumberFormat("en-US", { maximumFractionDigits: 6 });
-const percent = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
-function Metric({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{children}</dd>
-    </div>
-  );
+function Icon({ name, size = 18 }: { name: "mark" | "arrow" | "back" | "shield" | "activity" | "check" | "warning"; size?: number }) {
+  const paths = {
+    mark: <><circle cx="12" cy="12" r="8.2" /><path d="m12 7.5 4.5 4.5-4.5 4.5L7.5 12 12 7.5Z" opacity=".45" /></>,
+    arrow: <><path d="M5 12h13" /><path d="m13 7 5 5-5 5" /></>,
+    back: <><path d="M19 12H5" /><path d="m11 6-6 6 6 6" /></>,
+    shield: <><path d="M12 3.5 19 6v5.3c0 4.2-2.4 7.4-7 9.2-4.6-1.8-7-5-7-9.2V6l7-2.5Z" /><path d="m9 12 2 2 4-4" /></>,
+    activity: <><path d="M3 12h4l2.2-5 4.1 10 2.4-5H21" /></>,
+    check: <><path d="m5 12 4 4L19 6" /></>,
+    warning: <><path d="M12 4 21 19H3L12 4Z" /><path d="M12 9v4" /><path d="M12 16h.01" /></>,
+  };
+  return <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 
-function Findings({ items }: { items: string[] }) {
-  return items.length > 0 ? (
-    <ul>{items.map((item, index) => <li key={index}>{item}</li>)}</ul>
-  ) : <p>None reported.</p>;
+function Metric({ label, value, note, tone = "" }: { label: string; value: ReactNode; note?: string; tone?: string }) {
+  return <div className="metric"><dt>{label}</dt><dd className={tone}>{value}</dd>{note && <span>{note}</span>}</div>;
 }
 
-function Portfolio({ portfolio }: { portfolio: PortfolioState }) {
-  return (
-    <>
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr><th scope="col">Asset</th><th scope="col">Balance</th><th scope="col">Value</th><th scope="col">Category</th></tr>
-          </thead>
-          <tbody>
-            {portfolio.assets.map((asset) => (
-              <tr key={asset.symbol}>
-                <td>{asset.symbol}</td>
-                <td>{amount.format(asset.amount)} {asset.symbol}</td>
-                <td>{usd.format(asset.usdValue)}</td>
-                <td>{asset.category === "RISK" ? "Risk asset" : "User-approved defensive asset"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <dl className="metrics">
-        <Metric label="Total Value">{usd.format(portfolio.totalUsd)}</Metric>
-        <Metric label="Risk Asset Value">{usd.format(portfolio.riskAssetUsd)}</Metric>
-        <Metric label="Defensive Asset Value">{usd.format(portfolio.defensiveAssetUsd)}</Metric>
-        <Metric label="Risk Exposure">{percent.format(portfolio.riskExposurePct)}%</Metric>
-      </dl>
-      <p className="muted">Portfolio read: <time dateTime={portfolio.timestamp}>{portfolio.timestamp}</time></p>
-      {portfolio.blockNumber !== undefined && <p className="muted">Block: {portfolio.blockNumber}</p>}
-    </>
-  );
+function StatusPill({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "warning" | "success" }) {
+  return <span className={`status-pill ${tone}`}><span className="status-dot" />{children}</span>;
+}
+
+function assetValue(portfolio: RescueSession["before"], symbol: string) {
+  return portfolio.assets.find((asset) => asset.symbol === symbol)?.usdValue ?? 0;
+}
+
+function EmptyState({ onRun }: { onRun: () => void }) {
+  return <section className="empty-state"><div className="empty-orb"><Icon name="activity" size={28} /></div><p className="eyebrow">Mock rescue environment</p><h2>Read the position before you touch it.</h2><p>Enter a wallet label to run the complete rescue loop: read, stress test, investigate, approve, execute, then read again.</p><button className="primary-button" onClick={onRun}>Run the first reading <Icon name="arrow" size={17} /></button></section>;
+}
+
+function Findings({ title, items, tone = "" }: { title: string; items: string[]; tone?: string }) {
+  return <div className={`finding-block ${tone}`}><h3>{title}</h3>{items.length ? <ul>{items.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul> : <p className="muted">None reported.</p>}</div>;
 }
 
 export default function DemoPage() {
@@ -67,202 +47,51 @@ export default function DemoPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function runDemo(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSession(null);
-
+  async function runDemo(event?: FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
+    if (loading || !wallet.trim()) return;
+    setLoading(true); setError(null); setSession(null);
     try {
-      const response = await fetch("/api/rescue", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet }),
-      });
+      const response = await fetch("/api/rescue", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ wallet }) });
       let payload: unknown;
-      try {
-        payload = await response.json();
-      } catch {
-        throw new Error("The API returned an unreadable response.");
-      }
+      try { payload = await response.json(); } catch { throw new Error("The API returned an unreadable response."); }
       if (!response.ok) {
         const problem = RescueProblemSchema.safeParse(payload);
-        throw new Error(problem.success && problem.data.status === response.status
-          ? problem.data.detail
-          : `Demo request failed (HTTP ${response.status}).`);
+        throw new Error(problem.success && problem.data.status === response.status ? problem.data.detail : `Demo request failed (HTTP ${response.status}).`);
       }
       const parsed = RescueSessionSchema.safeParse(payload);
-      if (!parsed.success) {
-        throw new Error("The API response does not match the RescueSession contract.");
-      }
+      if (!parsed.success) throw new Error("The API response does not match the RescueSession contract.");
       setSession(parsed.data);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "The demo request failed.");
-    } finally {
-      setLoading(false);
-    }
+      window.setTimeout(() => document.getElementById("rescue-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "The demo request failed."); }
+    finally { setLoading(false); }
   }
 
-  const initialMarketAsset = session?.before.assets.find((asset) => asset.symbol === session.market.asset);
-  const initialPrice = initialMarketAsset && initialMarketAsset.amount > 0
-    ? initialMarketAsset.usdValue / initialMarketAsset.amount
-    : undefined;
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const risk = session?.riskAnalysis;
+  const policy = session?.policyDecision;
+  const beforeEth = session?.before.assets.find(asset => asset.symbol === "ETH");
 
-  return (
-    <main>
-      <header>
-        <p className="mock-banner">MOCK MODE · Simulated portfolio, market, investigation and swaps</p>
-        <h1>Autonomous On-chain Risk Guardian</h1>
-        <p>We don’t drive your portfolio. We protect it when things go wrong.</p>
-        <p>Humans decide when to take risk. The system only helps reduce it.</p>
-        <p className="muted">Developer demo. No real wallet signatures or on-chain transactions.</p>
-        <p className="muted">Automatic permission: RISK → user-approved DEFENSIVE only. No automatic re-entry.</p>
-      </header>
+  return <main className="app-shell">
+    <header className="topbar"><a className="brand" href="#top" aria-label="Verdant Rescue home"><span className="brand-mark"><Icon name="mark" size={21} /></span><span><strong>VERDANT / RESCUE</strong><small>DeFi position intelligence</small></span></a><nav className="nav-links" aria-label="Primary navigation"><button onClick={() => scrollTo("top")} className="active">Overview</button><button onClick={() => scrollTo("rescue-results")}>Rescue loop</button><button onClick={() => scrollTo("method")}>Method</button><a href="/risk-lab">ETH Risk Lab</a><a href="/position">Aave read-only</a></nav><div className="feed-status"><span className="live-dot" />MOCK MODE · LOCAL ADAPTERS</div></header>
 
-      <form onSubmit={runDemo} aria-busy={loading}>
-        <label htmlFor="wallet">Wallet address</label>
-        <p id="wallet-help" className="muted">Any nonempty test wallet is accepted in Mock mode.</p>
-        <div className="form-row">
-          <input
-            id="wallet"
-            name="wallet"
-            type="text"
-            value={wallet}
-            onChange={(event) => setWallet(event.target.value)}
-            required
-            disabled={loading}
-            aria-describedby="wallet-help"
-            autoComplete="off"
-            spellCheck={false}
-          />
-          <button type="submit" disabled={loading || wallet.trim().length === 0}>
-            {loading ? "Running Demo…" : "Run Demo"}
-          </button>
-        </div>
-      </form>
+    <section id="top" className="hero"><div><p className="eyebrow">Position safety layer · 06 Oct 2026</p><h1>Protect the<br /><em>position,</em> calmly.</h1><p className="hero-copy">A measured portfolio protection workflow: inspect the asset mix, make the risk legible, then let a hard policy decide whether capital can move.</p></div><div className="hero-note"><div className="note-icon"><Icon name="shield" size={20} /></div><strong>One action is in scope</strong><span>The only permitted action is a policy-approved ETH → USDC swap. Every external capability in this loop uses a mock adapter.</span></div></section>
 
-      {loading && <p role="status">Running the guardian flow and independently reading the portfolio again…</p>}
-      {error && <p className="error" role="alert">{error}</p>}
+    <section className="control-panel"><div className="control-copy"><p className="eyebrow">Start a rescue reading</p><h2>Give the loop a wallet label.</h2><p>Any nonempty value is accepted in Mock mode. No wallet connection, signature, API key or chain transaction is used.</p></div><form onSubmit={runDemo} aria-busy={loading}><label htmlFor="wallet">Wallet address or test label</label><div className="input-row"><input id="wallet" name="wallet" type="text" value={wallet} onChange={(event) => setWallet(event.target.value)} required disabled={loading} autoComplete="off" spellCheck={false} /><button className="primary-button" type="submit" disabled={loading || wallet.trim().length === 0}>{loading ? "Reading…" : "Run rescue loop"}<Icon name="arrow" size={17} /></button></div><p className="field-note">Example fixture: 10 ETH · $30,000 portfolio · 100% risk exposure</p></form></section>
 
-      {session && (
-        <div className="session" aria-label="Rescue session results">
-          <p className="wallet-result">Test wallet: <code>{session.before.wallet}</code></p>
+    {loading && <div className="loading-band" role="status"><span className="spinner" />Reading position → running stress tests → waiting for policy…</div>}
+    {error && <div className="error-band" role="alert"><Icon name="warning" size={18} />{error}</div>}
+    {!session && !loading && <EmptyState onRun={() => runDemo()} />}
 
-          <section aria-labelledby="before-heading">
-            <h2 id="before-heading">PORTFOLIO BEFORE · INITIAL</h2>
-            <Portfolio portfolio={session.before} />
-          </section>
+    {session && <div id="rescue-results" className="results-stack" aria-label="Rescue session results">
+      <div className="result-heading"><div><p className="eyebrow">Rescue session · request complete</p><h2>Evidence before action.</h2><p className="muted">Test wallet <code>{session.before.wallet}</code></p></div><VerificationBadge verification={session.verification} /></div>
+      <section className="snapshot-grid"><article className="dark-panel"><div className="panel-head"><div><h2>Before</h2><p>Portfolio read from the mock adapter</p></div><span className="panel-index">01</span></div><dl className="metric-grid"><Metric label="Total portfolio" value={usd.format(session.before.totalUsd)} note="observed value" /><Metric label="ETH position" value={usd.format(assetValue(session.before, "ETH"))} note="risk asset" /><Metric label="Risk exposure" value={`${session.before.riskExposurePct.toFixed(0)}%`} note="of total value" tone="warning-text" /><Metric label="ETH price before" value={beforeEth && beforeEth.amount > 0 ? usd.format(beforeEth.usdValue / beforeEth.amount) : "—"} note="before snapshot" /></dl></article><article className="light-panel"><div className="panel-head"><div><h2>Risk signal</h2><p>Local risk model + investigation</p></div><StatusPill tone="warning">{session.riskAnalysis.riskScore} / 100</StatusPill></div><div className="risk-score-line"><strong>{session.riskAnalysis.riskScore}</strong><span>risk score</span><span className="score-bar"><i style={{ width: `${session.riskAnalysis.riskScore}%` }} /></span></div><dl className="metric-grid compact"><Metric label="Confidence" value={`${(session.riskAnalysis.confidence * 100).toFixed(0)}%`} note="investigation" /><Metric label="Recommendation" value={session.riskAnalysis.recommendedAction} note="model output" /></dl></article></section>
+      <section className="dark-panel stress-panel"><div className="panel-head"><div><h2>Stress tests</h2><p>Projected portfolio values under additional shocks to the before snapshot</p></div><span className="panel-index">02</span></div><StressChart tests={risk?.stressTests ?? []} baselineUsd={session.before.totalUsd} /><p className="muted-on-dark">Fixture market price after the shock: {usd.format(session.market.priceUsd)}. The demo value change from $30,000 to $27,000 comes from the market shock; the mock swap itself models no fees or slippage.</p></section>
+      <section className="investigation-grid"><article className="light-panel"><div className="panel-head"><div><h2>Agent investigation</h2><p>Structured evidence · mock investigator</p></div><StatusPill tone="neutral">{((risk?.confidence ?? 0) * 100).toFixed(0)}% confidence</StatusPill></div><p className="investigation-summary">{risk?.investigation.summary}</p><div className="cause-callout"><span>Primary cause</span><strong>{risk?.investigation.primaryCause}</strong></div><div className="finding-columns"><Findings title="Evidence" items={risk?.investigation.evidence ?? []} /><Findings title="Uncertainty" items={risk?.investigation.uncertainties ?? []} tone="uncertainty" /></div></article><article className="dark-panel policy-panel"><div className="panel-head"><div><h2>Policy gate</h2><p>Independent hard-rule decision</p></div><span className="panel-index">03</span></div><div className="policy-decision"><span className={`decision-icon ${policy?.triggered ? "triggered" : "idle"}`}><Icon name={policy?.triggered ? "warning" : "check"} size={23} /></span><div><strong>{policy?.triggered ? "SWAP approved" : "No action"}</strong><span>{policy?.triggered ? `Reduce ${policy.reduceExposurePct?.toFixed(0)} percentage points: ${policy.sourceAsset} → ${policy.targetAsset}` : "Thresholds were not met"}</span></div></div><Findings title="Reasons" items={policy?.reasons ?? []} /></article></section>
+      <section className="execution-grid"><article className="light-panel"><div className="panel-head"><div><h2>Execution</h2><p>Mock executor output</p></div><ExecutionBadge execution={session.execution} /></div><div className="execution-line"><span className="execution-number">04</span><div><strong>{session.execution.action === "SWAP_TO_SAFE" ? `Mock SWAP ${session.execution.sourceAsset} → ${session.execution.targetAsset}` : "Policy did not approve execution"}</strong><p>{session.execution.error ?? "No real transaction was signed or broadcast."}</p></div></div>{session.execution.txHash && <p className="tx-hash"><span>Tx hash · mock</span><code>{session.execution.txHash}</code></p>}</article><article className="dark-panel after-panel"><div className="panel-head"><div><h2>After</h2><p>Independent portfolio re-read</p></div><span className="panel-index">05</span></div>{session.after ? <><div className="hf-transition"><span>{session.before.riskExposurePct.toFixed(0)}%</span><Icon name="arrow" size={20} /><strong>{session.after.riskExposurePct.toFixed(0)}%</strong></div><p className="muted-on-dark">Observed risk exposure after the independent re-read.</p><dl className="metric-grid compact"><Metric label="Portfolio after" value={usd.format(session.after.totalUsd)} note="position read" /><Metric label="Timestamp" value={new Date(session.after.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} note="mock adapter" /></dl></> : <p className="muted-on-dark">No portfolio read after execution: the action was skipped or failed.</p>}<VerificationDetails verification={session.verification} /></article></section>
+    </div>}
 
-          <p className="flow-arrow" aria-hidden="true">↓</p>
-          <section aria-labelledby="market-heading">
-            <h2 id="market-heading">SIMULATED MARKET SHOCK</h2>
-            <dl className="metrics">
-              <Metric label={`${session.market.asset} Price`}>
-                {initialPrice !== undefined && <>{usd.format(initialPrice)} → </>}{usd.format(session.market.priceUsd)}
-              </Metric>
-              <Metric label="5-minute Price Change">{percent.format(session.market.priceChange5mPct)}%</Metric>
-              <Metric label="1-hour Price Change">{percent.format(session.market.priceChange1hPct)}%</Metric>
-              <Metric label="Volatility Score">{session.market.volatilityScore} / 100</Metric>
-            </dl>
-            <p>The initial valuation precedes this market shock. The Demo swap uses the shocked market price.</p>
-            <p className="muted">Market observation: <time dateTime={session.market.timestamp}>{session.market.timestamp}</time></p>
-          </section>
-
-          <p className="flow-arrow" aria-hidden="true">↓</p>
-          <section aria-labelledby="risk-heading">
-            <h2 id="risk-heading">RISK ANALYSIS</h2>
-            <dl className="metrics">
-              <Metric label="Risk Score">{session.riskAnalysis.riskScore} / 100</Metric>
-              <Metric label="Confidence">{(session.riskAnalysis.confidence * 100).toFixed(0)}%</Metric>
-              <Metric label="Risk Exposure">{percent.format(session.riskAnalysis.riskExposurePct)}%</Metric>
-              <Metric label="Recommended Action">{session.riskAnalysis.recommendedAction}</Metric>
-            </dl>
-            <h3>Stress Tests · Initial portfolio valuation</h3>
-            <p className="muted">These hypothetical shocks use the independently read initial portfolio as their baseline.</p>
-            <div className="table-container">
-              <table>
-                <thead><tr><th scope="col">Price Change</th><th scope="col">Projected Portfolio Value</th><th scope="col">Projected Loss</th></tr></thead>
-                <tbody>
-                  {session.riskAnalysis.stressTests.map((test, index) => (
-                    <tr key={index}>
-                      <td>{percent.format(test.priceChangePct)}%</td>
-                      <td>{usd.format(test.projectedPortfolioUsd)}</td>
-                      <td>{usd.format(test.projectedLossUsd)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <h3>Agent Investigation · Mock</h3>
-            <p>{session.riskAnalysis.investigation.summary}</p>
-            <p><strong>Primary Cause:</strong> {session.riskAnalysis.investigation.primaryCause}</p>
-            <p className="muted">The Agent explains risk. Policy approves execution.</p>
-            <h3>Evidence</h3>
-            <Findings items={session.riskAnalysis.investigation.evidence} />
-            <h3>Uncertainty</h3>
-            <Findings items={session.riskAnalysis.investigation.uncertainties} />
-          </section>
-
-          <p className="flow-arrow" aria-hidden="true">↓</p>
-          <section aria-labelledby="policy-heading">
-            <h2 id="policy-heading">POLICY</h2>
-            <dl className="metrics">
-              <Metric label="Decision">{session.policyDecision.triggered ? "Triggered" : "Not Triggered"}</Metric>
-              <Metric label="Approved Action">{session.policyDecision.action}</Metric>
-              {session.policyDecision.triggered && (
-                <>
-                  <Metric label="Approved Direction">{session.policyDecision.sourceAsset} → {session.policyDecision.targetAsset}</Metric>
-                  <Metric label="Exposure Reduction">{percent.format(session.policyDecision.reduceExposurePct!)} percentage points</Metric>
-                </>
-              )}
-            </dl>
-            <h3>Reasons</h3>
-            <Findings items={session.policyDecision.reasons} />
-            <p className="muted">USDC is the Demo user’s approved defensive asset.</p>
-          </section>
-
-          <p className="flow-arrow" aria-hidden="true">↓</p>
-          <section aria-labelledby="execution-heading">
-            <h2 id="execution-heading">ACTION · MOCK</h2>
-            {!session.policyDecision.triggered ? (
-              <p>Skipped — Policy did not approve execution.</p>
-            ) : (
-              <>
-                <p><strong>{session.execution.success ? "Success" : "Failed"}</strong> · Mock {session.execution.action}</p>
-                {session.execution.success && (
-                  <p><strong>{amount.format(session.execution.sourceAmount!)} {session.execution.sourceAsset} → {amount.format(session.execution.targetAmount!)} {session.execution.targetAsset}</strong></p>
-                )}
-                {session.execution.error && <p className="error">{session.execution.error}</p>}
-              </>
-            )}
-            {session.execution.txHash && (
-              <p className="tx-hash"><strong>Tx Hash · Mock:</strong> <code>{session.execution.txHash}</code></p>
-            )}
-            <p className="muted">Demo assumption: USDC = $1; swap fees and slippage are omitted.</p>
-          </section>
-
-          <p className="flow-arrow" aria-hidden="true">↓</p>
-          <section aria-labelledby="after-heading">
-            <h2 id="after-heading">PORTFOLIO AFTER · INDEPENDENT RE-READ</h2>
-            {session.after ? (
-              <>
-                <p><strong>Risk Exposure: {percent.format(session.before.riskExposurePct)}% → {percent.format(session.after.riskExposurePct)}%</strong></p>
-                <Portfolio portfolio={session.after} />
-                {session.verification.status === "PASSED" && (
-                  <p>{usd.format(session.before.totalUsd)} → {usd.format(session.after.totalUsd)} reflects the simulated market shock. The Demo swap exchanges equal value at that shocked price.</p>
-                )}
-              </>
-            ) : <p>No portfolio read after execution: execution was skipped or failed.</p>}
-            <p className={session.verification.status === "PASSED" ? "verified" : session.verification.status === "FAILED" ? "error" : "muted"}>
-              <strong>Risk reduction verification: {session.verification.status}</strong>
-            </p>
-            <Findings items={session.verification.reasons} />
-            <p>The session stops here. No automatic swap from defensive assets back to risk assets.</p>
-          </section>
-        </div>
-      )}
-
-      <p className="muted"><Link href="/position">Optional Aave extension · Read only</Link>. Separate from the Guardian Mock flow.</p>
-    </main>
-  );
+    <section id="method" className="method-panel"><div><p className="eyebrow">Method note</p><h2>A compact safety stack for a noisy market.</h2><p>Portfolio Service reads the asset mix. Market Service supplies the ETH price. Risk and investigation make the exposure legible. Policy owns the allowlisted one-way swap, then Portfolio Service reads again to verify the exposure actually fell.</p></div><div className="formula"><span>trigger</span> = risk &gt; 80<br /><span>and</span> confidence &gt; 0.85<br /><span>and</span> exposure &gt; 70%<br /><em>action</em> = SWAP ETH → USDC ≤ 30 points</div></section>
+    <footer className="footer"><span>VERDANT / RESCUE · interface prototype</span><span>Mock observations · no real wallet or chain connection</span></footer>
+  </main>;
 }

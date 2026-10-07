@@ -1,5 +1,9 @@
 # Autonomous On-chain Risk Guardian
 
+## ETH Crash Risk Lab demo
+
+本次 ETH 链数据研究界面位于 [`/risk-lab`](http://localhost:3000/risk-lab)，API 为 `GET /api/eth-risk`。它使用经过 `OnchainSignalStateSchema` 校验的确定性链数据样本，展示卖压、波动率、杠杆、泡沫状态和左尾分位数五层模型，并把模型依据、置信度、证据引用和仓位建议放在同一页面。当前响应明确标记为 `MOCK_CHAIN_FIXTURE`，没有 RPC 读取、真实交易或实时预测；研究边界和替换真实 ETH 面板的步骤见 [`docs/eth-risk-lab.md`](docs/eth-risk-lab.md)。
+
 An autonomous on-chain risk guardian that reduces exposure when abnormal risk appears.
 
 > We don't drive your portfolio. We protect it when things go wrong.
