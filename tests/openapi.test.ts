@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { PolicyConfigSchema, PolicyDecisionSchema, RescueProblemSchema, RescueRequestSchema, RescueSessionSchema, VerificationResultSchema } from "@/domain/schemas";
+import { PolicyConfigSchema, PolicyDecisionSchema, RescueRequestSchema, RescueSessionSchema, VerificationResultSchema } from "@/domain/schemas";
 
 type Media = { example?: unknown; examples?: Record<string, { value: unknown }> };
 type Document = {
@@ -12,6 +12,8 @@ type Document = {
 };
 
 const load = (name: string): Document => JSON.parse(readFileSync(new URL(`../docs/${name}.openapi.json`, import.meta.url), "utf8"));
+import { GuardianProblemSchema } from "@/integration/guardian/contracts";
+
 const rescue = load("rescue-api");
 const endpoint = rescue.paths["/api/rescue"].post;
 
@@ -44,7 +46,7 @@ describe("published OpenAPI contracts", () => {
       const examples = media.examples ?? { single: { value: media.example } };
       for (const [name, example] of Object.entries(examples)) {
         it(`publishes a schema-valid ${status} / ${name} response example`, () => {
-          const result = status === "200" ? RescueSessionSchema.safeParse(example.value) : RescueProblemSchema.safeParse(example.value);
+          const result = status === "200" ? RescueSessionSchema.safeParse(example.value) : GuardianProblemSchema.safeParse(example.value);
           expect(result.success, JSON.stringify(result.error)).toBe(true);
         });
       }

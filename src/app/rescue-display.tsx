@@ -20,10 +20,11 @@ export function VerificationDetails({ verification }: { verification: Verificati
   </div>;
 }
 
-export function ExecutionBadge({ execution }: { execution: ExecutionResult }) {
+export function ExecutionBadge({ execution, pending = false }: { execution: ExecutionResult; pending?: boolean }) {
+  const unknown = pending || execution.error?.startsWith("SUBMITTED_UNKNOWN:");
   const failed = !execution.success && execution.action !== "NONE";
   return <span className={`status-pill ${execution.success ? "success" : failed ? "warning" : "neutral"}`}>
-    <span className="status-dot" />{execution.success ? "Success" : failed ? "Failed" : "Skipped"}
+    <span className="status-dot" />{unknown ? "Pending receipt" : execution.success ? "Success" : failed ? "Failed" : "Skipped"}
   </span>;
 }
 

@@ -166,3 +166,18 @@ D 负责最终联调：保存策略 → 启动持续监控 → 条件满足时�
 ## 7. C 回复时需要说明
 
 逐项回应第 4 节的建议：同意、需要调整，或需要哪一位提供什么信息。随后列出已修改内容、实际测试结果，以及仍需 D/A 接入的部分。共同决定落定前，可先完成第 3 节中不依赖方案选择的修改；不要把待确认建议写成已完成能力。
+
+
+## 8. D 实施回执（2026-10-07，集成分支）
+
+D 从 main `bc1d504` 开出 `d/guardian-monitor-integration`，整合 C 更新 `30d5bbb`。前文保留为原始交接，不代表当前分支仍停留在 `2c2db4a`。
+
+- 同意单钱包模型：HTTP 钱包、recipient、签名地址一致；大小写规范化。仅本机 Fork，验证 Anvil 元数据、链 ID 和持久记录中的 Fork instance。
+- 配置由 D 保存在 SQLite，复用 C validator；GET/PUT 带版本，冲突 409。保存从下一次观测生效；当前事件固定 config/version/before/market。
+- 前端支持配置、启动/暂停、状态、交易与验证分开展示；保留原 Organic 风格。HTTP 错误另建 D envelope，不修改冻结核心 schema。
+- D 服务端 10s 循环，数据库租约 + 持久事件去重。恢复用独立市场字段的 3 个新鲜连续样本，参数见 `docs/guardian-monitor.md`，暂属 D 演示选择，待 B 校准。
+- A 的 Fork 读取尚未交付时，D 在 integration 提供临时只读桥，读取 WETH/USDC 和池现价，不改 A 目录。ETH 符号明确指 WETH，原生 ETH 留作 gas。
+- C 通过注入的 signing client 运行：D 在广播前持久化本地签名交易的确定性 hash；网络不重试广播。未知结果仅查回执，重启不清除事件。C 内存 submissions 不是持久化依据。
+- C 错误文本在 D 边界转为有限阶段码，避免 RPC 原始错误外泄。成功 swap 后独立重读，验证失败保留事件并暂停。无自动 reset/retry API。
+
+详细实现、未覆盖边界和可复现验收命令：[guardian-monitor.md](docs/guardian-monitor.md)。D 的自动化用例覆盖持续超标、并发、重复请求、恢复、未知结果、重启以及暂停/恢复。Fork 完整实测结果只在实际运行完成后记录，不把跳过的 C Fork 测试算作通过。

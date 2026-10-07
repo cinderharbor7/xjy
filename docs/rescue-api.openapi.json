@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Guardian Mock Rescue API",
-    "version": "0.1.0",
-    "description": "Autonomous On-chain Risk Guardian Mock flow. Existing /api/rescue URL is retained, but its former lending/HF/REPAY response is intentionally replaced by Portfolio/Market/SWAP_TO_SAFE and verification. No legacy response shim, real DEX, wallet, LLM or transaction. Only RISK -> user-approved DEFENSIVE is permitted; defensive -> risk and re-entry are forbidden."
+    "title": "Guardian Managed Rescue API",
+    "version": "0.2.0",
+    "description": "Local fixed-wallet Guardian with persisted policy and single-event execution. MOCK by default; explicit Anvil FORK mode uses WETH to USDC with demo market changes and investigation. No mainnet trading. See guardian-monitor.md for policy and monitor control envelopes."
   },
   "servers": [
     {
@@ -15,9 +15,9 @@
   "paths": {
     "/api/rescue": {
       "post": {
-        "operationId": "runMockGuardianRescue",
-        "summary": "Run one independently scoped Guardian Mock rescue session",
-        "description": "Strict {wallet} request, no policy/asset/action/RPC overrides. Every call creates fresh Mock balances and market state, with no persistent idempotency, database or shared wallet updates. Core needs no API Key/RPC and accepts any trimmed nonempty wallet label. No pagination/multichain/wallet signing or retries. Orchestrator reads Portfolio, Market, analyzes/investigates, evaluates Policy, executes only if approved, then independently re-reads and verifies. MOCK_MODE=false explicitly fails. Aave live-read extension is separate.",
+        "operationId": "runGuardianObservation",
+        "summary": "Run one observation through the persistent event gate",
+        "description": "Run one observation for the server-bound wallet using persisted policy and the same event gate as the server monitor. An occupied risk event never permits another swap.",
         "requestBody": {
           "required": true,
           "content": {
@@ -26,7 +26,7 @@
                 "$ref": "#/components/schemas/RescueRequest"
               },
               "example": {
-                "wallet": "test-wallet"
+                "wallet": "0x1111111111111111111111111111111111111111"
               }
             }
           }
@@ -43,10 +43,13 @@
                 }
               },
               "X-Rescue-Mode": {
-                "description": "All core external capabilities are Mock.",
+                "description": "Actual server runtime mode",
                 "schema": {
                   "type": "string",
-                  "const": "MOCK"
+                  "enum": [
+                    "MOCK",
+                    "FORK"
+                  ]
                 }
               }
             },
@@ -477,55 +480,91 @@
             }
           },
           "400": {
-            "description": "Invalid JSON/request.",
-            "headers": {
-              "Cache-Control": {
-                "description": "Uncached result.",
-                "schema": {
-                  "type": "string",
-                  "const": "no-store"
-                }
-              }
-            },
+            "description": "Expected a server-bound wallet without extra fields.",
             "content": {
               "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RescueProblem"
+                  "$ref": "#/components/schemas/GuardianProblem"
                 },
                 "example": {
-                  "type": "urn:xjy:rescue:INVALID_REQUEST",
-                  "title": "Invalid rescue request",
+                  "type": "urn:xjy:guardian:INVALID_REQUEST",
+                  "title": "Guardian request failed",
                   "status": 400,
-                  "detail": "Expected { wallet: string } with a nonempty test wallet and no extra fields.",
-                  "instance": "/api/rescue",
-                  "code": "INVALID_REQUEST"
+                  "code": "INVALID_REQUEST",
+                  "detail": "Expected a server-bound wallet without extra fields.",
+                  "instance": "/api/rescue"
                 }
               }
             }
           },
-          "500": {
-            "description": "Configuration, module output or re-read failure. No raw exception leakage.",
-            "headers": {
-              "Cache-Control": {
-                "description": "Uncached result.",
-                "schema": {
-                  "type": "string",
-                  "const": "no-store"
-                }
-              }
-            },
+          "403": {
+            "description": "Only the server-bound demo wallet is permitted.",
             "content": {
               "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RescueProblem"
+                  "$ref": "#/components/schemas/GuardianProblem"
                 },
                 "example": {
-                  "type": "urn:xjy:rescue:RESCUE_FAILED",
-                  "title": "Rescue session failed",
-                  "status": 500,
-                  "detail": "The Mock Guardian session could not be completed. Check the server configuration.",
-                  "instance": "/api/rescue",
-                  "code": "RESCUE_FAILED"
+                  "type": "urn:xjy:guardian:WALLET_MISMATCH",
+                  "title": "Guardian request failed",
+                  "status": 403,
+                  "code": "WALLET_MISMATCH",
+                  "detail": "Only the server-bound demo wallet is permitted.",
+                  "instance": "/api/rescue"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The current risk event already owns its execution opportunity.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardianProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:guardian:EVENT_OCCUPIED",
+                  "title": "Guardian request failed",
+                  "status": 409,
+                  "code": "EVENT_OCCUPIED",
+                  "detail": "The current risk event already owns its execution opportunity.",
+                  "instance": "/api/rescue"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardianProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:guardian:JSON_REQUIRED",
+                  "title": "Guardian request failed",
+                  "status": 415,
+                  "code": "JSON_REQUIRED",
+                  "detail": "Use application/json.",
+                  "instance": "/api/rescue"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Guardian could not complete the request. Check server configuration; no automatic resend.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardianProblem"
+                },
+                "example": {
+                  "type": "urn:xjy:guardian:GUARDIAN_UNAVAILABLE",
+                  "title": "Guardian request failed",
+                  "status": 503,
+                  "code": "GUARDIAN_UNAVAILABLE",
+                  "detail": "Guardian could not complete the request. Check server configuration; no automatic resend.",
+                  "instance": "/api/rescue"
                 }
               }
             }
@@ -1230,6 +1269,38 @@
           }
         },
         "description": "Problem response. INVALID_REQUEST=400, RESCUE_FAILED=500. Raw exception text, endpoint URLs, credentials and stacks are never returned."
+      },
+      "GuardianProblem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "detail",
+          "instance"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          }
+        }
       }
     }
   }
