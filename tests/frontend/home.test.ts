@@ -11,6 +11,7 @@ it("integrates workbench links and per-coin fingerprints with working search and
   document.body.innerHTML = shell.match(/<body>([\s\S]*)<\/body>/)![1];
   history.replaceState(null, "", "/");
   sessionStorage.clear();
+  sessionStorage.setItem("verdant.market-mode", "demo");
   vi.stubGlobal("fetch", vi.fn());
   await import("../../web/app.js");
   expect(document.querySelectorAll(".coin-card")).toHaveLength(8);
