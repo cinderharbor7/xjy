@@ -68,4 +68,4 @@ Run the final combined build, real HTTP smoke and isolated local Fork acceptance
 - Upstream RPC availability can block a fresh Fork run; no retry or Mock substitution may hide it.
 - Resume from the frontmatter; use the captured source commits and current clean/merged state before fetching new team changes.
 
-Publication: [PR #3](https://github.com/cinderharbor7/xjy/pull/3), open against main. Published integration branch tracks `origin/codex/integrate-guardian`; main is unchanged. GitHub CI results are recorded separately from local acceptance.
+Publication: [PR #3](https://github.com/cinderharbor7/xjy/pull/3) was created against main; the original integration task did not merge main. The user subsequently authorized merging and a README update on 2026-10-07. PR #3 merged at `2026-10-07T03:53:48Z`, preserving integration history in commit `3d264a2`. Local main was fast-forwarded to the merge. The README and acceptance record now include the later Computer use checks and the pending V2 work; no V2 implementation or BOT deployment is included. GitHub CI results remain separate from local acceptance.

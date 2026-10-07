@@ -1,6 +1,6 @@
 # 团队集成验收：A/B/C/D
 
-日期：2026-10-07（Asia/Shanghai）。集成分支 `codex/integrate-guardian`，目标 `main`，共同基线 `bc1d504`。纳入 A `f14699e`、B `21eab08`、C `c062479`、D `dba34bf`（执行实现 `eef9e09`）。保留各分支提交历史；集成 [PR #3](https://github.com/cinderharbor7/xjy/pull/3) 已创建，不将 main覆盖或自动合并。
+日期：2026-10-07（Asia/Shanghai）。集成分支 `codex/integrate-guardian`，共同基线 `bc1d504`。纳入 A `f14699e`、B `21eab08`、C `c062479`、D `dba34bf`（执行实现 `eef9e09`）。保留各分支提交历史；用户确认后，[PR #3](https://github.com/cinderharbor7/xjy/pull/3) 于 `2026-10-07T11:53:48+08:00` 合入 main，合并提交 `3d264a2`。
 
 ## 新鲜工程检查
 
@@ -18,6 +18,18 @@
 真实执行 `pnpm dev --port 3118` 和 `pnpm start --port 3108`；`lsof`确认两者只监听 `127.0.0.1`。使用各自独立 `.guardian/` SQLite文件，未修改已有3000服务或用户事件状态。验证后停止本次测试进程。
 
 生产HTTP验收时间 `2026-10-07T03:27:43.731Z`：首页、`/risk-lab`、`/position`均200；默认MOCK/暂停；同源rescue200，Risk91/Confidence0.88，敞口100%→70%，verification PASSED。重复调用409、外国Origin403、请求偷偷添加action400。没有真实链上交易。
+
+## Computer use 浏览器验收
+
+同日使用 Codex in-app browser 实际操作本地页面；首页以显式 MOCK 模式启动，使用独立 SQLite 验收状态，不删除旧事件。默认 dev 同时提供前端和 API，只监听 `127.0.0.1:3000`。
+
+- 首次 Run rescue loop：Risk91、Confidence88%、Policy批准、Mock ETH→USDC、敞口100%→70%，独立验证PASSED。
+- 重复运行：页面提示当前风险事件已占用，HTTP409；未增加执行事件。监控Start/Pause正常，经历多个轮询周期后暂停，刷新保留Paused、同一CONFIRMED事件和救援结果。
+- Policy拒绝：另一份独立状态的3001实例把Risk阈值保存为100，刷新保持v2/100；Agent仍建议SWAP_TO_SAFE，但Policy为No action，Execution Skipped，无txHash，Verification SKIPPED。该临时实例验收后已停止。
+- `/risk-lab`：MOCK CHAIN FIXTURE、模型与依据正常展示，Refresh fixture正常。
+- `/position`：非法地址被前端拒绝；公开测试钱包`0x485c028c475dba482297656229d11b4eaf22357b`真实只读查询返回ACTIVE，展示合同JSON、合约地址、block/hash/time。该次观察块`26137899`，时间`2026-10-07T03:44:23.000Z`，HF约2.5346；这是该区块的结果，不是固定Demo值。
+
+本次浏览器没有执行Fork approve/swap、BOT部署或真实主网交易。Aave只读页面独立于Guardian Mock执行链。原始浏览器报告和截图位于Git忽略的`.guardian/ui-acceptance-20261007-1145/`，团队验收范围以上述记录为准。
 
 ## A→B真实主网只读分析
 
@@ -69,4 +81,4 @@ pnpm --silent data:analyze --wallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 -
 - Fork tradable ETH=WETH；主网只读Portfolio统计原生ETH。V3卖压和V2执行来自不同明确范围，不能混为同一池或同一链实例。
 - USDC=$1在Fork仍是假设；仅固定一个同签名钱包、WETH→USDC单跳，本机可运行不等于主网自动交易已可用。
 - Aave扩展和ResearchLab保留且独立；ResearchLab为MOCK_CHAIN_FIXTURE。没有新增BOT Chain部署或产品范围外功能。
-- 本轮没有浏览器视觉验收；已完成真实HTTP与页面200检查。
+- 浏览器验收覆盖Mock救援、策略拒绝、事件保留、Risk Lab和Aave只读；真实Fork完整流程由另一次独立HTTP/Fork脚本验收。

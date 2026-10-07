@@ -1,5 +1,16 @@
 # Autonomous On-chain Risk Guardian
 
+## 2026-10-07 Update · 第一版集成已合并
+
+A、B、C、D 的第一版交付已通过 [PR #3](https://github.com/cinderharbor7/xjy/pull/3) 合入 `main`，合并提交为 `3d264a2`。后续开发从最新 `main` 建新分支，继续沿用冻结的数据合同和四人模块边界。
+
+- 工程检查：`pnpm typecheck`、`pnpm build` 通过；`pnpm test` 为 **769 passed / 2 skipped**。两个跳过项需要显式 Fork 配置，未计为通过。
+- 默认 Mock 页面：Computer use 实测 Risk **91**、Confidence **88%**、Policy 批准、ETH → USDC、风险敞口 **100% → 70%**，独立验证 **PASSED**。
+- 权限与事件：提高 Policy 阈值后，Agent 仍建议换仓，但 Execution 为 **Skipped**；同一事件重复运行被拦截，监控启停和刷新保留已有事件。
+- 真实读取与本机执行：A→B 主网单次只读分析通过；本机 Anvil Fork 的 HTTP → Policy → swap → 独立 after → 验证通过；Aave 独立只读页面也完成浏览器查询验收。
+
+**当前尚未接通真实链上信号驱动的持续调查和交易监控。** 首页监控仍使用 Demo 风险变化和 Mock investigation；真实主网分析目前是单次只读入口。BOT 存证分支未纳入本次集成，也没有完成主网部署验收。详细范围与证据见 [团队集成验收](docs/team-integration-acceptance.md)。
+
 ## ETH Crash Risk Lab demo
 
 本次 ETH 链数据研究界面位于 [`/risk-lab`](http://localhost:3000/risk-lab)，API 为 `GET /api/eth-risk`。它使用经过 `OnchainSignalStateSchema` 校验的确定性链数据样本，展示卖压、波动率、杠杆、泡沫状态和左尾分位数五层模型，并把模型依据、置信度、证据引用和仓位建议放在同一页面。当前响应明确标记为 `MOCK_CHAIN_FIXTURE`，没有 RPC 读取、真实交易或实时预测；研究边界和替换真实 ETH 面板的步骤见 [`docs/eth-risk-lab.md`](docs/eth-risk-lab.md)。
@@ -16,9 +27,9 @@ An autonomous on-chain risk guardian that reduces exposure when abnormal risk ap
 
 比赛 MVP 只有 `NONE` 和 `SWAP_TO_SAFE` 两种动作：允许 `RISK → DEFENSIVE`；禁止 `DEFENSIVE → RISK`。Demo 使用 ETH → USDC，USDC 在这里是 **user-approved defensive asset**，不表示绝对安全或无风险。
 
-## 当前实现状态（团队集成分支）
+## 当前实现状态（main 第一版）
 
-本分支 `codex/integrate-guardian` 从 main `bc1d504` 开始，整合 A、B、C、D 的交付，保留配置 API/表单、固定钱包绑定、服务端监控、SQLite 持久化和 Fork 装配。**该版本通过 PR 供团队评审，尚未合入 main。A→B 已有真实数据的独立只读分析入口；交易监控仍使用明确标记的 Demo 风险输入和 Mock investigation。**
+第一版集成从 main `bc1d504` 开始，在 `codex/integrate-guardian` 整合 A、B、C、D 的交付，再通过 PR #3 合入 main。配置 API/表单、固定钱包绑定、服务端监控、SQLite 持久化和 Fork 装配已保留。**A→B 已有真实数据的独立只读分析入口；交易监控仍使用明确标记的 Demo 风险输入和 Mock investigation。**
 
 | 内容 | 当前状态 |
 | --- | --- |
@@ -182,14 +193,30 @@ tests/
 
 | 开发者 | 主要目录 | 下一步职责 |
 | --- | --- | --- |
-| A | `src/modules/portfolio/`、`src/modules/market/`、`src/modules/onchain/` | 钱包余额、行情及链上资金数据；与 D 统一 Fork WETH/USDC 余额和报价口径；按冻结的 `OnchainSignalState` 输出独立信号，不与 Portfolio 混用 |
-| B | `src/modules/risk/`、`src/modules/investigation/` | 消费链上信号与证据，开发异常识别、风险计算、压力测试和调查；与 D 定义市场风险恢复条件；只输出分析，不获得交易权限 |
-| C | `src/modules/policy/`、`src/modules/execution/` | 策略配置校验、白名单、额度与受限执行；修正并交付 Fork adapter、执行状态和接入说明，配合 D 防止重复交易；不负责 HTTP 路由或前端 |
-| D | `src/app/`、`src/integration/`、`src/modules/rescue/` | 配置 API/表单与存取、Dashboard、服务端持续监控、事件状态/去重/恢复、Fork 装配及执行后的独立重读和效果展示 |
+| A | `src/modules/portfolio/`、`src/modules/market/`、`src/modules/onchain/` | 为持续观察提供真实钱包余额、行情和卖压证据，保持共享快照与新鲜度；主网原生 ETH 与 Fork WETH 口径分别保持一致 |
+| B | `src/modules/risk/`、`src/modules/investigation/` | 用真实信号替换固定 Mock 调查，输出可核查的原因、评分、Confidence 和不确定性；与 D 定义真实异常触发及恢复规则，只输出分析 |
+| C | `src/modules/policy/`、`src/modules/execution/` | 保留 Policy 硬门控、白名单和额度检查；配合新分析链路复验冻结批准金额、Fork 执行、回执及异常处理 |
+| D | `src/app/`、`src/integration/`、`src/modules/rescue/` | 先把真实只读分析接进服务端监控和 Dashboard，再装配同一 Fork 实例内的分析、受限执行、事件恢复和独立 after 验证 |
 
 此表描述职责边界，不代表各模块均已完成。A/B 的数据交接边界已冻结；C/D 按 [D2C-handoff.md](D2C-handoff.md) 修改和联调，公共合同由集成负责人协调，不能各自修改后默认兼容。
 
 `src/domain/` 是共同稳定边界，`src/mocks/` 与公共配置由集成负责人协调，顺序整合变更。Adapter 实现由各负责人维护，D 在 composition root 注入；业务层不知道具体 Mock 类型。可选 Aave 扩展单独维护，不能作为新 Portfolio 或短周期 Market 的替代源。
+
+### 第二版开始前
+
+先拉取已合并的 `main`，确认第一版验收能在自己的环境复现，再从 main 建各自的新分支。公共 schema、Policy 权限和一次事件一次 swap 的规则继续冻结。
+
+B/D 必须先确认真实异常的触发条件、恢复条件和样本新鲜度：卖压回落多少、持续多久才能解除事件占用，以及什么算一个新的观察窗口。重复读取同一区块或窗口不能累计为新的恢复样本。当前 Demo 阈值和启发式 Confidence 尚未校准，不能直接当作真实交易规则。
+
+A/C/D 同时确认每条闭环的链实例、钱包、资产和行情口径。主网只读的原生 ETH 余额不能作为本机 Fork WETH 交易的 before；批准金额与执行必须使用同一次冻结快照。
+
+### 第二版目标与验收顺序
+
+1. **真实主网持续观察 → B 调查 → 页面报告，保持只读。** 页面展示真实窗口、区块、交易引用、来源和不确定性；数据失败或陈旧时明确失败，不用 Mock 补齐。
+2. **同一 Fork 实例内：信号 → Policy → 换仓 → 独立 after → 验证。** 复验重复事件、暂停/重启、恢复后新事件及未知回执；交易未知时只查原 hash，不重新广播。
+3. 继续限定单钱包、ETH/USDC 和单向减仓；风险梯度排在上述闭环之后。调查的 LLM 接入方式及真实恢复参数尚待团队确认，本次文档更新不修改合同或启用主网交易。
+
+BOT 存证作为独立集成项处理：先基于最新 main 审查分支并验收，再按赛事要求确认网络、实际部署和核验证据；现有测试网方案不能描述为已完成主网参赛部署。
 
 ## 数据合同与 API
 
@@ -266,7 +293,7 @@ OpenAPI 文档验证范围为 JSON 解析、内部引用及示例对 Zod 合同�
 - [ ] `/api/rescue` 严格输入与新 DTO/verification/error 合同一致；旧借贷格式不继续输出。
 - [ ] Aave 的 3 个专项测试保持通过；现有读取路径/字段/错误/NO_DEBT/canonical 要求不变，主核心不依赖它。
 
-本轮团队集成验收项（新鲜执行结果见 [team-integration-acceptance.md](docs/team-integration-acceptance.md)，历史 D 验收记录单独保留；未作浏览器视觉验收）：
+本轮团队集成验收项（工程、HTTP/Fork 和浏览器实际结果见 [team-integration-acceptance.md](docs/team-integration-acceptance.md)；历史 D 验收记录单独保留。浏览器测试覆盖 Mock 页面、Risk Lab 和 Aave 只读，Fork 完整流程由独立脚本验收）：
 
 - [ ] 固定测试钱包、签名地址、Fork 链配置和 WETH/USDC 读取一致，配置保存后按约定生效。
 - [ ] 服务端持续监控，在完整策略满足时自动执行；同一事件持续超标不重复 swap。
