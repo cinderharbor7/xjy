@@ -11,6 +11,7 @@ import {
   researchReport,
 } from "@/modules/attestation/report";
 import {
+  MAINNET_REPORT_REGISTRY,
   confirmTransaction,
   connectMetaMask,
   deployRegistry,
@@ -32,12 +33,13 @@ import {
 } from "../ui.js";
 import { downloadFile } from "../fingerprint/nft.js";
 const keys = {
-  pending: "xjy:bot:pending:v1",
-  intent: "xjy:bot:intent:v1",
-  report: "xjy:bot:report:v1",
-  contract: "xjy:bot:registry:968",
+  pending: "xjy:bot:pending:677:v1",
+  intent: "xjy:bot:intent:677:v1",
+  report: "xjy:bot:report:677:v1",
+  contract: "xjy:bot:registry:677",
 };
 const JobSchema = z.object({
+  chainId: z.literal(677),
   kind: z.enum(["DEPLOY", "PUBLISH"]),
   hash: z.string().regex(/^0x[0-9a-fA-F]{64}$/),
   publisher: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
@@ -64,8 +66,8 @@ export async function mount(root) {
     job,
     lastTx,
     busy = false,
-    contract = process.env.NEXT_PUBLIC_BOT_REPORT_REGISTRY || "",
-    notice = "固定报告后，使用测试 BOT 发布内容哈希。",
+    contract = "",
+    notice = "固定报告后，使用主网 BOT 发布内容哈希。",
     error = "",
     verification = "",
     storageBlocked = false;
@@ -85,7 +87,11 @@ export async function mount(root) {
       storageBlocked = true;
       notice = "存在未完成的发送意图，尚无可恢复的交易哈希。请核查钱包记录；当前禁止新交易，不自动重发。";
     }
-    contract ||= localStorage.getItem(keys.contract) || "";
+    if (localStorage.getItem("xjy:bot:pending:v1") || localStorage.getItem("xjy:bot:intent:v1")) {
+      storageBlocked = true;
+      notice = "旧测试网或未知网络存在发送记录；保留记录人工核查，主网禁止新签名，不查询为主网交易。";
+    }
+    contract = localStorage.getItem(keys.contract) || MAINNET_REPORT_REGISTRY;
   } catch {
     error =
       "浏览器记录无法解析，请保留原始记录并检查；当前禁止新交易，避免重复广播。";
@@ -95,9 +101,9 @@ export async function mount(root) {
     pageHead(
       "报告存证",
       "固定调查证据和分析结果，将内容哈希发布至 BOT Chain。与指纹 NFT 共享网络，使用各自独立的合约。",
-      "BOT Chain Testnet · 968",
+      "BOT Chain · 677",
     ) +
-    `<div class="notice">存证证明内容完整性，不为事实或研究结论背书。Mock / Fork / 实时来源随报告保留；此页不会触发 Guardian 交易。</div><div class="workspace-grid">${panel("准备报告", `<label>报告来源<select id="report-source"><option value="research">ETH Risk Lab 研究快照</option><option value="guardian">Guardian 已有运行或事件</option></select></label><div id="guardian-source" ${mode === "guardian" ? "" : "hidden"}><button class="button-secondary" data-report="load-events">读取已有事件</button><label>运行或事件<select id="report-event"><option value="">先读取已有记录</option></select></label></div><div class="action-row"><button class="button-primary" data-report="prepare">固定报告并计算哈希</button><label class="file-button">导入 JSON<input id="report-file" type="file" accept=".json,application/json"></label></div><div id="report-preview"></div>`)}${panel("发布到 BOT Chain", `<p>链 968 / Gas：测试 BOT。部署与发布均需钱包单独确认。</p><button class="button-primary" data-report="connect">连接 MetaMask</button><p id="report-account" class="note"></p><label>报告存证合约地址<input id="report-contract" placeholder="0x…" spellcheck="false" value="${esc(contract)}"></label><div class="action-row"><button class="button-primary" data-report="publish">发布报告哈希</button><button class="button-secondary" data-report="settle">查询原交易</button></div><details class="raw-details"><summary>首次使用：部署报告存证合约</summary><p>此合约只存报告哈希，不是指纹 NFT 合约。已有地址时无需重复部署。</p><button class="button-secondary" data-report="deploy">通过 MetaMask 部署</button></details><p id="report-progress" role="status"></p><p id="report-tx"></p>`, "dark-panel")}${panel("独立核验", `<p>导入报告并重新计算哈希。正文、证据、数组顺序和数值变更会影响结果；对象键顺序与缩进不影响。</p><label>预期发布者<input id="report-publisher" value="${esc(publisher)}" spellcheck="false" placeholder="0x…"></label><button class="button-primary" data-report="verify">重新计算并查询链上记录</button><p id="report-verification" role="status"></p>`, "wide")}</div><p id="report-error" class="error-band" role="alert" hidden></p><p class="note">报告 JSON 保存在本机浏览器，可下载保存；链上不上传报告正文。</p>`;
+    `<div class="notice">存证证明内容完整性，不为事实或研究结论背书。Mock / Fork / 实时来源随报告保留；此页不会触发 Guardian 交易。</div><div class="workspace-grid">${panel("准备报告", `<label>报告来源<select id="report-source"><option value="research">ETH Risk Lab 研究快照</option><option value="guardian">Guardian 已有运行或事件</option></select></label><div id="guardian-source" ${mode === "guardian" ? "" : "hidden"}><button class="button-secondary" data-report="load-events">读取已有事件</button><label>运行或事件<select id="report-event"><option value="">先读取已有记录</option></select></label></div><div class="action-row"><button class="button-primary" data-report="prepare">固定报告并计算哈希</button><label class="file-button">导入 JSON<input id="report-file" type="file" accept=".json,application/json"></label></div><div id="report-preview"></div>`)}${panel("发布到 BOT Chain", `<p>链 677 / Gas：BOT。部署与发布均需钱包单独确认。</p><button class="button-primary" data-report="connect">连接 MetaMask</button><p id="report-account" class="note"></p><label>报告存证合约地址<input id="report-contract" placeholder="0x…" spellcheck="false" value="${esc(contract)}"></label><div class="action-row"><button class="button-primary" data-report="publish">发布报告哈希</button><button class="button-secondary" data-report="settle">查询原交易</button></div><details class="raw-details"><summary>首次使用：部署报告存证合约</summary><p>此合约只存报告哈希，不是指纹 NFT 合约。已有地址时无需重复部署。</p><button class="button-secondary" data-report="deploy">通过 MetaMask 部署</button></details><p id="report-progress" role="status"></p><p id="report-tx"></p>`, "dark-panel")}${panel("独立核验", `<p>导入报告并重新计算哈希。正文、证据、数组顺序和数值变更会影响结果；对象键顺序与缩进不影响。</p><label>预期发布者<input id="report-publisher" value="${esc(publisher)}" spellcheck="false" placeholder="0x…"></label><button class="button-primary" data-report="verify">重新计算并查询链上记录</button><p id="report-verification" role="status"></p>`, "wide")}</div><p id="report-error" class="error-band" role="alert" hidden></p><p class="note">报告 JSON 保存在本机浏览器，可下载保存；链上不上传报告正文。</p>`;
   const find = (s) => root.querySelector(s);
   find("#report-source").value = mode;
   const intact = () =>
@@ -249,16 +255,16 @@ export async function mount(root) {
       throw new Error("当前浏览器不能安全协调交易窗口，已禁止新交易。请使用支持 Web Locks 的浏览器。");
     await navigator.locks.request("xjy:bot:send:v1", async () => {
       try {
-        if (localStorage.getItem(keys.pending) || localStorage.getItem(keys.intent))
+        if (localStorage.getItem(keys.pending) || localStorage.getItem(keys.intent) || localStorage.getItem("xjy:bot:pending:v1") || localStorage.getItem("xjy:bot:intent:v1"))
           throw new Error("已有发送记录");
-        const intent = JSON.stringify({ kind, publisher: account, createdAt: new Date().toISOString() });
+        const intent = JSON.stringify({ kind, chainId: 677, publisher: account, createdAt: new Date().toISOString() });
         localStorage.setItem(keys.intent, intent);
         if (localStorage.getItem(keys.intent) !== intent) throw new Error("发送意图未保存");
       } catch {
         storageBlocked = true;
         throw new Error("无法安全保存发送意图，或已有未完成交易；禁止新签名，请先核查原记录。");
       }
-      notice = "请在钱包中核对 BOT 测试网与费用。";
+      notice = "请在钱包中核对 BOT 主网 677 与实际 BOT 费用。";
       controls();
       let pending;
       try {
@@ -294,6 +300,7 @@ export async function mount(root) {
       verification = "内容与声明哈希不一致，未查询链上。";
       return;
     }
+    if (envelope.anchor && envelope.anchor.chainId !== 677) throw new Error("该文件是测试网存证；不能在主网核验原回执，请保留文件并使用原网络核查。");
     const hash = reportHash(envelope.report),
       result = await verifyOnChain(contract, publisher, hash);
     if (!result.exists) {
@@ -310,6 +317,7 @@ export async function mount(root) {
         throw new Error("文件的存证元数据与链上记录不一致。");
       await confirmTransaction({
         kind: "PUBLISH",
+        chainId: 677,
         hash: anchor.transactionHash,
         publisher: result.publisher,
         contract: result.contract,

@@ -9,11 +9,11 @@ import {
 } from "./pending.js";
 export { pendingTransaction } from "./pending.js";
 export const NETWORK = {
-  chainId: "0x3c8",
-  chainName: "Bohr Testnet / BOT Chain Testnet",
-  nativeCurrency: { name: "Test BOT", symbol: "BOT", decimals: 18 },
-  rpcUrls: ["https://rpc.bohr.life"],
-  blockExplorerUrls: ["https://scan.bohr.life"],
+  chainId: "0x2a5",
+  chainName: "BOT Chain",
+  nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
+  rpcUrls: ["https://rpc.botchain.ai"],
+  blockExplorerUrls: ["https://scan.botchain.ai"],
 };
 const safeRead = (key, fallback) => {
   try {
@@ -31,9 +31,9 @@ const save = (key, value) => {
   }
 };
 export const wallet = { account: null, chainId: null };
-export const contractAddress = () => safeRead("cfp.contract.968", "");
+export const contractAddress = () => safeRead("cfp.contract.677", "");
 export const collections = () =>
-  safeRead("cfp.collection.968", []).filter(
+  safeRead("cfp.collection.677", []).filter(
     (x) => x.owner?.toLowerCase() === wallet.account?.toLowerCase(),
   );
 export const base64 = (text) =>
@@ -155,8 +155,8 @@ async function signer() {
   }
   const { BrowserProvider } = await import("ethers");
   const provider = new BrowserProvider(window.ethereum);
-  if ((await provider.getNetwork()).chainId !== 968n)
-    throw new Error("钱包尚未切换到 BOT Chain Testnet，已停止操作。");
+  if ((await provider.getNetwork()).chainId !== 677n)
+    throw new Error("钱包尚未切换到 BOT Chain 主网，已停止操作。");
   wallet.chainId = NETWORK.chainId;
   return { provider, signer: await provider.getSigner() };
 }
@@ -175,13 +175,13 @@ export async function verifyContract(address) {
   if (!isAddress(address)) throw new Error("请输入有效的 EVM 合约地址。");
   const provider = new JsonRpcProvider(NETWORK.rpcUrls[0]);
   try {
-    if ((await provider.getNetwork()).chainId !== 968n)
+    if ((await provider.getNetwork()).chainId !== 677n)
       throw new Error("RPC 网络与 BOT Chain 不一致。");
     const code = await provider.getCode(address);
     const compiled = await loadArtifact();
     if (code.toLowerCase() !== compiled.deployedBytecode.toLowerCase())
       throw new Error("地址的合约字节码与本项目不一致，请确认部署版本。");
-    if (!save("cfp.contract.968", address))
+    if (!save("cfp.contract.677", address))
       throw new Error("浏览器无法保存配置，请允许本地存储。");
   } finally {
     provider.destroy();
@@ -260,7 +260,7 @@ async function settleTransaction(job, receipt, report, rpc) {
   if (code?.toLowerCase() !== a.deployedBytecode.toLowerCase())
     throw new Error("回执合约代码与本项目不一致，保留占用。");
   if (job.kind === "DEPLOY") {
-    if (!save("cfp.contract.968", address)) throw new Error("部署已成功但地址无法保存；保留原交易记录。");
+    if (!save("cfp.contract.677", address)) throw new Error("部署已成功但地址无法保存；保留原交易记录。");
     completeTransaction(job);
     report(`合约已部署并核验：${address}`, job.hash);
     return address;
@@ -279,8 +279,8 @@ async function settleTransaction(job, receipt, report, rpc) {
   const metadata = metadataFromUri(job.edition.uri);
   const record = { owner: job.owner, tokenId: tokenId.toString(), contract: address, tx: job.hash,
     chainId: job.chainId, metadata, capturedAt: metadata.properties.capturedAt };
-  const records = safeRead("cfp.collection.968", []);
-  if (!save("cfp.collection.968", [record, ...records.filter((x) => x.tx?.toLowerCase() !== job.hash.toLowerCase())]))
+  const records = safeRead("cfp.collection.677", []);
+  if (!save("cfp.collection.677", [record, ...records.filter((x) => x.tx?.toLowerCase() !== job.hash.toLowerCase())]))
     throw new Error(`Token #${record.tokenId} 已铸造但收藏记录无法保存；保留原交易记录。`);
   completeTransaction(job);
   report(`已收藏，Token #${record.tokenId}。链上所有权与快照摘要已核验。`, job.hash);
@@ -314,7 +314,7 @@ export async function deployContract(report) {
     const owner = await s.getAddress();
     const factory = new ContractFactory(a.abi, a.bytecode, s);
     report("请在钱包中核对部署费用并确认。");
-    return broadcast({ kind: "DEPLOY", chainId: 968, owner }, async () => {
+    return broadcast({ kind: "DEPLOY", chainId: 677, owner }, async () => {
       const contract = await factory.deploy();
       return contract.deploymentTransaction();
     }, report);
@@ -337,7 +337,7 @@ export async function mintEdition(edition, report) {
     const digest = keccak256(toUtf8Bytes(edition.uri));
     if (await contract.minted(owner, digest)) throw new Error("这个账户已收藏过同一份快照。");
     report("请在钱包中核对 Gas 费用并确认铸造。");
-    return broadcast({ kind: "MINT", chainId: 968, owner, contract: address, digest,
+    return broadcast({ kind: "MINT", chainId: 677, owner, contract: address, digest,
       edition: { uri: edition.uri, metadata: edition.metadata, snapshot: edition.snapshot } },
     () => contract.mint(edition.uri), report);
   });
@@ -346,6 +346,6 @@ export function errorMessage(error) {
   if (error.code === 4001 || error.code === "ACTION_REJECTED")
     return "你取消了钱包操作，未完成上链。";
   if (error.code === "INSUFFICIENT_FUNDS")
-    return "测试 BOT 余额不足以支付 Gas，请补充后重试。";
+    return "主网 BOT 余额不足以支付 Gas，请补充后重试。";
   return error.shortMessage || error.message || "操作失败，请稍后重试。";
 }

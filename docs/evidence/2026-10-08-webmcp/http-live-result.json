@@ -1,0 +1,53 @@
+{
+  "httpStatus": 200,
+  "noStore": "no-store",
+  "mode": "isolated MOCK Guardian; public market HTTP reads",
+  "modelCredentials": "not configured",
+  "ethereumRpc": "not configured",
+  "createdAt": "2026-10-08T01:26:01.325Z",
+  "snapshotId": "ca970009-5957-4710-9242-f235aed6948c",
+  "sourceStates": [
+    {
+      "group": "market",
+      "status": "live",
+      "collectedAt": "2026-10-08T01:25:54.826Z"
+    },
+    {
+      "group": "history",
+      "status": "live",
+      "collectedAt": "2026-10-08T01:25:54.510Z"
+    },
+    {
+      "group": "orderbook",
+      "status": "live",
+      "collectedAt": "2026-10-08T01:25:56.696Z"
+    },
+    {
+      "group": "dex",
+      "status": "live",
+      "collectedAt": "2026-10-08T01:25:53.815Z"
+    },
+    {
+      "group": "tvl",
+      "status": "live",
+      "collectedAt": "2026-10-08T01:25:53.848Z"
+    },
+    {
+      "group": "sentiment",
+      "status": "live",
+      "collectedAt": "2026-10-08T01:25:53.945Z"
+    },
+    {
+      "group": "github",
+      "status": "live",
+      "collectedAt": "2026-10-08T01:25:54.377Z"
+    },
+    {
+      "group": "news",
+      "status": "unavailable",
+      "collectedAt": null
+    }
+  ],
+  "browserAgent": "NOT TESTED",
+  "visualInspection": "NOT PERFORMED"
+}

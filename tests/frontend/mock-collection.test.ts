@@ -41,7 +41,7 @@ it("keeps immutable image, source and capture time across module reload", async 
 });
 
 it("does not read or alter real NFT collections, contracts or pending transactions", () => {
-  const keys = ["cfp.collection.968", "cfp.contract.968", "cfp.pending.968.v1"];
+  const keys = ["cfp.collection.968", "cfp.contract.968", "cfp.pending.968.v1", "cfp.collection.677", "cfp.contract.677", "cfp.pending.677.v1"];
   for (const key of keys) localStorage.setItem(key, "retained original bytes");
   saveMockCollection(createEdition(market.coins[0], market.sentiment));
   expect(mockCollections()).toHaveLength(1);
@@ -93,7 +93,7 @@ it("runs the shared UI flow for every asset and keeps Mock cards free of blockch
   expect(section.textContent).toContain("未上链");
   expect(section.querySelector('a[href*="/tx/"]')).toBeNull();
   expect(section.textContent).not.toContain("Token #");
-  expect(document.querySelector('[data-collection-section="BOT_TESTNET"]')).not.toBeNull();
+  expect(document.querySelector('[data-collection-section="BOT_MAINNET"]')).not.toBeNull();
   expect(request).not.toHaveBeenCalled();
   const { fingerprintSVG } = await import("../../web/fingerprint/render.js");
   for (const coin of identityAssets) {

@@ -1,0 +1,24 @@
+{
+  "failure": {
+    "status": "数据未准备完成。旧报告已清空，请检查来源后重新准备。",
+    "outputHidden": true,
+    "coverageEmpty": true
+  },
+  "away": {
+    "tools": [],
+    "reportElements": 0
+  },
+  "returned": {
+    "tools": [
+      "create_eth_snapshot",
+      "get_eth_evidence",
+      "get_eth_indicator_definitions",
+      "get_eth_report",
+      "get_eth_snapshot",
+      "submit_eth_report"
+    ],
+    "status": "尚未准备数据。",
+    "outputHidden": true,
+    "coverageEmpty": true
+  }
+}

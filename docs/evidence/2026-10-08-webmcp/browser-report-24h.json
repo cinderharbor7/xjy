@@ -1,0 +1,476 @@
+{
+  "version": 1,
+  "reportId": "35fb4280-3010-445d-9248-0d556c892ab4",
+  "acceptedAt": "2026-10-08T01:35:13.847Z",
+  "origin": "EXTERNAL_AGENT",
+  "validation": "STRUCTURE_AND_REFERENCES_ONLY",
+  "analysis": {
+    "snapshotId": "d471c97e-6dbc-4072-b840-591904499bc7",
+    "conclusion": "INSUFFICIENT_DATA",
+    "summary": "ETH 在 Binance 的滚动 24 小时下跌 3.821%，与多个参照资产同向走弱。目前的数据能描述市场变化，但缺少异常基线、链上交易核验和已核实事件，无法确认这是否构成 Ethereum 链上异动，更无法确定原因。",
+    "observations": [
+      {
+        "statement": "Binance ETH/USDT 快照价格为 2584.97 USDT；滚动 24 小时变化 -3.821%，振幅约 5.65%。这些都是单交易所数据。",
+        "basis": "CURRENT",
+        "evidenceIds": [
+          "market-1"
+        ]
+      },
+      {
+        "statement": "实际返回 24 个已收盘小时样本；小时收益率日化波动率约 2.16%，样本最大回撤约 3.99%，主动买入成交额占比约 40.46%。",
+        "basis": "CURRENT",
+        "evidenceIds": [
+          "history-1"
+        ]
+      },
+      {
+        "statement": "100 档返回盘口中，约 1% 范围内买方深度约 165.82 万 USDT、卖方深度约 84.54 万 USDT。这是一批瞬时挂单，不能视为已成交的资金流。",
+        "basis": "CURRENT",
+        "evidenceIds": [
+          "orderbook-1"
+        ]
+      },
+      {
+        "statement": "DEX Screener 返回 30 个 WETH 为 baseToken 的池，合计流动性约 3.442 亿 USD。没有历史序列，不能据此判断流动性下降。",
+        "basis": "CURRENT",
+        "evidenceIds": [
+          "dex-1"
+        ]
+      },
+      {
+        "statement": "Ethereum 链级 TVL 快照约 522.41 亿 USD，不能用单点值推断资金流出。",
+        "basis": "CURRENT",
+        "evidenceIds": [
+          "tvl-1"
+        ]
+      }
+    ],
+    "hypotheses": [
+      {
+        "explanation": "多种参照资产同向下跌，使全市场共同压力成为一种待核查解释；这并不证明 ETH 的下跌原因。",
+        "supportingEvidenceIds": [
+          "market-1"
+        ],
+        "counterEvidenceIds": [
+          "orderbook-1"
+        ],
+        "uncertainty": "瞬时盘口买方深度更高，没有显示同方向的挂单卖压，但既不能推翻共同压力假设，也不能排除短时挂单撤回；需要时间序列和独立事件来源。"
+      }
+    ],
+    "uncertainties": [
+      "没有定义或验证异常阈值与历史基线，因此价格变化不能直接等同于链上异常。",
+      "当前快照不包含直接核验的 Ethereum 交易、资金流或合约事件。",
+      "新闻来源不可用；不能据此声称没有相关事件，也没有可核实的新闻原因。",
+      "Alternative.me 情绪为全市场背景，GitHub 活跃信息不等于协议安全证据；来源时间也不完全同步。"
+    ],
+    "nextChecks": [
+      "选定具体异常问题和比较窗口，再核查对应 Ethereum 交易或合约事件。",
+      "获取相同范围的历史盘口、成交和池流动性，检验是否明显偏离基线。",
+      "补充可核实的事件来源，并检验与变化的时间关系及反证。"
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "snapshotId": "d471c97e-6dbc-4072-b840-591904499bc7",
+    "asset": "ETH",
+    "windowDays": 1,
+    "createdAt": "2026-10-08T01:33:50.236Z",
+    "evidence": [
+      {
+        "id": "market-1",
+        "group": "market",
+        "source": "Binance Spot",
+        "url": "https://data-api.binance.vision/api/v3/ticker/24hr?symbol=ETHUSDT",
+        "status": "live",
+        "collectedAt": "2026-10-08T01:33:44.396Z",
+        "observedAt": "2026-10-08T01:33:43.998Z",
+        "scope": "Binance现货ETH/USDT滚动24h；其他资产仅作市场比较。",
+        "data": {
+          "unit": "USDT",
+          "eth": {
+            "price": 2584.97,
+            "change": -3.821,
+            "volume": 1153442126.414829,
+            "high": 2689.92,
+            "low": 2538.06,
+            "trades": 3141787,
+            "amplitude": 5.650247240174579
+          },
+          "context": [
+            {
+              "asset": "ETH",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:43.998Z",
+              "price": 2584.97,
+              "change": -3.821,
+              "volume": 1153442126.414829
+            },
+            {
+              "asset": "BTC",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:44.013Z",
+              "price": 83369.56,
+              "change": -2.296,
+              "volume": 1782028083.7235677
+            },
+            {
+              "asset": "SOL",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:43.746Z",
+              "price": 116.63,
+              "change": -2.808,
+              "volume": 234791467.94613
+            },
+            {
+              "asset": "BNB",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:44.097Z",
+              "price": 774.96,
+              "change": -0.369,
+              "volume": 96264505.66631
+            },
+            {
+              "asset": "LINK",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:43.210Z",
+              "price": 13.359,
+              "change": -3.892,
+              "volume": 24893881.32851
+            },
+            {
+              "asset": "UNI",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:44.045Z",
+              "price": 8.002,
+              "change": -4.919,
+              "volume": 81275322.56224
+            },
+            {
+              "asset": "AVAX",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:44.010Z",
+              "price": 11.178,
+              "change": -3.145,
+              "volume": 77061357.26526
+            },
+            {
+              "asset": "DOGE",
+              "status": "live",
+              "observedAt": "2026-10-08T01:33:43.538Z",
+              "price": 0.08945,
+              "change": -4.311,
+              "volume": 115533717.89975
+            }
+          ]
+        }
+      },
+      {
+        "id": "history-1",
+        "group": "history",
+        "source": "Binance Klines",
+        "url": "https://data-api.binance.vision/api/v3/klines?symbol=ETHUSDT&interval=1h&limit=25",
+        "status": "live",
+        "collectedAt": "2026-10-08T01:33:43.237Z",
+        "observedAt": "2026-10-08T01:00:00.000Z",
+        "scope": "实际返回的已收盘小时样本；窗口以首末时间为准。波动率为小时收益率日化。",
+        "data": {
+          "unit": "USDT",
+          "sampleCount": 24,
+          "history": [
+            {
+              "time": 1791334800000,
+              "close": 2657.58,
+              "volume": 55804606.468589,
+              "buyVolume": 12962554.099391
+            },
+            {
+              "time": 1791338400000,
+              "close": 2612.54,
+              "volume": 190553986.535907,
+              "buyVolume": 75662697.697206
+            },
+            {
+              "time": 1791342000000,
+              "close": 2611.14,
+              "volume": 56670149.739508,
+              "buyVolume": 15814639.14124
+            },
+            {
+              "time": 1791345600000,
+              "close": 2610.31,
+              "volume": 44045588.583829,
+              "buyVolume": 9813037.08262
+            },
+            {
+              "time": 1791349200000,
+              "close": 2620.9,
+              "volume": 43817136.234063,
+              "buyVolume": 13103781.531502
+            },
+            {
+              "time": 1791352800000,
+              "close": 2618,
+              "volume": 45838597.286928,
+              "buyVolume": 10677415.178448
+            },
+            {
+              "time": 1791356400000,
+              "close": 2616.32,
+              "volume": 29708507.079224,
+              "buyVolume": 14346536.943248
+            },
+            {
+              "time": 1791360000000,
+              "close": 2609.99,
+              "volume": 86810274.514868,
+              "buyVolume": 57851273.867951
+            },
+            {
+              "time": 1791363600000,
+              "close": 2596.99,
+              "volume": 42152030.226893,
+              "buyVolume": 16250964.93257
+            },
+            {
+              "time": 1791367200000,
+              "close": 2579.89,
+              "volume": 72029784.003951,
+              "buyVolume": 30967864.50335
+            },
+            {
+              "time": 1791370800000,
+              "close": 2578.94,
+              "volume": 32613084.230989,
+              "buyVolume": 15397909.946343
+            },
+            {
+              "time": 1791374400000,
+              "close": 2572.94,
+              "volume": 33048920.605716,
+              "buyVolume": 15562438.201601
+            },
+            {
+              "time": 1791378000000,
+              "close": 2569.44,
+              "volume": 74943802.894217,
+              "buyVolume": 33478374.318701
+            },
+            {
+              "time": 1791381600000,
+              "close": 2563.8,
+              "volume": 37317281.393531,
+              "buyVolume": 16986977.027195
+            },
+            {
+              "time": 1791385200000,
+              "close": 2570.73,
+              "volume": 57425701.990692,
+              "buyVolume": 21266214.62698
+            },
+            {
+              "time": 1791388800000,
+              "close": 2568.52,
+              "volume": 46036419.883912,
+              "buyVolume": 17921927.223354
+            },
+            {
+              "time": 1791392400000,
+              "close": 2551.63,
+              "volume": 59253441.393854,
+              "buyVolume": 26377773.157562
+            },
+            {
+              "time": 1791396000000,
+              "close": 2562.98,
+              "volume": 21335963.992469,
+              "buyVolume": 11960171.050956
+            },
+            {
+              "time": 1791399600000,
+              "close": 2571.09,
+              "volume": 20044296.251175,
+              "buyVolume": 10571185.827199
+            },
+            {
+              "time": 1791403200000,
+              "close": 2574.52,
+              "volume": 22632211.834914,
+              "buyVolume": 10042401.768852
+            },
+            {
+              "time": 1791406800000,
+              "close": 2567.69,
+              "volume": 22989596.66379,
+              "buyVolume": 9087553.036174
+            },
+            {
+              "time": 1791410400000,
+              "close": 2569.8,
+              "volume": 12986140.285115,
+              "buyVolume": 4125955.203673
+            },
+            {
+              "time": 1791414000000,
+              "close": 2574.14,
+              "volume": 18529058.855503,
+              "buyVolume": 6030558.138504
+            },
+            {
+              "time": 1791417600000,
+              "close": 2575.75,
+              "volume": 27341734.755666,
+              "buyVolume": 10635934.51108
+            }
+          ],
+          "volatility": 2.1638823560043345,
+          "drawdown": 3.986709713348227,
+          "buyRatio": 0.40461450911734
+        }
+      },
+      {
+        "id": "orderbook-1",
+        "group": "orderbook",
+        "source": "Binance order book",
+        "url": "https://data-api.binance.vision/api/v3/depth?symbol=ETHUSDT&limit=100",
+        "status": "live",
+        "collectedAt": "2026-10-08T01:33:42.781Z",
+        "observedAt": null,
+        "scope": "返回100档内±1%深度；非完整盘口。",
+        "data": {
+          "unit": "USDT; spread %, imbalance ratio",
+          "bestBid": 2584.96,
+          "bestAsk": 2584.97,
+          "spread": 0.0003868524331959439,
+          "bidDepth": 1658248.105171,
+          "askDepth": 845383.3604110004,
+          "imbalance": 0.3246742805139809
+        }
+      },
+      {
+        "id": "dex-1",
+        "group": "dex",
+        "source": "DEX Screener",
+        "url": "https://api.dexscreener.com/token-pairs/v1/ethereum/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "status": "live",
+        "collectedAt": "2026-10-08T01:33:44.221Z",
+        "observedAt": null,
+        "scope": "WETH为baseToken的返回池集合；非全链，无历史流动性序列。",
+        "data": {
+          "asset": "WETH",
+          "unit": "USD / count",
+          "pools": 30,
+          "liquidity": 344236915.71999997,
+          "largest": 99865295.21,
+          "buys": 37252,
+          "sells": 32552
+        }
+      },
+      {
+        "id": "tvl-1",
+        "group": "tvl",
+        "source": "DefiLlama",
+        "url": "https://api.llama.fi/v2/chains",
+        "status": "live",
+        "collectedAt": "2026-10-08T01:33:42.842Z",
+        "observedAt": null,
+        "scope": "链级TVL静态值，非协议TVL或资金流。",
+        "data": {
+          "chain": "Ethereum",
+          "tvlUsd": 52241028767.38592
+        }
+      },
+      {
+        "id": "sentiment-1",
+        "group": "sentiment",
+        "source": "Alternative.me",
+        "url": "https://api.alternative.me/fng/?limit=1",
+        "status": "live",
+        "collectedAt": "2026-10-08T01:33:42.333Z",
+        "observedAt": "2026-10-08T00:00:00.000Z",
+        "scope": "全市场恐惧贪婪指数，非ETH专属。",
+        "data": {
+          "value": 64
+        }
+      },
+      {
+        "id": "github-1",
+        "group": "github",
+        "source": "GitHub",
+        "url": "https://api.github.com/repos/ethereum/go-ethereum",
+        "status": "live",
+        "collectedAt": "2026-10-08T01:33:43.346Z",
+        "observedAt": null,
+        "scope": "仓库背景；最后推送不等于最后提交，Stars非安全评分。",
+        "data": {
+          "repository": "ethereum/go-ethereum",
+          "stars": 51388,
+          "forks": 22166,
+          "issues": 477,
+          "pushedAt": "2026-10-07T15:41:38Z"
+        }
+      },
+      {
+        "id": "news-1",
+        "group": "news",
+        "source": "GDELT",
+        "url": "https://api.gdeltproject.org/api/v2/doc/doc",
+        "status": "unavailable",
+        "collectedAt": null,
+        "observedAt": null,
+        "scope": "最近24h无返回新闻或来源不可用；不证明没有相关事件。",
+        "data": null
+      }
+    ],
+    "limitations": [
+      "多源采集批次，非同一时刻或同一区块快照。",
+      "网站未调用模型；外部Agent解释未经独立核实。",
+      "stale只作历史背景；unavailable不作证据；不填充Mock。",
+      "没有论文来源，不以论文方法背书；无综合预测分数。",
+      "此快照为市场与生态数据，不含直接核验的链上交易，不确认异动原因。"
+    ]
+  },
+  "indicatorDefinitions": [
+    {
+      "id": "market",
+      "formula": "24h change = Binance priceChangePercent; amplitude = (high-low)/open*100",
+      "unit": "% / USDT",
+      "limitation": "单交易所滚动24h，不是全网；USDT不是USD。"
+    },
+    {
+      "id": "volatility",
+      "formula": "std_population(log(close[t]/close[t-1])) * sqrt(24) * 100",
+      "unit": "%",
+      "limitation": "已收盘小时K线的日化波动率；不足2个收盘价返回null。"
+    },
+    {
+      "id": "drawdown",
+      "formula": "max((runningPeak-close)/runningPeak)*100",
+      "unit": "%",
+      "limitation": "仅小时收盘价，不包含小时内最大回撤。"
+    },
+    {
+      "id": "buyRatio",
+      "formula": "sum(takerBuyQuoteVolume)/sum(quoteVolume)",
+      "unit": "ratio [0,1]",
+      "limitation": "当前窗口报价资产成交额；成交额为0返回null。"
+    },
+    {
+      "id": "orderbook",
+      "formula": "spread=(ask-bid)/mid*100; depth=sum(price*quantity) within ±1%; imbalance=(bidDepth-askDepth)/(bidDepth+askDepth)",
+      "unit": "% / USDT / ratio [-1,1]",
+      "limitation": "仅返回100档；分母为0返回null。"
+    },
+    {
+      "id": "dex",
+      "formula": "Returned WETH base-token pools: count and sum(liquidity.usd)",
+      "unit": "USD / count",
+      "limitation": "返回池集合，非全网。买卖笔数不是净卖出额；无历史不能称流动性下降。"
+    },
+    {
+      "id": "context",
+      "formula": "Provider observations; no composite risk score",
+      "unit": "各来源标注",
+      "limitation": "链TVL非协议TVL；情绪是市场背景；新闻只有标题与收录时间；仓库推送非提交。未采用论文指标。"
+    }
+  ]
+}

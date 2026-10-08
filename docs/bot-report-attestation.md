@@ -10,34 +10,29 @@
 
 报告保留原始数据模式。当前 Risk Lab 为 `MOCK_CHAIN_FIXTURE`；Guardian 的 `MOCK` 与 `FORK` 分开标记。Fork 余额和成交来自本机链，市场变化与调查仍是演示输入。未来 `LIVE_CHAIN_READ` 模式按源快照原样保存，不推断所有模型已经拟合。
 
-BOT 存证是独立的真实测试网交易，只证明指定地址在链上记录了这个哈希；不证明报告事实正确、模型准确或策略能盈利。内容正文不会发送到合约；发布者地址、哈希、时间及交易本身是公开记录。JSON 保存在本机浏览器并可以下载；清除浏览器数据不会删除链上记录，但会丢失本机草稿/待确认交易提示。
+BOT 存证是独立的真实链上交易，只证明指定地址在链上记录了这个哈希；不证明报告事实正确、模型准确或策略能盈利。内容正文不会发送到合约；发布者地址、哈希、时间及交易本身是公开记录。JSON 保存在本机浏览器并可以下载；清除浏览器数据不会删除链上记录，但会丢失本机草稿/待确认交易提示。
 
 ## 网络与钱包
 
 | 项目 | 值 |
 | --- | --- |
-| Chain ID | `968` / `0x3c8` |
-| 网络名 | BOT Chain Testnet |
-| RPC | `https://rpc.bohr.life` |
+| Chain ID | `677` / `0x2a5` |
+| 网络名 | BOT Chain Mainnet |
+| RPC | `https://rpc.botchain.ai` |
 | 原生币 | BOT，18 decimals |
-| 浏览器 | `https://scan.bohr.life` |
+| 浏览器 | `https://scan.botchain.ai` |
 
-本次只读 RPC 检查 `eth_chainId` 实际返回 `0x3c8`。项目不接收、不保存 BOT 钱包私钥；部署与发布均由 MetaMask 签名。现有 `FORK_PRIVATE_KEY` 仅属于既有本机 Fork 执行，不用于 BOT 存证，BOT-only 操作无需配置它。
+2026-10-08 只读 RPC 检查 `eth_chainId` 实际返回 `0x2a5`；已知主网回执及代码检查见 [主网验收](bot-mainnet-acceptance.md)。项目不接收、不保存 BOT 钱包私钥；部署与发布均由 MetaMask 签名。现有 `FORK_PRIVATE_KEY` 仅属于既有本机 Fork 执行，不用于 BOT 存证，BOT-only 操作无需配置它。
 
 ## 首次部署（用户在 MetaMask 操作）
 
 1. 在安装并解锁 MetaMask 的 Chrome/Edge 浏览器中打开 `http://localhost:3000/attestations`。应用内置浏览器若没有 MetaMask 注入，请改用安装扩展的浏览器。运行本分支使用 `pnpm install`、`pnpm contract:check`、`pnpm dev`。
-2. 点击“连接 MetaMask”，选中已领取测试 BOT 的账户。展开“首次使用：部署存证合约”，点击“通过 MetaMask 部署”。
-3. MetaMask 会请求切换或添加 Chain ID 968。核对上述参数，再在钱包中确认部署交易及测试 BOT gas。
+2. 点击“连接 MetaMask”，选中有主网 BOT Gas 的账户。展开“首次使用：部署存证合约”，点击“通过 MetaMask 部署”。
+3. MetaMask 会请求切换或添加 Chain ID 677。核对上述参数，再在钱包中确认部署交易及主网 BOT gas。
 4. 等待页面确认部署回执并核对合约 runtime bytecode。页面会显示并保存合约地址；本浏览器可立即使用。
-5. 团队共享地址时，在 `.env.local` 设置 `NEXT_PUBLIC_BOT_REPORT_REGISTRY=0x实际部署地址`，重新构建/重启。`NEXT_PUBLIC_BOT_RPC_URL` 默认就是上述 RPC。不要把私钥加入任何 `NEXT_PUBLIC_*` 变量。
+5. 默认报告存证合约为已核验的 `0x1bA50A79BEB8d44c0f9ff1D4dBdDCa523eFb340e`，已有合约无需再次部署。页面也可填写其他同版本主网registry地址，核验后按主网保存。NFT不可使用该地址。旧 `NEXT_PUBLIC_BOT_RPC_URL` / `NEXT_PUBLIC_BOT_REPORT_REGISTRY` 测试网配置不再决定本轮主网网络或默认地址；不改私钥。
 
-```dotenv
-NEXT_PUBLIC_BOT_RPC_URL=https://rpc.bohr.life
-NEXT_PUBLIC_BOT_REPORT_REGISTRY=
-```
-
-地址为空时允许用户从页面部署或填写已有地址。页面每次发布/核验都会检查 RPC chain ID 和合约代码哈希，拒绝错误网络、无代码地址及其他版本实现。换编译器、源码或编译设置后必须重新生成 artifact 并部署相应版本；不会把旧地址默认为新实现。
+页面每次发布/核验都会检查 RPC chain ID 和合约代码哈希，拒绝错误网络、无代码地址及其他版本实现。换编译器、源码或编译设置后必须重新生成 artifact 并部署相应版本；不会把旧地址默认为新实现。
 
 ## 发布与核验
 
@@ -85,6 +80,10 @@ node scripts/test-attestation-evm.mjs <Anvil可执行文件绝对路径>
 
 本地 EVM 验收启动隔离的 127.0.0.1:19545 / chain ID 968，不接 BOT RPC。使用随机临时账户，只在该本地节点准备余额。实际部署合约，验证 code hash、发布者、区块时间、事件、重复拒绝、不同发布者不互相覆盖、零哈希拒绝。脚本结束后停止自己的节点。
 
-本次实际结果：`contract:check`、TypeScript 和生产构建通过；普通测试 **359 passed / 6 skipped**（4 个需本地 EVM 的新合约测试、2 个既有 Fork 测试默认跳过）。新合约测试已通过上述隔离 Anvil 脚本单独实际运行，**4/4 通过**。生产 HTTP 验证 `/attestations` 与原 `/api/eth-risk` 返回 200，读取报告页后监控仍暂停、事件数为 0。没有启动用户现有 Fork 或要求钱包签名。
+历史测试网/本地EVM阶段结果：`contract:check`、TypeScript 和生产构建通过；普通测试 **359 passed / 6 skipped**（4 个需本地 EVM 的新合约测试、2 个既有 Fork 测试默认跳过）。新合约测试已通过上述隔离 Anvil 脚本单独实际运行，**4/4 通过**。生产 HTTP 验证 `/attestations` 与原 `/api/eth-risk` 返回 200，读取报告页后监控仍暂停、事件数为 0。没有启动用户现有 Fork 或要求钱包签名。
 
-**尚需钱包验收：** BOT 测试网上的实际部署、MetaMask 签名和实际发布需要用户操作钱包。代码/本地 EVM 通过不代表这些步骤已完成；未填写虚假的测试网合约地址或交易 hash。遵照用户要求，没有进行视觉检查。
+**历史阶段尚需钱包验收：** BOT 测试网上的实际部署、MetaMask 签名和实际发布需要用户操作钱包。代码/本地 EVM 通过不代表这些步骤已完成；未填写虚假的测试网合约地址或交易 hash。遵照用户要求，没有进行视觉检查。
+
+## 2026-10-08 主网状态
+
+主网读侧与既有发布交易已通过实际核验；用户交易为PUBLISH，未提供合约创建交易或原报告正文。当前接线与新鲜1050项测试/typecheck/build通过，详情见 [主网验收](bot-mainnet-acceptance.md)。旧968文件可导入保留，不能在677验证其anchor；旧pending保留，禁止新签名或跨链查询，不自动迁移/删除。未重新发送交易或要求钱包签名；NFT合约独立，尚不能把registry当作NFT主网部署证明。

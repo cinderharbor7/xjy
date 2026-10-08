@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const owner = "0x1111111111111111111111111111111111111111";
 const address = "0x2222222222222222222222222222222222222222";
 const hash = "0x" + "a".repeat(64);
-const key = "cfp.pending.968.v1";
+const key = "cfp.pending.677.v1";
 const mocks = vi.hoisted(() => ({
   mint: vi.fn(), deploy: vi.fn(), wait: vi.fn(), minted: vi.fn(),
   chain: vi.fn(), receipt: vi.fn(), code: vi.fn(), read: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock("../../web/fingerprint/render.js", () => ({
 vi.mock("ethers", async (original) => ({
   ...(await original<object>()),
   BrowserProvider: class {
-    getNetwork = async () => ({ chainId: 968n });
+    getNetwork = async () => ({ chainId: 677n });
     getCode = async () => "0xcafe";
     getSigner = async () => ({ getAddress: mocks.address });
   },
@@ -50,7 +50,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear(); sessionStorage.clear();
   mocks.address.mockResolvedValue(owner);
-  mocks.chain.mockResolvedValue(968);
+  mocks.chain.mockResolvedValue(677);
   mocks.code.mockResolvedValue("0xcafe");
   mocks.receipt.mockResolvedValue(null);
   mocks.minted.mockResolvedValue(false);
@@ -59,7 +59,7 @@ beforeEach(() => {
   mocks.deploy.mockResolvedValue({ deploymentTransaction: () => ({ hash, wait: mocks.wait }) });
   vi.stubGlobal("fetch", vi.fn(async () => Response.json(artifact)));
   Object.defineProperty(window, "ethereum", { configurable: true, value: {
-    on() {}, request: vi.fn(async ({ method }: { method: string }) => method === "eth_chainId" ? "0x3c8" : [owner]),
+    on() {}, request: vi.fn(async ({ method }: { method: string }) => method === "eth_chainId" ? "0x2a5" : [owner]),
   } });
   let held = false;
   Object.defineProperty(navigator, "locks", { configurable: true, value: { request:
@@ -68,7 +68,7 @@ beforeEach(() => {
       held = true;
       try { return await action({ name: key }); } finally { held = false; }
     } } });
-  localStorage.setItem("cfp.contract.968", JSON.stringify(address));
+  localStorage.setItem("cfp.contract.677", JSON.stringify(address));
 });
 afterEach(() => {
   vi.restoreAllMocks(); vi.unstubAllGlobals();
@@ -80,7 +80,7 @@ it("persists deployment hash after timeout and blocks a second deployment after 
   let nft = await import("../../web/fingerprint/nft.js");
   const report = vi.fn();
   await expect(nft.deployContract(report)).rejects.toThrow("timed out");
-  expect(JSON.parse(localStorage.getItem(key)!)).toMatchObject({ kind: "DEPLOY", owner, chainId: 968, hash, status: "SUBMITTED" });
+  expect(JSON.parse(localStorage.getItem(key)!)).toMatchObject({ kind: "DEPLOY", owner, chainId: 677, hash, status: "SUBMITTED" });
   expect(report.mock.calls.at(-1)?.[1]).toBe(hash);
   vi.resetModules(); nft = await import("../../web/fingerprint/nft.js");
   await expect(nft.deployContract(report)).rejects.toThrow("待核验");
@@ -99,7 +99,7 @@ it("freezes a mint snapshot and keeps the original hash and occupation on receip
   expect(report.mock.calls.at(-1)?.[1]).toBe(hash);
   await expect(nft.mintEdition(edition, report)).rejects.toThrow("待核验");
   expect(mocks.mint).toHaveBeenCalledTimes(1);
-  expect(mocks.http).toHaveBeenCalledWith("https://rpc.bohr.life", { retryCount: 0, timeout: 15_000 });
+  expect(mocks.http).toHaveBeenCalledWith("https://rpc.botchain.ai", { retryCount: 0, timeout: 15_000 });
 });
 
 it("refuses to broadcast if persistent storage is unavailable", async () => {
@@ -192,7 +192,7 @@ it("recovers a successful deployment through only the original receipt and code 
 it("retains occupation when the recovery RPC is on another chain or deployment bytecode mismatches", async () => {
   const nft = await import("../../web/fingerprint/nft.js");
   await expect(nft.deployContract(vi.fn())).rejects.toThrow("timed out");
-  mocks.chain.mockResolvedValueOnce(677);
+  mocks.chain.mockResolvedValueOnce(968);
   await expect(nft.queryPendingTransaction(vi.fn())).rejects.toThrow("网络不一致");
   expect(mocks.receipt).not.toHaveBeenCalled();
   mocks.receipt.mockResolvedValueOnce({ transactionHash: hash, from: owner, to: null, status: "success", contractAddress: address });
@@ -214,7 +214,7 @@ it("reconstructs a successful collection from the stored edition and checks exac
   const result = await nft.queryPendingTransaction(vi.fn());
   expect(result).toMatchObject({ tokenId: "1", tx: hash, metadata: edition.metadata });
   expect(localStorage.getItem(key)).toBeNull();
-  expect(JSON.parse(localStorage.getItem("cfp.collection.968")!)).toHaveLength(1);
+  expect(JSON.parse(localStorage.getItem("cfp.collection.677")!)).toHaveLength(1);
   expect(mocks.mint).toHaveBeenCalledTimes(1);
 });
 
@@ -254,7 +254,7 @@ it("rejects malformed URI metadata before any mint request", async () => {
 });
 
 it("restores the pending hash in the UI and keeps deploy/mint disabled while exposing original-hash recovery", async () => {
-  localStorage.setItem(key, JSON.stringify({ id: crypto.randomUUID(), kind: "DEPLOY", owner, chainId: 968, status: "SUBMITTED", hash }));
+  localStorage.setItem(key, JSON.stringify({ id: crypto.randomUUID(), kind: "DEPLOY", owner, chainId: 677, status: "SUBMITTED", hash }));
   document.body.innerHTML = readFileSync("web/index.html", "utf8").match(/<body>([\s\S]*)<\/body>/)![1];
   history.replaceState(null, "", "/");
   sessionStorage.setItem("verdant.market-mode", "demo");
@@ -272,4 +272,17 @@ it("restores the pending hash in the UI and keeps deploy/mint disabled while exp
   expect(document.querySelector("#mint-progress")!.textContent).toContain(hash);
   expect(localStorage.getItem(key)).not.toBeNull();
   expect(mocks.mint).not.toHaveBeenCalled(); expect(mocks.deploy).not.toHaveBeenCalled();
+});
+
+it.each(["SENDING", "SUBMITTED", "DAMAGED"])("retains legacy %s occupation and refuses mainnet signatures or recovery", async (status) => {
+  const legacyKey = "cfp.pending.968.v1";
+  const raw = status === "DAMAGED" ? "{broken" : JSON.stringify({ id: crypto.randomUUID(), kind: "DEPLOY", chainId: 968, owner, status, hash: status === "SENDING" ? null : hash });
+  localStorage.setItem(legacyKey, raw);
+  const nft = await import("../../web/fingerprint/nft.js");
+  await expect(nft.deployContract(vi.fn())).rejects.toThrow("旧测试网");
+  await expect(nft.mintEdition(edition, vi.fn())).rejects.toThrow("旧测试网");
+  await expect(nft.queryPendingTransaction(vi.fn())).rejects.toThrow("旧测试网");
+  expect(mocks.deploy).not.toHaveBeenCalled(); expect(mocks.mint).not.toHaveBeenCalled();
+  expect(mocks.receipt).not.toHaveBeenCalled();
+  expect(localStorage.getItem(legacyKey)).toBe(raw);
 });

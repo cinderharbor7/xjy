@@ -21,7 +21,7 @@ export const ReportSchema = z.discriminatedUnion("kind", [
 });
 export type RiskReport = z.infer<typeof ReportSchema>;
 const hash = z.string().regex(/^0x[0-9a-f]{64}$/);
-export const AnchorSchema = z.strictObject({ chainId: z.literal(968), contract: z.string().regex(/^0x[0-9a-fA-F]{40}$/), publisher: z.string().regex(/^0x[0-9a-fA-F]{40}$/), transactionHash: hash, timestamp: z.string().regex(/^\d+$/) });
+export const AnchorSchema = z.strictObject({ chainId: z.union([z.literal(968), z.literal(677)]), contract: z.string().regex(/^0x[0-9a-fA-F]{40}$/), publisher: z.string().regex(/^0x[0-9a-fA-F]{40}$/), transactionHash: hash, timestamp: z.string().regex(/^\d+$/) });
 export type ReportAnchor = z.infer<typeof AnchorSchema>;
 export const EnvelopeSchema = z.strictObject({ format: z.literal(HASH_FORMAT), algorithm: z.literal("keccak256"), report: ReportSchema, reportHash: hash, anchor: AnchorSchema.optional() });
 export type ReportEnvelope = z.infer<typeof EnvelopeSchema>;

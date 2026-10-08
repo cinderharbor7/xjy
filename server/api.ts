@@ -6,7 +6,29 @@ import * as investigation from "../src/app/api/transaction-checks/route";
 import * as research from "../src/app/api/eth-risk/route";
 import * as onchainAnalysis from "../src/app/api/onchain-analysis/route";
 import { market, detail } from "./fingerprint.js";
+import { SnapshotSchema } from "../src/modules/eth-report/contracts";
+import { collectSnapshot } from "./eth-report";
+import { assertLocalRequest } from "../src/integration/guardian/http";
+import { isGuardianError } from "../src/integration/guardian/contracts";
+
 type Handler = (request: Request) => Response | Promise<Response>;
+
+async function ethReportSnapshot(request: Request) {
+  const problem = (status: number, code: string, detail: string) => Response.json({ type: `urn:xjy:eth-report:${code}`, title: "调查数据未准备完成", status, code, detail }, { status, headers: { "Cache-Control": "no-store", "Content-Type": "application/problem+json" } });
+  try {
+    assertLocalRequest(request);
+    const params = new URL(request.url).searchParams;
+    const days = params.get("days");
+    if (params.size !== 1 || !["1", "7"].includes(days ?? "")) return problem(400, "INVALID_WINDOW", "只接受 days=1 或 days=7。");
+    const windowDays = days === "7" ? 7 : 1;
+    const snapshot = SnapshotSchema.parse(await collectSnapshot(windowDays));
+    if (snapshot.windowDays !== windowDays) throw new Error("WINDOW_MISMATCH");
+    return Response.json(snapshot, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    if (isGuardianError(error)) return problem(error.status, error.code, "请从配置的本机页面同源读取。");
+    return problem(503, "SNAPSHOT_UNAVAILABLE", "数据未通过校验，未生成快照；请检查来源后手动重试。");
+  }
+}
 const routes: Record<string, Record<string, Handler>> = {
   "/api/rescue": { POST: rescue.POST },
   "/api/monitor": { GET: monitor.GET, POST: monitor.POST },
@@ -15,6 +37,7 @@ const routes: Record<string, Record<string, Handler>> = {
   "/api/transaction-checks": { POST: investigation.POST },
   "/api/eth-risk": { GET: research.GET },
   "/api/onchain-analysis": { POST: onchainAnalysis.POST },
+  "/api/eth-report-snapshot": { GET: ethReportSnapshot },
   "/api/market": {
     GET: async () =>
       Response.json(await market(), {

@@ -58,6 +58,13 @@ describe("risk report content hash", () => {
     const a = exportReport(report), b = exportReport(report, anchor); expect(a.reportHash).toBe(b.reportHash);
     expect(parseReportFile(JSON.stringify(b)).matches).toBe(true);
   });
+  it("accepts mainnet anchors without changing the report hash or dropping historical testnet files", () => {
+    const report = researchReport(getRiskLabSnapshot());
+    const anchor = { chainId: 677 as const, contract: `0x${"11".repeat(20)}`, publisher: `0x${"22".repeat(20)}`, transactionHash: `0x${"ab".repeat(32)}`, timestamp: "1790000000" };
+    const file = exportReport(report, anchor);
+    expect(parseReportFile(JSON.stringify(file)).matches).toBe(true);
+    expect(file.reportHash).toBe(exportReport(report).reportHash);
+  });
   it("exports a non-triggered session without fabricating an event or historical policy version", async () => {
     const session = await createMockRescueOrchestrator(DEMO_WALLET, { ...DEMO_POLICY_CONFIG, minRiskScore: 100 }).runRescueSession(DEMO_WALLET);
     const report = guardianSessionReport(session, "MOCK");

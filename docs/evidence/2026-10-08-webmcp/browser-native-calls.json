@@ -1,0 +1,67 @@
+{
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "tools": [
+    {
+      "name": "create_eth_snapshot",
+      "origin": "http://127.0.0.1:3118",
+      "annotations": {
+        "readOnlyHint": false,
+        "untrustedContentHint": true
+      }
+    },
+    {
+      "name": "get_eth_evidence",
+      "origin": "http://127.0.0.1:3118",
+      "annotations": {
+        "readOnlyHint": true,
+        "untrustedContentHint": true
+      }
+    },
+    {
+      "name": "get_eth_indicator_definitions",
+      "origin": "http://127.0.0.1:3118",
+      "annotations": {
+        "readOnlyHint": true,
+        "untrustedContentHint": true
+      }
+    },
+    {
+      "name": "get_eth_report",
+      "origin": "http://127.0.0.1:3118",
+      "annotations": {
+        "readOnlyHint": true,
+        "untrustedContentHint": true
+      }
+    },
+    {
+      "name": "get_eth_snapshot",
+      "origin": "http://127.0.0.1:3118",
+      "annotations": {
+        "readOnlyHint": true,
+        "untrustedContentHint": true
+      }
+    },
+    {
+      "name": "submit_eth_report",
+      "origin": "http://127.0.0.1:3118",
+      "annotations": {
+        "readOnlyHint": false,
+        "untrustedContentHint": true
+      }
+    }
+  ],
+  "calls": [
+    "09:37:15 · create_eth_snapshot · 开始",
+    "09:37:24 · create_eth_snapshot · 完成",
+    "09:37:50 · submit_eth_report · 开始",
+    "09:37:50 · submit_eth_report · 失败",
+    "09:37:50 · submit_eth_report · 开始",
+    "09:37:50 · submit_eth_report · 失败",
+    "09:37:50 · submit_eth_report · 开始",
+    "09:37:50 · submit_eth_report · 完成"
+  ],
+  "reportId": "79ae6239-d69e-459a-a9d8-231dcf8da77f",
+  "resources": [
+    "http://127.0.0.1:3118/api/eth-report-snapshot?days=7"
+  ]
+}

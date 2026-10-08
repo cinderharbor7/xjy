@@ -54,6 +54,7 @@ export async function market() {
       value: fng ? Number(fng.value) : null,
       label: fng?.value_classification ?? "暂无数据",
       mode: sentiment.status,
+      collectedAt: sentiment.asOf,
       asOf: fng ? new Date(Number(fng.timestamp) * 1000).toISOString() : null,
     },
     coins: coins.map((c) => {
@@ -117,6 +118,12 @@ export async function detail(id, days) {
           p.baseToken?.address?.toLowerCase() === coin.token?.toLowerCase(),
       )
     : [];
+  // A missing per-pool metric makes the aggregate unknown, never a fabricated zero.
+  const aggregatePoolMetric = (pick, reducer = (a, b) => a + b) => {
+    const values = pools.map(pick);
+    return values.every((v) => typeof v === "number" && Number.isFinite(v) && v >= 0)
+      ? values.reduce((a, b) => reducer(a, b), 0) : null;
+  };
   const volume = history.reduce((n, k) => n + k.volume, 0),
     buyVolume = history.reduce((n, k) => n + k.buyVolume, 0);
   return {
@@ -153,10 +160,10 @@ export async function detail(id, days) {
     dex: pools.length
       ? {
           pools: pools.length,
-          liquidity: pools.reduce((n, p) => n + (p.liquidity?.usd || 0), 0),
-          largest: Math.max(...pools.map((p) => p.liquidity?.usd || 0)),
-          buys: pools.reduce((n, p) => n + (p.txns?.h24?.buys || 0), 0),
-          sells: pools.reduce((n, p) => n + (p.txns?.h24?.sells || 0), 0),
+          liquidity: aggregatePoolMetric((p) => p.liquidity?.usd),
+          largest: aggregatePoolMetric((p) => p.liquidity?.usd, Math.max),
+          buys: aggregatePoolMetric((p) => p.txns?.h24?.buys),
+          sells: aggregatePoolMetric((p) => p.txns?.h24?.sells),
           wrapped: !!coin.wrapped,
         }
       : null,

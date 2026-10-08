@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-10-08T00:28:23.208Z",
+  "chainId": 677,
+  "transactionHash": "0x7de08a6cdbc77c938014c2178f92927665b79ac5ec8762d99b08c931bf84eb73",
+  "transactionKind": "PUBLISH, not contract creation",
+  "contract": "0x1bA50A79BEB8d44c0f9ff1D4dBdDCa523eFb340e",
+  "blockNumber": "25912843",
+  "blockHash": "0xefdf9a71693e634393ef3f5de94bbf8fca28d8e6b39f0747d0871612119a6598",
+  "blockTimestamp": "1791419043",
+  "publisher": "0xeC4cB3a19247096DB3A6E0fc7860a93C8B998369",
+  "reportHash": "0x9d54fcf7dec2397b4aa15a0a6b4b25c6de4370e9851c2b7b4b1544e39bf07091",
+  "receiptStatus": "success",
+  "codeMatchesProjectRegistry": true,
+  "eventAndStorageTimestampMatch": true,
+  "anchor": {
+    "chainId": 677,
+    "contract": "0x1bA50A79BEB8d44c0f9ff1D4dBdDCa523eFb340e",
+    "publisher": "0xeC4cB3a19247096DB3A6E0fc7860a93C8B998369",
+    "transactionHash": "0x7de08a6cdbc77c938014c2178f92927665b79ac5ec8762d99b08c931bf84eb73",
+    "timestamp": "1791419043"
+  },
+  "contentVerification": "Original report JSON not supplied; hash publication proven, original content not independently verified",
+  "noNewTransactionSent": true
+}

@@ -1,3 +1,21 @@
+## 2026-10-08 Update — WebMCP 外部 Agent 真实报告
+
+`/report` 已改为 ETH 市场与生态调查工作台：网站复用资产观察首页与 ETH 详情的数据，外部 Agent 在支持 WebMCP 的应用内浏览器调用六个工具，提交带引用的报告。网站提供数据与格式/引用校验，**不再在真实报告流程请求内置模型**。无需钱包、LLM Key 或 Ethereum RPC Key；旧钱包链上规则接口仍需要 RPC，AI 模式现返回 HTTP 410。
+
+页面保留 VERDANT 主题与国际主义排版，报告可切换 **A4 阅读版 / JSON 数据版**，支持复制、下载；只保存当前页面会话。网站采集的事实、外部解释与未知项分别标明。暂无论文来源，现有指标明确为工程统计。Guardian、Risk Lab、收藏与存证边界保持独立。
+
+启动 `pnpm dev`，在支持 WebMCP 的浏览器打开 `/report`，准备数据后让外部 Agent 调查并提交。六工具与输入示例见 [WebMCP 报告使用说明](docs/webmcp-reports.md)。普通浏览器可以准备数据，但不能以此获得 Agent 调查；工具已注册也不代表 Agent 已运行。
+
+以下按日期保留历史接入与验收记录；2026-10-07 的内置 DeepSeek 报告用法已被本次 WebMCP 方式取代。最新验收：1085 passed / 6 skipped，typecheck/build/隔离HTTP通过；原生WebMCP六工具与真实24h/7d报告回写、A4/JSON、手机布局和引用跳转均已实测。ChatGPT自身Site Tools客户端UI仍待确认。证据见 [本轮验收](docs/webmcp-report-acceptance.md)。
+
+## 2026-10-08 Update — BOT 主网存证接线与已知交易核验
+
+本地当前报告存证已统一为主网677，默认使用已核验的 `RiskReportRegistry`：`0x1bA50A79BEB8d44c0f9ff1D4dBdDCa523eFb340e`。官方RPC `https://rpc.botchain.ai`，浏览器 `https://scan.botchain.ai`；旧测试网的公共env变量不用于本轮主网存证。NFT与registry是不同合约，不能共用此地址。
+
+用户给出的 [交易](https://scan.botchain.ai/tx/0x7de08a6cdbc77c938014c2178f92927665b79ac5ec8762d99b08c931bf84eb73) 是成功的报告哈希发布（不是合约创建）；运行时代码、回执、发布事件、mapping和区块时间已只读核验一致。原报告JSON未提供，所以只能证明hash发布，不能核对原文。证据与边界见[主网验收](docs/bot-mainnet-acceptance.md)。
+
+主网本地状态按677隔离，旧不明/测试网待确认记录保留并阻止新签名，不自动清理或重发。历史968报告可解析，但不会在主网核验旧anchor。BOT接线当轮测试1050 passed / 6 skipped，typecheck/build通过，独立安全复审无未解决的重要问题；最新整体验收见上节。本轮无新广播、私钥/环境文件修改或BOT钱包交互验收。
+
 # Ethereum 异动调查原型 · Risk Guardian
 
 ## 2026-10-07 Update · 真实报告收尾（本地候选版）

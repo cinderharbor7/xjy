@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-const key = "cfp.pending.968.v1";
+const key = "cfp.pending.677.v1";
 const address = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
 const fields = {
   id: z.string().uuid(),
-  chainId: z.literal(968),
+  chainId: z.literal(677),
   owner: address,
   status: z.enum(["SENDING", "SUBMITTED"]),
   hash: z.string().regex(/^0x[0-9a-fA-F]{64}$/).nullable(),
@@ -26,7 +26,10 @@ const schema = z.discriminatedUnion("kind", [
 let lastKnownJob = null;
 
 export function pendingTransaction() {
+  let legacyPending = false;
   try {
+    legacyPending = localStorage.getItem("cfp.pending.968.v1") !== null;
+    if (legacyPending) throw new Error("Legacy pending occupation");
     const raw = localStorage.getItem(key);
     const stored = raw ? schema.parse(JSON.parse(raw)) : null;
     // If storage failed after broadcast, keep the already known hash visible in this tab.
@@ -34,7 +37,7 @@ export function pendingTransaction() {
       return lastKnownJob;
     return lastKnownJob = stored;
   } catch {
-    const error = new Error("浏览器待确认记录无法读取；禁止新的 NFT 交易，请保留记录人工核查。");
+    const error = new Error(legacyPending ? "旧测试网存在待确认 NFT 记录；保留原记录人工核查，禁止新的主网签名，不按主网查询旧哈希。" : "浏览器待确认记录无法读取；禁止新的 NFT 交易，请保留记录人工核查。");
     error.transactionHash = lastKnownJob?.hash;
     throw error;
   }

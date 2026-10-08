@@ -1,0 +1,60 @@
+{
+  "groups": [
+    [
+      {
+        "id": "market-1",
+        "status": "live"
+      }
+    ],
+    [
+      {
+        "id": "history-1",
+        "status": "live"
+      }
+    ],
+    [
+      {
+        "id": "orderbook-1",
+        "status": "live"
+      }
+    ],
+    [
+      {
+        "id": "dex-1",
+        "status": "live"
+      }
+    ],
+    [
+      {
+        "id": "tvl-1",
+        "status": "live"
+      }
+    ],
+    [
+      {
+        "id": "sentiment-1",
+        "status": "live"
+      }
+    ],
+    [
+      {
+        "id": "github-1",
+        "status": "live"
+      }
+    ],
+    [
+      {
+        "id": "news-1",
+        "status": "unavailable"
+      }
+    ]
+  ],
+  "invalidReport": {
+    "rejected": true,
+    "error": "Tool was executed but the invocation failed. For example, the script function threw an error",
+    "outputHidden": true
+  },
+  "resources": [
+    "http://127.0.0.1:3118/api/eth-report-snapshot?days=1"
+  ]
+}

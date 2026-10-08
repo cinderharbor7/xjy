@@ -38,9 +38,9 @@ afterEach(() => {
 });
 it("keeps an unresolved broadcast and prevents a second publish or deployment", async () => {
   localStorage.setItem(
-    "xjy:bot:pending:v1",
+    "xjy:bot:pending:677:v1",
     JSON.stringify({
-      kind: "DEPLOY",
+      kind: "DEPLOY", chainId: 677,
       publisher: account,
       hash: "0x" + "a".repeat(64),
     }),
@@ -54,7 +54,7 @@ it("keeps an unresolved broadcast and prevents a second publish or deployment", 
   document.querySelector<HTMLButtonElement>('[data-report="settle"]')!.click();
   await tick();
   await tick();
-  expect(localStorage.getItem("xjy:bot:pending:v1")).not.toBeNull();
+  expect(localStorage.getItem("xjy:bot:pending:677:v1")).not.toBeNull();
   expect(chain.publishHash).not.toHaveBeenCalled();
   expect(chain.deployRegistry).not.toHaveBeenCalled();
   expect(document.body.textContent).toContain("保留原交易哈希");
@@ -62,8 +62,8 @@ it("keeps an unresolved broadcast and prevents a second publish or deployment", 
 it("loads a tampered saved report but refuses publication and retains its original declared hash", async () => {
   const envelope = exportReport(researchReport(getRiskLabSnapshot()));
   envelope.report.capturedAt = "2026-10-07T00:00:00.000Z";
-  localStorage.setItem("xjy:bot:report:v1", JSON.stringify(envelope));
-  localStorage.setItem("xjy:bot:registry:968", account);
+  localStorage.setItem("xjy:bot:report:677:v1", JSON.stringify(envelope));
+  localStorage.setItem("xjy:bot:registry:677", account);
   dispose = await mount(document.querySelector("main")!);
   document.querySelector<HTMLButtonElement>('[data-report="connect"]')!.click();
   await tick();
@@ -112,7 +112,7 @@ it("retains an ambiguous sending intent across remount without broadcasting a se
   await connect();
   document.querySelector<HTMLButtonElement>('[data-report="deploy"]')!.click();
   await tick(); await tick();
-  expect(localStorage.getItem("xjy:bot:intent:v1")).not.toBeNull();
+  expect(localStorage.getItem("xjy:bot:intent:677:v1")).not.toBeNull();
   dispose();
   dispose = await mount(document.querySelector("main")!);
   await connect();
@@ -123,18 +123,18 @@ it("retains an ambiguous sending intent across remount without broadcasting a se
 });
 
 it("keeps a known hash and durable intent when saving the submitted job fails", async () => {
-  vi.mocked(chain.deployRegistry).mockResolvedValue({ kind: "DEPLOY", publisher: account, hash });
+  vi.mocked(chain.deployRegistry).mockResolvedValue({ kind: "DEPLOY", chainId: 677, publisher: account, hash });
   dispose = await mount(document.querySelector("main")!);
   await connect();
   const original = Storage.prototype.setItem;
   vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key: string, value: string) {
-    if (key === "xjy:bot:pending:v1") throw new Error("quota");
+    if (key === "xjy:bot:pending:677:v1") throw new Error("quota");
     return original.call(this, key, value);
   });
   document.querySelector<HTMLButtonElement>('[data-report="deploy"]')!.click();
   await tick(); await tick();
   expect(document.querySelector("#report-tx")!.textContent).toContain(hash);
-  expect(localStorage.getItem("xjy:bot:intent:v1")).not.toBeNull();
+  expect(localStorage.getItem("xjy:bot:intent:677:v1")).not.toBeNull();
   expect(document.querySelector<HTMLButtonElement>('[data-report="deploy"]')!.disabled).toBe(true);
   dispose();
   dispose = await mount(document.querySelector("main")!);
@@ -144,13 +144,13 @@ it("keeps a known hash and durable intent when saving the submitted job fails", 
 });
 
 it("does not release a confirmed job when local pending cleanup fails", async () => {
-  localStorage.setItem("xjy:bot:pending:v1", JSON.stringify({ kind: "DEPLOY", publisher: account, hash }));
+  localStorage.setItem("xjy:bot:pending:677:v1", JSON.stringify({ kind: "DEPLOY", chainId: 677, publisher: account, hash }));
   vi.mocked(chain.confirmTransaction).mockResolvedValue({ contract: account });
   dispose = await mount(document.querySelector("main")!);
   vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => { throw new Error("storage denied"); });
   document.querySelector<HTMLButtonElement>('[data-report="settle"]')!.click();
   await tick(); await tick();
-  expect(localStorage.getItem("xjy:bot:pending:v1")).not.toBeNull();
+  expect(localStorage.getItem("xjy:bot:pending:677:v1")).not.toBeNull();
   expect(document.querySelector("#report-tx")!.textContent).toContain(hash);
   expect(document.querySelector<HTMLButtonElement>('[data-report="deploy"]')!.disabled).toBe(true);
   expect(document.body.textContent).toContain("本地交易记录无法清理");
@@ -162,26 +162,47 @@ it("clears a sending intent only after an explicit wallet rejection", async () =
   await connect();
   document.querySelector<HTMLButtonElement>('[data-report="deploy"]')!.click();
   await tick(); await tick();
-  expect(localStorage.getItem("xjy:bot:intent:v1")).toBeNull();
+  expect(localStorage.getItem("xjy:bot:intent:677:v1")).toBeNull();
   expect(document.querySelector<HTMLButtonElement>('[data-report="deploy"]')!.disabled).toBe(false);
 });
 
 it("retains the known hash across remount if removing just the sending intent fails", async () => {
-  localStorage.setItem("xjy:bot:pending:v1", JSON.stringify({ kind: "DEPLOY", publisher: account, hash }));
-  localStorage.setItem("xjy:bot:intent:v1", JSON.stringify({ kind: "DEPLOY", publisher: account }));
+  localStorage.setItem("xjy:bot:pending:677:v1", JSON.stringify({ kind: "DEPLOY", chainId: 677, publisher: account, hash }));
+  localStorage.setItem("xjy:bot:intent:677:v1", JSON.stringify({ kind: "DEPLOY", chainId: 677, publisher: account }));
   vi.mocked(chain.confirmTransaction).mockResolvedValue({ contract: account });
   dispose = await mount(document.querySelector("main")!);
   const original = Storage.prototype.removeItem;
   vi.spyOn(Storage.prototype, "removeItem").mockImplementation(function (this: Storage, key: string) {
-    if (key === "xjy:bot:intent:v1") throw new Error("intent cleanup denied");
+    if (key === "xjy:bot:intent:677:v1") throw new Error("intent cleanup denied");
     return original.call(this, key);
   });
   document.querySelector<HTMLButtonElement>('[data-report="settle"]')!.click();
   await tick(); await tick();
-  expect(JSON.parse(localStorage.getItem("xjy:bot:pending:v1")!).hash).toBe(hash);
+  expect(JSON.parse(localStorage.getItem("xjy:bot:pending:677:v1")!).hash).toBe(hash);
   dispose();
   dispose = await mount(document.querySelector("main")!);
   expect(document.querySelector("#report-tx")!.textContent).toContain(hash);
   expect(document.querySelector<HTMLButtonElement>('[data-report="settle"]')!.disabled).toBe(false);
   expect(chain.deployRegistry).not.toHaveBeenCalled();
+});
+
+it("preserves legacy pending records without querying them on mainnet or signing again", async () => {
+  const legacy = JSON.stringify({ kind: "DEPLOY", publisher: account, hash });
+  localStorage.setItem("xjy:bot:pending:v1", legacy);
+  dispose = await mount(document.querySelector("main")!);
+  await connect();
+  expect(document.querySelector<HTMLButtonElement>('[data-report="deploy"]')!.disabled).toBe(true);
+  expect(chain.confirmTransaction).not.toHaveBeenCalled();
+  expect(chain.deployRegistry).not.toHaveBeenCalled();
+  expect(localStorage.getItem("xjy:bot:pending:v1")).toBe(legacy);
+});
+it("does not verify an imported testnet anchor against mainnet", async () => {
+  const report = exportReport(researchReport(getRiskLabSnapshot()), { chainId: 968, contract: account, publisher: account, transactionHash: hash, timestamp: "123" });
+  localStorage.setItem("xjy:bot:report:677:v1", JSON.stringify(report));
+  const verify = vi.spyOn(chain, "verifyOnChain");
+  dispose = await mount(document.querySelector("main")!);
+  document.querySelector<HTMLButtonElement>('[data-report="verify"]')!.click();
+  await tick(); await tick();
+  expect(verify).not.toHaveBeenCalled();
+  expect(document.body.textContent).toContain("测试网");
 });

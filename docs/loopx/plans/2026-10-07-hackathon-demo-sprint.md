@@ -35,6 +35,9 @@ slices:
   - id: P-011
     status: pending
     depends: [P-009, P-010]
+  - id: P-012
+    status: done
+    depends: []
 ---
 
 # Hackathon 冻结方案执行交接
@@ -205,6 +208,17 @@ P-010 后续进展（2026-10-07 22:58）：用户提供 DeepSeek 本地凭据，
 > anchors: `用户剩余TODO5/6; AC-008/TC-006; 视频、发布、正式提交分别举证; 不虚构用户/效果`
 > verify: `最终typecheck/test/build/http; 两分钟讲稿与实际能力一致; 录屏可播放; 经确认Git合并发布; 提交成功回执`
 > review: `材料来源/日期/模式准确; 待办及未验证项保留; 不混淆历史和实时`
+
+## P-012 BOT 主网既有存证核验与接线
+
+按用户主网地址与既有交易接入677报告存证，保留已修改的前端与独立NFT边界。已有交易仅查验，不重发；旧数据不删除不迁移，当前主网发送恢复按网络隔离；历史968报告仍可解析，但禁止按主网核验。基线15个NFT测试因前端主网更改未同步而失败。新鲜主网读取与受控边界测试、完整测试/build和独立exact diff审阅作为验收。PPT/其他未提交改动不覆盖，Git发布与新签名不在本轮。
+
+实际验收：完整1050 passed / 6 skipped、typecheck/build通过；主网代码/回执/发布事件/mapping/区块时间实测一致，证据见docs/bot-mainnet-acceptance.md。独立安全审阅发现两项已修复并复审。没有原报告JSON，仅证明hash发布；用户给的是PUBLISH而非创建合约交易。修复尚未commit/push。
+
+> writes: `src/modules/attestation/`, `web/pages/attestations.js`, `web/app.js必要标签`, `tests/`, `主网验收记录`, `README与网络文档`, `本计划与D-013`
+> anchors: `用户2026-10-08主网合约/交易及赶紧改请求; AC-013/D-013/TC-013`
+> verify: `pnpm typecheck; pnpm test; pnpm build; 主网已有回执/code/event/storage只读核验`
+> review: `独立exact diff：错链/旧pending/持久化/回执/no自动签名/公共格式保留`
 
 ## Integration And Final Verification
 

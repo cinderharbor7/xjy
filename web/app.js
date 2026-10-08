@@ -1,5 +1,4 @@
 import { identityAssets, esc, pct, time as timestamp } from "./ui.js";
-import "./style.css";
 import {
   sampleMarket,
   coins as registeredCoins,
@@ -96,6 +95,7 @@ let cleanup = () => {},
   currentEdition = null,
   transactionBusy = false;
 let pageCleanup = () => {};
+let renderedRoute = "";
 let toastTimer;
 function toast(message) {
   $("#toast").textContent = message;
@@ -309,7 +309,7 @@ function collectionPage() {
     : mockItems.length
       ? `<div class="collection-grid">${mockItems.map((item) => `<article class="collection-card" data-collection-mode="MOCK"><img src="${esc(item.metadata.image)}" alt="${esc(item.metadata.name)}"/><div><h3>${esc(item.metadata.name)}</h3><p>MOCK · 本地快照 · 未上链</p><p>${timestamp(item.metadata.properties.capturedAt)}</p><p>行情来源：${esc(statusName[item.metadata.properties.sourceMode])}</p><a href="/coins/${encodeURIComponent(item.metadata.properties.symbol)}">查看币种详情 ↗</a></div></article>`).join("")}</div>`
       : '<div class="empty-state"><h3>还没有 Mock 收藏</h3><p>选择任意已登记币种，收藏此刻的指纹。无需连接钱包。</p><a href="/" class="button-primary">探索指纹图鉴</a></div>';
-  return `<div class="section-head mt-5"><div><h2>我的收藏</h2><p>本地 Demo 与 BOT 测试网收藏分别展示。</p></div></div><section class="workspace-panel" data-collection-section="MOCK"><h2>Mock 收藏 · ${mockItems ? mockItems.length : "—"} 枚</h2><div class="notice">MOCK MODE · 未上链。仅保存在当前浏览器，刷新后保留；清除浏览器数据或更换设备不会同步。</div>${demo}</section><section class="workspace-panel" data-collection-section="BOT_TESTNET"><div class="section-head"><h2>BOT 测试网收藏 · ${items.length} 枚</h2><button class="button-secondary" data-action="network">BOT 测试网设置</button></div><div class="notice">这里展示当前钱包在本浏览器成功铸造的记录。转让后的最新所有权请以区块浏览器为准，与 Mock 收藏分开。</div>${items.length ? `<div class="collection-grid">${items.map((item) => `<article class="collection-card" data-collection-mode="BOT_TESTNET"><img src="${esc(item.metadata.image)}" alt="${esc(item.metadata.name)}"/><div><h3>${esc(item.metadata.name)}</h3><p>Token #${esc(item.tokenId)} / BOT Chain</p><p>${timestamp(item.capturedAt)}</p><a href="${NETWORK.blockExplorerUrls[0]}/tx/${esc(item.tx)}" target="_blank" rel="noopener">查看链上记录 ↗</a></div></article>`).join("")}</div>` : `<div class="empty-state"><h3>${wallet.account ? "尚无本浏览器铸造记录" : "连接钱包查看测试网收藏"}</h3><p>真实测试网铸造需单独选择并在钱包确认。</p>${wallet.account ? "" : '<button class="button-secondary" data-action="wallet">连接钱包</button>'}</div>`}</section>`;
+  return `<div class="section-head mt-5"><div><h2>我的收藏</h2><p>本地 Demo 与 BOT 主网收藏分别展示。</p></div></div><section class="workspace-panel" data-collection-section="MOCK"><h2>Mock 收藏 · ${mockItems ? mockItems.length : "—"} 枚</h2><div class="notice">MOCK MODE · 未上链。仅保存在当前浏览器，刷新后保留；清除浏览器数据或更换设备不会同步。</div>${demo}</section><section class="workspace-panel" data-collection-section="BOT_MAINNET"><div class="section-head"><h2>BOT 主网收藏 · ${items.length} 枚</h2><button class="button-secondary" data-action="network">BOT 主网设置</button></div><div class="notice">这里展示当前钱包在本浏览器成功铸造的记录。转让后的最新所有权请以区块浏览器为准，与 Mock 收藏分开。</div>${items.length ? `<div class="collection-grid">${items.map((item) => `<article class="collection-card" data-collection-mode="BOT_MAINNET"><img src="${esc(item.metadata.image)}" alt="${esc(item.metadata.name)}"/><div><h3>${esc(item.metadata.name)}</h3><p>Token #${esc(item.tokenId)} / BOT Chain</p><p>${timestamp(item.capturedAt)}</p><a href="${NETWORK.blockExplorerUrls[0]}/tx/${esc(item.tx)}" target="_blank" rel="noopener">查看链上记录 ↗</a></div></article>`).join("")}</div>` : `<div class="empty-state"><h3>${wallet.account ? "尚无本浏览器铸造记录" : "连接钱包查看主网收藏"}</h3><p>真实主网铸造需单独选择并在钱包确认。</p>${wallet.account ? "" : '<button class="button-secondary" data-action="wallet">连接钱包</button>'}</div>`}</section>`;
 }
 function mount() {
   cleanup();
@@ -326,6 +326,7 @@ function currentCoin() {
   return [...state.market.coins, ...identityAssets].find((c) => c.id === id);
 }
 function render() {
+  renderedRoute = location.pathname + location.search;
   const version = ++routeVersion;
   cleanup();
   sculptureCleanup();
@@ -442,7 +443,7 @@ function modal(title, content) {
 function guide() {
   modal(
     "读懂一枚货币指纹",
-    `<p>它是一份市场数据的视觉切片。同样的数据与参数会生成相同的静态收藏版本，动态视图则让结构更容易被观察。</p><div class="guide-row"><strong>色彩</strong><span>币种拥有固定基础色相；Alternative.me 全市场恐惧贪婪指数影响色彩分布。它不代表某个币的独立新闻情绪。</span></div><div class="guide-row"><strong>形态</strong><span>日内振幅 =（24h 最高价 − 最低价）÷ 开盘价。振幅越大，纹理起伏越明显；15% 为视觉映射上限。</span></div><div class="guide-row"><strong>节奏</strong><span>24h USDT 成交额经 log10 归一化，影响动态速度。不同币种之间可以在同一尺度下观察。</span></div><div class="guide-row"><strong>收藏</strong><span>默认 Mock 收藏将此刻图像、数值、来源状态和时间保存在当前浏览器，明确标为未上链。另行选择 BOT 测试网铸造时才需要钱包确认；流体视图是同组参数的另一种呈现。</span></div><p>首页焦点是编辑精选，不是收益排行。缺失数据使用中性形态并显示 —；演示数据会显式标记。漂亮的指纹不等于安全的资产。</p><button class="button-primary mt-3" data-action="close">明白了</button>`,
+    `<p>它是一份市场数据的视觉切片。同样的数据与参数会生成相同的静态收藏版本，动态视图则让结构更容易被观察。</p><div class="guide-row"><strong>色彩</strong><span>币种拥有固定基础色相；Alternative.me 全市场恐惧贪婪指数影响色彩分布。它不代表某个币的独立新闻情绪。</span></div><div class="guide-row"><strong>形态</strong><span>日内振幅 =（24h 最高价 − 最低价）÷ 开盘价。振幅越大，纹理起伏越明显；15% 为视觉映射上限。</span></div><div class="guide-row"><strong>节奏</strong><span>24h USDT 成交额经 log10 归一化，影响动态速度。不同币种之间可以在同一尺度下观察。</span></div><div class="guide-row"><strong>收藏</strong><span>默认 Mock 收藏将此刻图像、数值、来源状态和时间保存在当前浏览器，明确标为未上链。另行选择 BOT 主网铸造时才需要钱包确认；流体视图是同组参数的另一种呈现。</span></div><p>首页焦点是编辑精选，不是收益排行。缺失数据使用中性形态并显示 —；演示数据会显式标记。漂亮的指纹不等于安全的资产。</p><button class="button-primary mt-3" data-action="close">明白了</button>`,
   );
 }
 function mockCollectionDialog(c) {
@@ -452,21 +453,21 @@ function mockCollectionDialog(c) {
   currentEdition = createEdition(c, sentiment);
   modal(
     "Mock 收藏此刻的指纹",
-    `<div class="notice">MOCK MODE · 未上链。无需钱包、不消耗 Gas，仅保存本地指纹快照。</div><div class="mint-preview"><img src="${currentEdition.metadata.image}" alt="${esc(c.name)} 指纹快照"><div><h3>${esc(c.name)}</h3><p>行情来源：${esc(statusName[c.mode])}</p><p>快照时间：${timestamp(currentEdition.snapshot.capturedAt)}</p><p>此快照不会随后续行情变化。</p></div></div><div class="mint-actions"><button class="button-primary" data-action="confirm-mock-collection">确认 Mock 收藏</button><button class="button-secondary" data-action="download">下载快照</button><button class="text-button" data-action="real-mint" data-coin="${esc(c.id)}">另行选择 BOT 测试网铸造</button></div><p id="mock-progress" role="status"></p>`,
+    `<div class="notice">MOCK MODE · 未上链。无需钱包、不消耗 Gas，仅保存本地指纹快照。</div><div class="mint-preview"><img src="${currentEdition.metadata.image}" alt="${esc(c.name)} 指纹快照"><div><h3>${esc(c.name)}</h3><p>行情来源：${esc(statusName[c.mode])}</p><p>快照时间：${timestamp(currentEdition.snapshot.capturedAt)}</p><p>此快照不会随后续行情变化。</p></div></div><div class="mint-actions"><button class="button-primary" data-action="confirm-mock-collection">确认 Mock 收藏</button><button class="button-secondary" data-action="download">下载快照</button><button class="text-button" data-action="real-mint" data-coin="${esc(c.id)}">另行选择 BOT 主网铸造</button></div><p id="mock-progress" role="status"></p>`,
   );
 }
 function mintDialog(c) {
   currentEdition = createEdition(c, state.market.sentiment);
   modal(
     "收藏此刻的指纹",
-    `<div class="mint-preview"><img src="${currentEdition.metadata.image}" alt="待铸造的 ${c.name} 矢量指纹"><div><h3>${c.name}</h3><dl><div><dt>网络</dt><dd>BOT Chain Testnet</dd></div><div><dt>数据</dt><dd>${statusName[c.mode]}</dd></div><div><dt>版本</dt><dd>纹理版 v1 / SVG</dd></div><div><dt>存储</dt><dd>图像与快照完整上链</dd></div></dl></div></div><p>收藏的是这一刻的固定纹理，不随后续行情改变。铸造费用为钱包显示的测试 BOT Gas，合约不收取额外铸造费。</p>${c.mode === "demo" ? '<label class="notice block"><input type="checkbox" id="demo-consent"> 我知道这是演示数据 NFT，不是真实市场快照。</label>' : ""}${!contractAddress() ? '<div class="notice">尚未配置 NFT 合约。可先下载快照，或打开测试网设置部署合约。</div>' : `<p class="break-all text-[11px]">合约：${esc(contractAddress())}</p>`}<div class="mint-actions"><button class="button-primary" data-action="confirm-mint" ${c.price == null || !contractAddress() ? "disabled" : ""}>确认并在钱包铸造</button><button class="button-secondary" data-action="download">下载快照</button><button class="text-button" data-action="network">测试网设置</button></div><div id="mint-progress" class="mint-progress" role="status"></div>`,
+    `<div class="mint-preview"><img src="${currentEdition.metadata.image}" alt="待铸造的 ${c.name} 矢量指纹"><div><h3>${c.name}</h3><dl><div><dt>网络</dt><dd>BOT Chain 主网</dd></div><div><dt>数据</dt><dd>${statusName[c.mode]}</dd></div><div><dt>版本</dt><dd>纹理版 v1 / SVG</dd></div><div><dt>存储</dt><dd>图像与快照完整上链</dd></div></dl></div></div><p>收藏的是这一刻的固定纹理，不随后续行情改变。铸造费用为钱包显示的主网 BOT Gas，合约不收取额外铸造费。</p>${c.mode === "demo" ? '<label class="notice block"><input type="checkbox" id="demo-consent"> 我知道这是演示数据 NFT，不是真实市场快照。</label>' : ""}${!contractAddress() ? '<div class="notice">尚未配置 NFT 合约。可先下载快照，或打开主网设置部署合约。</div>' : `<p class="break-all text-[11px]">合约：${esc(contractAddress())}</p>`}<div class="mint-actions"><button class="button-primary" data-action="confirm-mint" ${c.price == null || !contractAddress() ? "disabled" : ""}>确认并在钱包铸造</button><button class="button-secondary" data-action="download">下载快照</button><button class="text-button" data-action="network">主网设置</button></div><div id="mint-progress" class="mint-progress" role="status"></div>`,
   );
   pendingControls(true);
 }
 function networkDialog() {
   modal(
-    "BOT 测试网设置",
-    `<dl class="text-xs leading-8 text-muted"><div>网络：Bohr Testnet / Chain ID 968</div><div>RPC：${NETWORK.rpcUrls[0]}</div><div>Gas：测试 BOT</div><div>浏览器：<a class="underline" href="${NETWORK.blockExplorerUrls[0]}" target="_blank" rel="noopener">scan.bohr.life</a></div></dl><p>如果已有本项目合约，填写地址并核验。也可以通过钱包部署新合约；钱包会显示费用并请求你确认。</p><label class="form-label" for="contract-address">NFT 合约地址</label><input class="config-input" id="contract-address" placeholder="0x…" value="${esc(contractAddress())}"><div class="mint-actions"><button class="button-primary" data-action="save-contract">核验并保存</button><button class="button-secondary" data-action="deploy">部署新合约</button></div><div id="mint-progress" class="mint-progress" role="status"></div><p>元数据由收藏者提交，合约保存其不可变版本，不证明数据源的真实性。</p>`,
+    "BOT 主网设置",
+    `<dl class="text-xs leading-8 text-muted"><div>网络：BOT Chain / Chain ID 677</div><div>RPC：${NETWORK.rpcUrls[0]}</div><div>Gas：BOT</div><div>浏览器：<a class="underline" href="${NETWORK.blockExplorerUrls[0]}" target="_blank" rel="noopener">scan.botchain.ai</a></div></dl><p>如果已有本项目合约，填写地址并核验。也可以通过钱包部署新合约；钱包会显示费用并请求你确认。</p><label class="form-label" for="contract-address">NFT 合约地址</label><input class="config-input" id="contract-address" placeholder="0x…" value="${esc(contractAddress())}"><div class="mint-actions"><button class="button-primary" data-action="save-contract">核验并保存</button><button class="button-secondary" data-action="deploy">部署新合约</button></div><div id="mint-progress" class="mint-progress" role="status"></div><p>元数据由收藏者提交，合约保存其不可变版本，不证明数据源的真实性。</p>`,
   );
   pendingControls(true);
 }
@@ -727,10 +728,13 @@ $("#modal").addEventListener("cancel", (e) => {
   if (transactionBusy) e.preventDefault();
 });
 window.addEventListener("storage", (event) => {
-  if (event.key === "cfp.pending.968.v1" && $("#modal").open) pendingControls(true);
+  if (event.key === "cfp.pending.677.v1" && $("#modal").open) pendingControls(true);
   if (event.key === MOCK_COLLECTION_KEY && location.pathname === "/collection") render();
 });
-window.addEventListener("popstate", render);
+window.addEventListener("popstate", () => {
+  // Fragment jumps stay in the current page, including its report/session state.
+  if (location.pathname + location.search !== renderedRoute) render();
+});
 // Native URLs keep all existing workbench deep links usable without a client framework.
 if (location.hash.startsWith("#/coin/"))
   location.replace("/coins/" + encodeURIComponent(location.hash.split("/")[2]));
@@ -741,7 +745,7 @@ if (state.market.mode === "live" && (location.pathname === "/"
 } else render();
 
 function homeTools() {
-  return '<section class="workspace-paths" aria-label="研究工作台"><div><h2>从观察到核验</h2><p>沿着资产数据，找到有出处的结论。</p></div><a href="/report"><strong>真实异动报告</strong><span>同一观察的量化、证据与未知项</span></a><a href="/investigate"><strong>交易核验</strong><span>Ethereum 外层事实与指定池兑换</span></a><a href="/risk-lab"><strong>风险研究</strong><span>ETH 研究模型与证据样本</span></a><a href="/guardian"><strong>保护实验</strong><span>单钱包策略与结果核验</span></a><a href="/attestations"><strong>报告存证</strong><span>BOT 测试网上的内容完整性</span></a></section>';
+  return '<section class="workspace-paths" aria-label="研究工作台"><div><h2>从观察到核验</h2><p>沿着资产数据，找到有出处的结论。</p></div><a href="/report"><strong>真实异动报告</strong><span>市场数据、调查解释与证据</span></a><a href="/investigate"><strong>交易核验</strong><span>Ethereum 外层事实与指定池兑换</span></a><a href="/risk-lab"><strong>风险研究</strong><span>ETH 研究模型与证据样本</span></a><a href="/guardian"><strong>保护实验</strong><span>单钱包策略与结果核验</span></a><a href="/attestations"><strong>报告存证</strong><span>BOT 主网上的内容完整性</span></a></section>';
 }
 function coinTools(c) {
   return c.id === "ETH"

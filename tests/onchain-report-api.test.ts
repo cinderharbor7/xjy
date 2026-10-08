@@ -2,11 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/onchain-analysis/route";
 import { generateOnchainReport } from "@/integration/onchain-report";
 import { EthereumReadError } from "@/modules/onchain/read-error";
-import { AiInvestigationError } from "@/modules/investigation/ai-investigation.adapter";
 import { OnchainReportSchema } from "@/integration/onchain-report.contracts";
 import { historicalReport } from "./helpers/onchain-report";
 
-vi.mock("@/integration/onchain-report", () => ({ generateOnchainReport: vi.fn() }));
+vi.mock("@/integration/onchain-report", async (original) => ({ ...(await original<typeof import("@/integration/onchain-report")>()), generateOnchainReport: vi.fn() }));
 const generate = vi.mocked(generateOnchainReport);
 const wallet = historicalReport().portfolio.state.wallet;
 const request = (body: unknown = { wallet }, headers = {}) => new Request("http://localhost:3000/api/onchain-analysis", {
@@ -52,11 +51,10 @@ describe("onchain report HTTP boundary", () => {
     expect(JSON.stringify(body)).not.toContain("secret");
     expect(generate).toHaveBeenCalledTimes(1);
   });
-  it.each(["AI_CONFIGURATION_REQUIRED", "AI_REQUEST_FAILED", "AI_OUTPUT_INVALID"] as const)("does not return a rule report on %s", async (code) => {
-    generate.mockRejectedValue(new AiInvestigationError(code));
+  it("rejects removed AI mode with 410 before generating or reading", async () => {
     const response = await POST(request({ wallet, investigationMode: "AI" }));
-    expect(response.status).toBe(503); expect((await response.json()).code).toBe(code);
-    expect(generate).toHaveBeenCalledExactlyOnceWith({ wallet, investigationMode: "AI" });
+    expect(response.status).toBe(410); expect((await response.json()).code).toBe("AI_MODE_REMOVED");
+    expect(generate).not.toHaveBeenCalled();
   });
   it("never serializes unknown provider errors or credentials", async () => {
     generate.mockRejectedValue(new Error("https://secret@rpc.invalid/API_KEY"));

@@ -2,15 +2,16 @@ import { createPublicClient, createWalletClient, custom, decodeEventLog, defineC
 import artifact from "./registry-artifact.json";
 import type { ReportAnchor } from "./report";
 
-export const botChain = defineChain({ id: 968, name: "BOT Chain Testnet", nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
-  rpcUrls: { default: { http: [process.env.NEXT_PUBLIC_BOT_RPC_URL || "https://rpc.bohr.life"] } }, blockExplorers: { default: { name: "BOT Scan", url: "https://scan.bohr.life" } }, testnet: true });
+export const botChain = defineChain({ id: 677, name: "BOT Chain Mainnet", nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
+  rpcUrls: { default: { http: ["https://rpc.botchain.ai"] } }, blockExplorers: { default: { name: "BOT Scan", url: "https://scan.botchain.ai" } }, testnet: false });
+export const MAINNET_REPORT_REGISTRY = "0x1bA50A79BEB8d44c0f9ff1D4dBdDCa523eFb340e" as const;
 export const registryAbi = parseAbi([
   "function REGISTRY_ID() view returns (bytes32)", "function attestations(address publisher, bytes32 reportHash) view returns (uint256)", "function publish(bytes32 reportHash)",
   "event ReportPublished(bytes32 indexed reportHash, address indexed publisher, uint256 timestamp)",
 ]);
 export const registryBytecode = artifact.bytecode as Hash;
 export type InjectedWallet = EIP1193Provider & { isMetaMask?: boolean; providers?: InjectedWallet[]; on?: (event: string, listener: (...args: unknown[]) => void) => void; removeListener?: (event: string, listener: (...args: unknown[]) => void) => void };
-export type TransactionJob = { kind: "DEPLOY" | "PUBLISH"; hash: Hash; publisher: Address; contract?: Address; reportHash?: Hash };
+export type TransactionJob = { kind: "DEPLOY" | "PUBLISH"; chainId: 677; hash: Hash; publisher: Address; contract?: Address; reportHash?: Hash };
 export function getMetaMask(): InjectedWallet {
   const injected = (window as Window & { ethereum?: InjectedWallet }).ethereum;
   const provider = injected?.providers?.find(p => p.isMetaMask) ?? (injected?.isMetaMask ? injected : undefined);
@@ -22,7 +23,7 @@ type Reader = ReturnType<typeof botReader>;
 export function transactionUrl(hash: Hash) { return `${botChain.blockExplorers.default.url}/tx/${hash}`; }
 export async function assertRegistry(address: string, reader: Reader = botReader()): Promise<Address> {
   const contract = getAddress(address);
-  if (await reader.getChainId() !== botChain.id) throw new Error("RPC 链 ID 不等于 968，已停止操作。");
+  if (await reader.getChainId() !== botChain.id) throw new Error("RPC 链 ID 不等于 677，已停止操作。");
   const code = await reader.getCode({ address: contract });
   if (!code || code === "0x" || keccak256(code) !== artifact.runtimeCodeHash) throw new Error("该地址不是当前版本的 RiskReportRegistry 存证合约。");
   return contract;
@@ -33,23 +34,23 @@ export async function connectMetaMask(provider: InjectedWallet): Promise<Address
   return getAddress(accounts[0]);
 }
 export async function ensureBotChain(provider: InjectedWallet, account: Address) {
-  if (Number(await provider.request({ method: "eth_chainId" })) !== 968) {
-    try { await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x3c8" }] }); }
+  if (Number(await provider.request({ method: "eth_chainId" })) !== 677) {
+    try { await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x2a5" }] }); }
     catch (error) {
       if ((error as { code?: number }).code !== 4902) throw error;
-      await provider.request({ method: "wallet_addEthereumChain", params: [{ chainId: "0x3c8", chainName: botChain.name, nativeCurrency: botChain.nativeCurrency, rpcUrls: [...botChain.rpcUrls.default.http], blockExplorerUrls: [botChain.blockExplorers.default.url] }] });
-      await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x3c8" }] });
+      await provider.request({ method: "wallet_addEthereumChain", params: [{ chainId: "0x2a5", chainName: botChain.name, nativeCurrency: botChain.nativeCurrency, rpcUrls: [...botChain.rpcUrls.default.http], blockExplorerUrls: [botChain.blockExplorers.default.url] }] });
+      await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x2a5" }] });
     }
   }
   const accounts = await provider.request({ method: "eth_accounts" });
-  if (!accounts[0] || getAddress(accounts[0]) !== account || Number(await provider.request({ method: "eth_chainId" })) !== 968) throw new Error("账户或网络已变更，请重新连接后操作。");
+  if (!accounts[0] || getAddress(accounts[0]) !== account || Number(await provider.request({ method: "eth_chainId" })) !== 677) throw new Error("账户或网络已变更，请重新连接后操作。");
 }
 export async function deployRegistry(provider: InjectedWallet, publisher: Address): Promise<TransactionJob> {
   await ensureBotChain(provider, publisher);
-  if (await botReader().getChainId() !== 968) throw new Error("RPC 网络不匹配。");
+  if (await botReader().getChainId() !== 677) throw new Error("RPC 网络不匹配。");
   const wallet = createWalletClient({ account: publisher, chain: botChain, transport: custom(provider, { retryCount: 0 }) });
   const hash = await wallet.deployContract({ abi: registryAbi, bytecode: registryBytecode });
-  return { kind: "DEPLOY", hash, publisher };
+  return { kind: "DEPLOY", chainId: 677, hash, publisher };
 }
 export async function publishHash(provider: InjectedWallet, publisher: Address, address: string, reportHash: Hash): Promise<TransactionJob> {
   await ensureBotChain(provider, publisher);
@@ -61,11 +62,12 @@ export async function publishHash(provider: InjectedWallet, publisher: Address, 
   await ensureBotChain(provider, publisher);
   const wallet = createWalletClient({ account: publisher, chain: botChain, transport: custom(provider, { retryCount: 0 }) });
   const hash = await wallet.writeContract(request);
-  return { kind: "PUBLISH", hash, publisher, contract, reportHash };
+  return { kind: "PUBLISH", chainId: 677, hash, publisher, contract, reportHash };
 }
 export async function confirmTransaction(job: TransactionJob, wait = false): Promise<{ contract: Address; anchor?: ReportAnchor }> {
+  if (job.chainId !== botChain.id) throw new Error("待确认交易网络不匹配，禁止按主网查询旧记录。");
   const reader = botReader();
-  if (await reader.getChainId() !== 968) throw new Error("RPC 网络不匹配。");
+  if (await reader.getChainId() !== 677) throw new Error("RPC 网络不匹配。");
   const receipt = wait ? await reader.waitForTransactionReceipt({ hash: job.hash, timeout: 60_000, retryCount: 0 }) : await reader.getTransactionReceipt({ hash: job.hash });
   if (receipt.status !== "success") throw new Error("TRANSACTION_REVERTED");
   if (receipt.from.toLowerCase() !== job.publisher.toLowerCase()) throw new Error("回执发布者与签名请求不一致。");
@@ -82,7 +84,7 @@ export async function confirmTransaction(job: TransactionJob, wait = false): Pro
       if (event.eventName === "ReportPublished" && event.args.reportHash === job.reportHash && event.args.publisher.toLowerCase() === job.publisher.toLowerCase()) {
         const stored = await reader.readContract({ address: contract, abi: registryAbi, functionName: "attestations", args: [job.publisher, job.reportHash] });
         if (stored !== event.args.timestamp) throw new Error("存储与发布事件不一致。");
-        return { contract, anchor: { chainId: 968, contract, publisher: job.publisher, transactionHash: receipt.transactionHash, timestamp: stored.toString() } };
+        return { contract, anchor: { chainId: 677, contract, publisher: job.publisher, transactionHash: receipt.transactionHash, timestamp: stored.toString() } };
       }
     } catch { /* Ignore unrelated event logs; a matching registry event is still required. */ }
   }

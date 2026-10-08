@@ -104,6 +104,13 @@ try {
     (await api("/api/eth-risk")).body.dataMode,
     "MOCK_CHAIN_FIXTURE",
   );
+  const removedAI = await api("/api/onchain-analysis", "POST", { wallet, investigationMode: "AI" });
+  assert.equal(removedAI.response.status, 410);
+  assert.equal(removedAI.body.code, "AI_MODE_REMOVED");
+  const invalidSnapshot = await api("/api/eth-report-snapshot?days=2");
+  assert.equal(invalidSnapshot.response.status, 400);
+  assert.equal(invalidSnapshot.body.code, "INVALID_WINDOW");
+  assert.equal((await api("/api/eth-report-snapshot?days=1", "GET", undefined, { origin: "https://external.invalid" })).response.status, 403);
   const updated = await api("/api/policy", "PUT", {
     wallet,
     config: { ...policy.config, minRiskScore: 100 },
@@ -136,6 +143,7 @@ try {
     policyVersioning: "passed",
     manualRescue: "PASSED",
     duplicateEvent: "blocked",
+    reportMigration: "AI 410; invalid window 400; cross-origin 403",
     visualInspection: "NOT PERFORMED",
   };
   writeFileSync(resolve(out, "result.json"), JSON.stringify(result, null, 2));

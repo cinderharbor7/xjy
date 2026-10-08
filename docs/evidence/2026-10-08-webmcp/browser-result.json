@@ -1,0 +1,76 @@
+{
+  "testedAt": "2026-10-08T01:40:20.070Z",
+  "taskSpaceId": 6,
+  "url": "http://127.0.0.1:3118/report",
+  "browser": "Ego Chromium 152 native document.modelContext",
+  "externalCaller": "Codex via native getTools/executeTool, not a website model request",
+  "siteToolsClientUI": "NOT TESTED",
+  "dataSources": {
+    "live": 7,
+    "stale": 0,
+    "unavailable": [
+      "news"
+    ]
+  },
+  "windows": {
+    "day1Samples": 24,
+    "day7Samples": 168
+  },
+  "reportIds": {
+    "day1": "35fb4280-3010-445d-9248-0d556c892ab4",
+    "day7": "79ae6239-d69e-459a-a9d8-231dcf8da77f"
+  },
+  "jsonDownloadMatches": true,
+  "mobile": {
+    "viewportWidth": 375,
+    "documentWidthA4": 375,
+    "documentWidthJSON": 375,
+    "paperWidth": 341.25,
+    "overflowElements": []
+  },
+  "citationRegression": {
+    "before": "fragment popstate cleared report",
+    "after": "citation and browser back preserve reportId",
+    "testRedBeforeFix": true,
+    "testGreenAfterFix": true
+  },
+  "negativeChecks": {
+    "unknownEvidenceRejected": true,
+    "unavailableEvidenceRejected": true,
+    "oldSnapshotRejected": true,
+    "differentResubmissionRejected": true,
+    "identicalResubmissionSameReportId": true
+  },
+  "lifecycle": {
+    "failure": {
+      "status": "数据未准备完成。旧报告已清空，请检查来源后重新准备。",
+      "outputHidden": true,
+      "coverageEmpty": true
+    },
+    "away": {
+      "tools": [],
+      "reportElements": 0
+    },
+    "returned": {
+      "tools": [
+        "create_eth_snapshot",
+        "get_eth_evidence",
+        "get_eth_indicator_definitions",
+        "get_eth_report",
+        "get_eth_snapshot",
+        "submit_eth_report"
+      ],
+      "status": "尚未准备数据。",
+      "outputHidden": true,
+      "coverageEmpty": true
+    }
+  },
+  "controlledNetworkFailure": true,
+  "verification": {
+    "tests": "1085 passed / 6 skipped",
+    "typecheck": "passed",
+    "build": "passed",
+    "http": "passed",
+    "independentIncrementalReview": "no actionable findings"
+  }
+}
