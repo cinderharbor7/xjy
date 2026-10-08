@@ -30,10 +30,10 @@ slices:
     status: in_progress
     depends: [P-008]
   - id: P-010
-    status: pending
+    status: done
     depends: [P-009]
   - id: P-011
-    status: pending
+    status: in_progress
     depends: [P-009, P-010]
   - id: P-012
     status: done
@@ -203,6 +203,8 @@ P-010 后续进展（2026-10-07 22:58）：用户提供 DeepSeek 本地凭据，
 ## P-011 演示材料、发布与提交收尾
 
 准备固定真实案例、日期/范围明确的历史输出备份与两分钟讲稿。录像须实际录制并核验可播放；未录制不能用截图或文稿代称。运行检查通过后展示可审阅改动，Git合并/发布在用户明确确认后执行；正式比赛提交及回执按主办方要求和用户操作证据记录。BOT、主网交易、校准与收益预测不扩大进本轮。
+
+P-011 进展（2026-10-07 23:40，D，分支 `d/real-report-ai-verify`）：D 的演示材料已统一并入基于最新 main（`86a3d14`，真实报告已合并）的本分支——[PPT 逐页内容](../../hackathon/presentation.md)、[6 分钟讲稿＋答辩](../../hackathon/talk-script.md)、[提交说明](../../hackathon/submission.md)，AI 口径已按 D-012 实测更新（显式 AI 已接线、三类实测通过、在线各一次、非自主 Agent）。本分支复跑 `pnpm typecheck` + `pnpm test`：**1043 passed / 6 skipped**。P-010 标记 done：规则/AI 成功、缺凭据、证据不足、模型错误受控测试与配置后真实 AI 三类验收均已有 22:58/23:00 实测证据。P-009 保持 in_progress：专用 RPC 未配置（本机当前无 `.env.local`），公共 RPC 稳定性与专用节点重跑未通过。仍待完成：完整主线录屏（需用户视觉验收）、队长补 TBD、四人复述核对、正式提交与回执。
 
 > writes: `README.md`, `docs/demo-cases.md`, `docs/demo-runbook.md`, `验收记录与历史实测备份`
 > anchors: `用户剩余TODO5/6; AC-008/TC-006; 视频、发布、正式提交分别举证; 不虚构用户/效果`
