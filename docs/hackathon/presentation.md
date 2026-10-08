@@ -1,5 +1,8 @@
 # 比赛 PPT 逐页内容（D 统一稿）
 
+> **2026-10-08 接入更新：下方为10月7日历史备稿。**当前 `/report` 已改为外部 Agent 通过 WebMCP 调查 ETH 的24h/7d公开快照，返回可切换的 A4/JSON 报告；不再输入钱包或选择内置 RULES/DeepSeek。交易核验、单池量化和保护实验仍是独立能力，不能画成已贯通的链上自动保护流程。
+> 原生六工具、真实数据回写与手机显示已验收；ChatGPT自身Site Tools UI及通用AI对照未验收。BOT主网报告registry和已有发布交易已核验，NFT与新钱包交易未验收。更新第4、11、12页及现场演示前，请核对 [README](../../README.md)、[WebMCP使用说明](../webmcp-reports.md)、[最新验收](../webmcp-report-acceptance.md) 和 [BOT主网核验](../bot-mainnet-acceptance.md)。
+
 > 日期：2026-10-07 ｜ 执笔：D ｜ 状态：待四人逐页核对（AC-001）
 >
 > 口径真源：[比赛冻结方案](../loopx/design/2026-10-07-hackathon-freeze/需求设计文档.md)。

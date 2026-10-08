@@ -1,5 +1,10 @@
 # 比赛提交说明（D 统一稿）
 
+> **2026-10-08 接入更新：下方保留10月7日历史备稿，不能按其中旧 `/report` 用法提交或演示。**
+> 当前报告入口以 ETH 的24h/7d公开市场与生态快照为输入，由外部 Agent 通过六个 WebMCP 工具调查并提交结构化报告；网站不调用内置 DeepSeek，不需要钱包或服务器 LLM Key。A4/JSON、来源、未知项、引用校验及原生浏览器回写已验收。交易核验 `/investigate` 仍独立使用 Ethereum RPC，并非本次报告快照中的链上证据。
+> BOT主网677的报告registry及用户提供的已有发布交易已只读核验；不代表原报告内容已核实、NFT已部署或新钱包交易已验收。最新普通测试1085 passed / 6 skipped。ChatGPT自身Site Tools客户端UI、新闻来源可用性、真实需求及通用AI对照仍未验收。
+> 当前运行与能力边界以 [README最新更新](../../README.md)、[WebMCP使用说明](../webmcp-reports.md)、[浏览器验收](../webmcp-report-acceptance.md)、[BOT主网核验](../bot-mainnet-acceptance.md) 为准；正式提交与回执仍未完成。
+
 > 日期：2026-10-07 ｜ 执笔：D ｜ 状态：待队长补全 TBD 项并实际提交（P-004）
 >
 > 按选手手册 5.2 交付物要求组织：① 项目介绍 ② 代码与运行说明 ③ 演示材料。
